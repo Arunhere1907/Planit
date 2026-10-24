@@ -1,0 +1,42 @@
+[
+  {
+    "id": "rag-cost-ahm-wedding",
+    "title": "Ahmedabad Wedding Industry Benchmark (2024-2026)",
+    "category": "benchmark_costs",
+    "city": "Ahmedabad",
+    "content": "For weddings in Ahmedabad: Catering averages ₹800 - ₹1,400 per plate for vegetarian multi-cuisine buffets (pure veg/Jain standard). SG Highway and Sindhu Bhavan lawn rentals range from ₹1.5L to ₹3.5L for 200-500 guests. Decor for traditional Gujarati/Marwari mandap and entrance ranges between ₹75,000 to ₹1.8L. Photography teams (candid + drone + cinematic video) average ₹60,000 to ₹1.2L for 2 days. Total per-head cost benchmarks between ₹3,500 to ₹5,500 for a quality celebration.",
+    "source": "Gujarat Event Management Association (GEMA) Cost Index"
+  },
+  {
+    "id": "rag-cost-metro-birthday",
+    "title": "Metro Birthday & Milestone Event Benchmark",
+    "category": "benchmark_costs",
+    "city": "All Metros",
+    "content": "Milestone birthdays (1st, 18th, 50th) average ₹800 to ₹1,500 per guest for catering and cake. Decor with customized helium balloon arches, marquee numbers, and photo-booth backdrop ranges ₹15,000 to ₹35,000. Professional emcee and interactive game host fees range ₹8,000 to ₹18,000.",
+    "source": "National Party Planners Directory 2025"
+  },
+  {
+    "id": "rag-tradition-gujarati",
+    "title": "Gujarati Wedding Rituals & Protocol Guide",
+    "category": "rituals",
+    "city": "Ahmedabad",
+    "content": "Key rituals include Mandap Mahurat, Grah Shanti (requires 2 hours in morning, priest dakshina, wooden patla and earthen pots), Mosalu/Mameru (maternal uncle gifts), Jaan arrival with Nashik/Dhol baraat, Ponkhana (welcoming groom with brass pestle and grain), Jaimala, Kanyadaan, Hastamelap, Mangal Pheras (4 rounds around holy fire), and Saptapadi. Strict Jain and Swaminarayan guests require no onion, no garlic, and root-vegetable-free food served before sunset (chouviar).",
+    "source": "Vedic Rituals & Gujarati Cultural Heritage Handbook"
+  },
+  {
+    "id": "rag-permits-civic",
+    "title": "Civic Guidelines, Sound Curfew & Fire Safety",
+    "category": "permits",
+    "city": "Pan-India",
+    "content": "Outdoor music amplifiers require police loudspeaker permits and must conclude by 10:00 PM per Supreme Court environmental noise regulations. Indoor banquet halls must maintain certified smoke alarms, twin illuminated fire exits, and minimum 2 emergency fire extinguishers. Open flames for hawan/mandap require designated sand buckets and water extinguisher nearby.",
+    "source": "Municipal Corporation Fire & Sound Safety Protocol"
+  },
+  {
+    "id": "rag-weather-winter-gujarat",
+    "title": "Gujarat Winter Climate & Outdoor Event Logistics",
+    "category": "weather_safety",
+    "city": "Ahmedabad",
+    "content": "November to February in Ahmedabad features pleasant dry days (26°C - 30°C) with brisk evening breezes dropping to 12°C - 16°C. Dew forms on open grass lawns after 9:30 PM, which can wet chair covers and silk sarees. Recommend wooden decking under carpet, outdoor brass patio heaters (angeethi/heaters) for elderly relatives, and warm beverage stations (kulhad masala chai, badam milk).",
+    "source": "IMD West Regional Climate Analysis"
+  }
+]

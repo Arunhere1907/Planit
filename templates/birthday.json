@@ -1,0 +1,32 @@
+{
+  "id": "birthday",
+  "name": "Birthday Party & Milestone Celebration",
+  "description": "Fun, high-energy milestone or intimate birthday celebration template.",
+  "default_budget_split": [
+    { "category": "Venue & Space Rental", "percent": 28, "reasoning": "Cafe, banquet party room, rooftop, or outdoor lawn rental." },
+    { "category": "Food, Cake & Drinks", "percent": 35, "reasoning": "Custom themed cake, snacks/live street food stations, dinner buffet, mocktails." },
+    { "category": "Themed Decor & Balloons", "percent": 15, "reasoning": "Balloon arches, photo-booth backdrop, neon signs, and table styling." },
+    { "category": "Entertainment & Games", "percent": 10, "reasoning": "Game host/emcee, magic show, caricature artist, or DJ." },
+    { "category": "Photography & Reels", "percent": 6, "reasoning": "Party photographer and short-form video reels creator." },
+    { "category": "Favors & Return Gifts", "percent": 4, "reasoning": "Personalized gift hampers, custom cookies, or souvenir bags." },
+    { "category": "Contingency Buffer", "percent": 2, "reasoning": "Emergency buffer for unexpected extra attendees or cake toppings." }
+  ],
+  "timeline_milestones": [
+    { "offset_days": 30, "title": "Choose Party Theme & Secure Venue Booking", "phase": "1 month", "role": "Organizer", "priority": "high", "linked_vendor": "Venue & Space Rental" },
+    { "offset_days": 21, "title": "Design & Distribute Digital Invitations with RSVP Link", "phase": "1 month", "role": "Host", "priority": "high", "linked_vendor": "Invitations & Stationery" },
+    { "offset_days": 14, "title": "Order Custom Birthday Cake & Finalize Menu", "phase": "1 week", "role": "Host", "priority": "high", "linked_vendor": "Food, Cake & Drinks" },
+    { "offset_days": 10, "title": "Book Emcee / Entertainer & Curate Party Playlist", "phase": "1 week", "role": "Organizer", "priority": "medium", "linked_vendor": "Entertainment & Games" },
+    { "offset_days": 5, "title": "Purchase Return Gifts, Favors & Prop Kits", "phase": "1 week", "role": "Host", "priority": "medium", "linked_vendor": "Favors & Return Gifts" },
+    { "offset_days": 1, "title": "Confirm Cake Delivery Window & Pre-blow Balloons", "phase": "Day before", "role": "Decorator", "priority": "high", "linked_vendor": "Themed Decor & Balloons" },
+    { "offset_days": 0, "title": "Venue Setup, Welcome Guests & Cake Cutting Protocol", "phase": "Day-of", "role": "Host", "priority": "high", "linked_vendor": "All Vendors" }
+  ],
+  "vendor_categories": [
+    "Venue & Space Rental",
+    "Food, Cake & Drinks",
+    "Themed Decor & Balloons",
+    "Entertainment & Games",
+    "Photography & Reels",
+    "Favors & Return Gifts"
+  ],
+  "tone": "Vibrant, playful, exciting, and uplifting."
+}

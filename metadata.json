@@ -1,0 +1,6 @@
+{
+  "name": "PlanIt - GenAI Event Planning Assistant",
+  "description": "AI-powered event planning assistant with conversational intake, deterministic budget math, backwards timeline, vendor discovery, and risk advisory.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

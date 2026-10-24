@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@import "./shared/styles/tokens.css";
+
+/* Base Body Styles */
+body {
+  background-color: var(--neutral-bg);
+  color: var(--neutral-text-body);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Tabular numerals for prices, dates, percentages */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

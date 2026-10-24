@@ -1,0 +1,159 @@
+[
+  {
+    "id": "v-ahm-venue-1",
+    "name": "The Green Pearl Heritage Resort & Lawn",
+    "category": "Venue & Facilities",
+    "city": "Ahmedabad",
+    "area": "SG Highway / Bodakdev",
+    "rating": 4.8,
+    "user_ratings_total": 412,
+    "price_level": 3,
+    "approx_cost": 220000,
+    "address": "Opp. Karnavati Club, S.G. Highway, Ahmedabad, Gujarat 380058",
+    "phone": "+91 79 2685 4100",
+    "website": "https://greenpearlresort.example.com",
+    "google_maps_url": "https://maps.google.com/?q=The+Green+Pearl+Ahmedabad",
+    "image": "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80",
+    "reviews": [
+      { "author": "Jigar Patel", "rating": 5, "text": "Magnificent sprawling lush lawn with vintage heritage archways! Accommodated 350 people with extreme comfort. Ample parking." },
+      { "author": "Sneha Shah", "rating": 5, "text": "Management was super helpful with sound permissions and clean green rooms for bridal prep." },
+      { "author": "Amit Trivedi", "rating": 4, "text": "Great ambiance, though approach road had minor traffic during peak evening hours." }
+    ],
+    "highlights": ["Capacity 150-600 guests", "Valet parking for 120 cars", "Separate mandap amphitheater"],
+    "red_flags": []
+  },
+  {
+    "id": "v-ahm-venue-2",
+    "name": "Shivalik Grand Royal Banquet",
+    "category": "Venue & Facilities",
+    "city": "Ahmedabad",
+    "area": "Satellite / Prahlad Nagar",
+    "rating": 4.6,
+    "user_ratings_total": 298,
+    "price_level": 2,
+    "approx_cost": 180000,
+    "address": "4th Floor, Shivalik Square, Prahlad Nagar Rd, Ahmedabad, Gujarat 380015",
+    "phone": "+91 79 4002 9988",
+    "website": "https://shivalikbanquets.example.com",
+    "google_maps_url": "https://maps.google.com/?q=Shivalik+Grand+Ahmedabad",
+    "image": "https://images.unsplash.com/photo-1544077960-604201fe74bc?auto=format&fit=crop&w=800&q=80",
+    "reviews": [
+      { "author": "Kavita Dave", "rating": 5, "text": "Fully air-conditioned acoustic crystal halls, very aesthetic golden chandeliers and polite staff." },
+      { "author": "Rohit Joshi", "rating": 4, "text": "Priced well for central Ahmedabad. Elevator queue can get slightly busy during simultaneous hall exits." }
+    ],
+    "highlights": ["Centrally air conditioned", "In-house backup generator", "Acoustic sound insulation"],
+    "red_flags": []
+  },
+  {
+    "id": "v-ahm-cat-1",
+    "name": "Rasraj Gourmet Royal Caterers",
+    "category": "Catering & Beverages",
+    "city": "Ahmedabad",
+    "area": "Ellis Bridge",
+    "rating": 4.9,
+    "user_ratings_total": 560,
+    "price_level": 3,
+    "approx_cost": 240000,
+    "per_plate": 1150,
+    "address": "Near VS Hospital, Ellis Bridge, Ahmedabad, Gujarat 380006",
+    "phone": "+91 98250 12345",
+    "website": "https://rasrajcaterers.example.com",
+    "google_maps_url": "https://maps.google.com/?q=Rasraj+Caterers+Ahmedabad",
+    "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=800&q=80",
+    "reviews": [
+      { "author": "Parth Mehta", "rating": 5, "text": "Their Gujarati-Marwari fusion menu blew everyone away! The Mohanthal with Rabdi and Mexican live tacos were hits." },
+      { "author": "Bhavna Ben", "rating": 5, "text": "Special 100% pure Jain kitchen team. Superb hygiene, crystal clear glassware and spotless staff uniforms." },
+      { "author": "Dhaval Shah", "rating": 4.5, "text": "A bit on the higher quote side, but absolute zero food waste management and timely refills." }
+    ],
+    "highlights": ["Dedicated Jain counter", "70+ live dessert options", "Strict HACCP food hygiene certified"],
+    "red_flags": []
+  },
+  {
+    "id": "v-ahm-cat-2",
+    "name": "Annapurna Swad Caterers & Live Counters",
+    "category": "Catering & Beverages",
+    "city": "Ahmedabad",
+    "area": "Naranpura",
+    "rating": 4.7,
+    "user_ratings_total": 310,
+    "price_level": 2,
+    "approx_cost": 195000,
+    "per_plate": 850,
+    "address": "12 Shanti Nagar, Near Ankur Cross Road, Naranpura, Ahmedabad 380013",
+    "phone": "+91 94260 77112",
+    "website": "https://annapurnaswad.example.com",
+    "google_maps_url": "https://maps.google.com/?q=Annapurna+Swad+Ahmedabad",
+    "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80",
+    "reviews": [
+      { "author": "Meera Patel", "rating": 5, "text": "Great traditional Kathiyawadi & North Indian counters. Everyone loved the live undhiyu and jalebi fafda counter." },
+      { "author": "Jayesh Bhai", "rating": 4, "text": "Pocket friendly and solid taste. Recommended booking 2 months in advance." }
+    ],
+    "highlights": ["Traditional Kathiyawadi specialist", "Live copper tawa stations", "Value for money"],
+    "red_flags": []
+  },
+  {
+    "id": "v-ahm-dec-1",
+    "name": "Utsav Mandap & Floral Artistry",
+    "category": "Decor & Floral Design",
+    "city": "Ahmedabad",
+    "area": "Vastrapur",
+    "rating": 4.8,
+    "user_ratings_total": 240,
+    "price_level": 2,
+    "approx_cost": 95000,
+    "address": "Shop 4, Sunrise Mall Lane, Vastrapur, Ahmedabad 380015",
+    "phone": "+91 98980 44321",
+    "website": "https://utsavartistry.example.com",
+    "google_maps_url": "https://maps.google.com/?q=Utsav+Mandap+Ahmedabad",
+    "image": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80",
+    "reviews": [
+      { "author": "Pooja Vora", "rating": 5, "text": "Fresh marigold and mogra floral hangings were stunning! The pastel mandap gave royal aesthetic vibes." },
+      { "author": "Hiren Shah", "rating": 4.5, "text": "Delivered exactly the 3D render preview shown during initial meetings." }
+    ],
+    "highlights": ["Custom 3D layout simulation", "Fresh local flower direct sourcing", "Brass diya installations"],
+    "red_flags": []
+  },
+  {
+    "id": "v-ahm-photo-1",
+    "name": "Drishti Weddings & Cinema",
+    "category": "Photography & Video",
+    "city": "Ahmedabad",
+    "area": "Navrangpura",
+    "rating": 4.9,
+    "user_ratings_total": 380,
+    "price_level": 2,
+    "approx_cost": 72000,
+    "address": "Gulbai Tekra, Near University Ground, Navrangpura, Ahmedabad 380009",
+    "phone": "+91 97129 88301",
+    "website": "https://drishtiweddings.example.com",
+    "google_maps_url": "https://maps.google.com/?q=Drishti+Weddings+Ahmedabad",
+    "image": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=800&q=80",
+    "reviews": [
+      { "author": "Karan Raval", "rating": 5, "text": "Their candid shots captured the emotional tears during bidaai and laughter in sangeet perfectly. Fast teaser delivery!" },
+      { "author": "Priyanka Soni", "rating": 5, "text": "Cinematic drone shots and same-week highlight reel was a massive hit on family WhatsApp groups." }
+    ],
+    "highlights": ["Dual 4K cameras & 4K Drone", "Same-week teaser edit", "Leather-bound heirloom album"],
+    "red_flags": []
+  },
+  {
+    "id": "v-mum-venue-1",
+    "name": "SkyLounge Rooftop Bandra",
+    "category": "Venue & Space Rental",
+    "city": "Mumbai",
+    "area": "Bandra West",
+    "rating": 4.8,
+    "user_ratings_total": 310,
+    "price_level": 3,
+    "approx_cost": 65000,
+    "address": "14th Floor, Skyline Tower, Hill Road, Bandra West, Mumbai 400050",
+    "phone": "+91 98200 44556",
+    "website": "https://skyloungemumbai.example.com",
+    "google_maps_url": "https://maps.google.com/?q=SkyLounge+Bandra",
+    "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80",
+    "reviews": [
+      { "author": "Rhea Kapoor", "rating": 5, "text": "Sunset views over the Arabian Sea are mesmerizing! Great acoustic bar and private lounge area." }
+    ],
+    "highlights": ["Sea-view terrace", "Full bar license", "In-house DJ setup"],
+    "red_flags": []
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "id": "community",
+  "name": "Community Festival & Cultural Gathering",
+  "description": "Large-scale public or society gathering requiring civic permits, staging, crowds, volunteer logistics, and community food.",
+  "default_budget_split": [
+    { "category": "Stage, Sound & AV Infrastructure", "percent": 25, "reasoning": "Risers, line-array speakers, LED walls, stage lighting, and tech engineer." },
+    { "category": "Community Dining / Refreshments", "percent": 30, "reasoning": "Prasad/langar/community feast, water stations, eco-friendly disposables." },
+    { "category": "Grounds, Tents & Crowd Barricades", "percent": 15, "reasoning": "Shamiana/canopy, security barricades, generator backup, portable sanitation." },
+    { "category": "Permits, Security & First Aid", "percent": 10, "reasoning": "Police NOC, fire department clearance, ambulance standby, security bouncers." },
+    { "category": "Cultural Performers & Honorarium", "percent": 8, "reasoning": "Folk dancers, singers, sound artists, and guest honorarium." },
+    { "category": "Signage, Badges & Volunteer Kits", "percent": 5, "reasoning": "Directional banners, volunteer t-shirts, walkie-talkie rentals." },
+    { "category": "Emergency & Weather Contingency", "percent": 7, "reasoning": "Reserve for sudden rain protection, overtime equipment, medical supplies." }
+  ],
+  "timeline_milestones": [
+    { "offset_days": 60, "title": "Submit Municipal & Police Permit Applications", "phase": "3 months", "role": "Permit Committee", "priority": "high", "linked_vendor": "Permits, Security & First Aid" },
+    { "offset_days": 45, "title": "Book Public Grounds & Power Substation Connections", "phase": "1 month", "role": "Grounds Lead", "priority": "high", "linked_vendor": "Grounds, Tents & Crowd Barricades" },
+    { "offset_days": 30, "title": "Confirm Stage, Sound System & Generator Contracts", "phase": "1 month", "role": "Technical Lead", "priority": "high", "linked_vendor": "Stage, Sound & AV Infrastructure" },
+    { "offset_days": 20, "title": "Launch Volunteer Drive & Form Safety Marshall Squads", "phase": "1 month", "role": "Volunteer Head", "priority": "medium", "linked_vendor": "Signage, Badges & Volunteer Kits" },
+    { "offset_days": 10, "title": "Finalize Community Feast Menu & Food Hygiene Checklist", "phase": "1 week", "role": "Food Committee", "priority": "high", "linked_vendor": "Community Dining / Refreshments" },
+    { "offset_days": 2, "title": "Stage Rigging, Sound Check & Fire Extinguisher Inspection", "phase": "Day before", "role": "Technical Lead", "priority": "high", "linked_vendor": "Stage, Sound & AV Infrastructure" },
+    { "offset_days": 0, "title": "Crowd Gates Open, Volunteer Briefing & Program Rollout", "phase": "Day-of", "role": "Program Director", "priority": "high", "linked_vendor": "All Vendors" }
+  ],
+  "vendor_categories": [
+    "Stage, Sound & AV Infrastructure",
+    "Community Dining / Refreshments",
+    "Grounds, Tents & Crowd Barricades",
+    "Permits, Security & First Aid",
+    "Cultural Performers & Honorarium",
+    "Signage, Badges & Volunteer Kits"
+  ],
+  "tone": "Inspiring, communal, well-organized, welcoming, and civic-minded."
+}

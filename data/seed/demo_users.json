@@ -1,0 +1,26 @@
+[
+  {
+    "id": "user-demo-1",
+    "name": "Aarav Patel",
+    "email": "aarav.patel@example.com",
+    "role": "owner",
+    "avatar": "AP",
+    "title": "Lead Host / Event Owner"
+  },
+  {
+    "id": "user-demo-2",
+    "name": "Diya Shah",
+    "email": "diya.shah@example.com",
+    "role": "editor",
+    "avatar": "DS",
+    "title": "Co-Planner / Editor"
+  },
+  {
+    "id": "user-demo-3",
+    "name": "Uncle Kirit",
+    "email": "kiritbhai@example.com",
+    "role": "viewer",
+    "avatar": "UK",
+    "title": "Family Elder / Viewer Only"
+  }
+]

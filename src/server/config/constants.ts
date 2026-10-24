@@ -1,0 +1,36 @@
+/**
+ * System-Wide Constants and Defaults
+ */
+
+export const HTTP_STATUS = {
+  OK: 200,
+  CREATED: 201,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_ENTITY: 422,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+  BAD_GATEWAY: 502,
+} as const;
+
+export const BUDGET_THRESHOLDS = {
+  WARNING_PERCENT: 80,
+  DANGER_PERCENT: 100,
+  CONTINGENCY_DEFAULT_PERCENT: 7.0,
+} as const;
+
+export const TIMEOUTS = {
+  LLM_CALL_MS: 10000,
+  PLACES_API_MS: 5000,
+} as const;
+
+export const RATE_LIMITS = {
+  WINDOW_MS: 60 * 1000, // 1 minute
+  MAX_AI_REQUESTS: 25,
+  MAX_STANDARD_REQUESTS: 120,
+} as const;
+
+export const DEFAULT_DEMO_USER_ID = "user-demo-1";
