@@ -3,21 +3,21 @@ import {
   INTAKE_EXTRACTION_SYSTEM_PROMPT,
   IDEA_GENERATION_SYSTEM_PROMPT,
   INVITATION_GENERATION_SYSTEM_PROMPT,
-  RISK_ANALYSIS_SYSTEM_PROMPT
+  RISK_ANALYSIS_SYSTEM_PROMPT,
 } from './prompts/event-prompts.js';
 import {
   EventProfile,
   EventType,
-  EventBudget,
-  TimelineTask,
-  CreativeIdea,
-  EventMessage,
-  RiskItem
+  FullEventPlan,
+  Task,
+  RunOfShowItem,
+  IdeaItem,
+  InvitationItem,
+  RiskItem,
 } from '../../../shared/types/index.js';
 import {
   calculateDefaultBudget,
   generateDefaultTimeline,
-  DEFAULT_BUDGET_SPLITS
 } from '../../../shared/utils/deterministic-math.js';
 import { logger } from '../../utils/logger.js';
 
@@ -39,10 +39,14 @@ export class AIService {
         const parsed = JSON.parse(rawJson);
         return {
           profile: this.sanitizeExtractedProfile(parsed.profile || parsed),
-          followUpQuestions: Array.isArray(parsed.followUpQuestions) ? parsed.followUpQuestions : [],
-          confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.85
+          followUpQuestions: Array.isArray(parsed.follow_up_questions)
+            ? parsed.follow_up_questions
+            : Array.isArray(parsed.followUpQuestions)
+            ? parsed.followUpQuestions
+            : [],
+          confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.85,
         };
-      } catch (err) {
+      } catch (err: unknown) {
         logger.warn('LLM extraction failed or timed out, using deterministic fallback parser', { err });
       }
     }
@@ -59,19 +63,26 @@ export class AIService {
     confidence: number;
   } {
     const lower = text.toLowerCase();
-    
+
     // 1. Detect Type
     let eventType: EventType = 'wedding';
     if (lower.includes('birthday') || lower.includes('bday') || lower.includes('turning')) {
       eventType = 'birthday';
-    } else if (lower.includes('garba') || lower.includes('community') || lower.includes('festival') || lower.includes('gathering')) {
+    } else if (
+      lower.includes('garba') ||
+      lower.includes('community') ||
+      lower.includes('festival') ||
+      lower.includes('gathering')
+    ) {
       eventType = 'community';
     } else if (lower.includes('conference') || lower.includes('anniversary')) {
-      eventType = 'other';
+      eventType = 'general';
     }
 
     // 2. Detect Guest Count
-    const guestMatch = lower.match(/(\d+)\s*(guests?|people|pax|members|attendees?)/i) || lower.match(/guests?:\s*(\d+)/i);
+    const guestMatch =
+      lower.match(/(\d+)\s*(guests?|people|pax|members|attendees?)/i) ||
+      lower.match(/guests?:\s*(\d+)/i);
     const guestCount = guestMatch ? parseInt(guestMatch[1], 10) : 150;
 
     // 3. Detect Budget (INR Lakhs or raw numbers)
@@ -80,15 +91,34 @@ export class AIService {
     if (lakhMatch) {
       totalBudget = Math.round(parseFloat(lakhMatch[1]) * 100000);
     } else {
-      const budgetMatch = lower.match(/(?:budget|cost|rs\.?|inr|₹)\s*[:=]?\s*(\d[\d,]+)/i);
-      if (budgetMatch) {
-        totalBudget = parseInt(budgetMatch[1].replace(/,/g, ''), 10);
+      const croreMatch = lower.match(/(\d+(?:\.\d+)?)\s*(?:crore|cr)/i);
+      if (croreMatch) {
+        totalBudget = Math.round(parseFloat(croreMatch[1]) * 10000000);
+      } else {
+        const rawBudgetMatch = lower.match(/(?:rs\.?|inr|budget:?)\s*(\d[\d,]+)/i);
+        if (rawBudgetMatch) {
+          totalBudget = parseInt(rawBudgetMatch[1].replace(/,/g, ''), 10);
+        }
       }
     }
 
     // 4. Detect City
-    const cities = ['Ahmedabad', 'Mumbai', 'Delhi', 'Bengaluru', 'Jaipur', 'Udaipur', 'Surat', 'Pune', 'Goa', 'Chennai', 'Hyderabad', 'Kolkata'];
     let city = 'Ahmedabad';
+    const cities = [
+      'Ahmedabad',
+      'Mumbai',
+      'Delhi',
+      'Bengaluru',
+      'Jaipur',
+      'Udaipur',
+      'Surat',
+      'Vadodara',
+      'Pune',
+      'Goa',
+      'Hyderabad',
+      'Chennai',
+      'Kolkata',
+    ];
     for (const c of cities) {
       if (lower.includes(c.toLowerCase())) {
         city = c;
@@ -96,96 +126,106 @@ export class AIService {
       }
     }
 
-    // 5. Detect Month/Date
-    const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
-    let targetDate = '2026-12-18';
-    const foundMonthIdx = months.findIndex(m => lower.includes(m));
-    if (foundMonthIdx !== -1) {
-      const mStr = String(foundMonthIdx + 1).padStart(2, '0');
-      targetDate = `2026-${mStr}-15`;
+    // 5. Detect Date (e.g. December 2026 or YYYY-MM-DD)
+    let date = '2026-12-18';
+    const dateMatch = lower.match(/(\d{4}-\d{2}-\d{2})/);
+    if (dateMatch) {
+      date = dateMatch[1];
+    } else if (lower.includes('december') || lower.includes('dec')) {
+      date = '2026-12-18';
+    } else if (lower.includes('november') || lower.includes('nov')) {
+      date = '2026-11-20';
+    } else if (lower.includes('january') || lower.includes('jan')) {
+      date = '2027-01-22';
     }
 
-    // 6. Detect Dietary & Vibe
-    const dietaryMix: string[] = [];
-    if (lower.includes('veg') || lower.includes('vegetarian')) dietaryMix.push('Pure Vegetarian');
-    if (lower.includes('jain')) dietaryMix.push('Jain Options');
-    if (lower.includes('non-veg')) dietaryMix.push('Non-Vegetarian Counter');
-    if (dietaryMix.length === 0) dietaryMix.push('Multi-Cuisine Buffet');
+    // 6. Food & Vibe heuristics
+    let dietaryMix = 'Vegetarian & Jain friendly';
+    if (lower.includes('jain')) dietaryMix = 'Strict Jain & Pure Vegetarian counters';
+    else if (lower.includes('non-veg') || lower.includes('chicken')) dietaryMix = 'Mixed Gourmet Non-Veg & Veg';
 
-    let vibe = 'Traditional Indian with Modern Elegance';
-    if (lower.includes('minimal')) vibe = 'Minimalist & Contemporary';
-    if (lower.includes('royal') || lower.includes('grand')) vibe = 'Royal Heritage & Luxurious';
-    if (lower.includes('funky') || lower.includes('party')) vibe = 'Vibrant & High-Energy';
+    const indoorOutdoor: 'indoor' | 'outdoor' | 'hybrid' = lower.includes('rooftop') || lower.includes('lawn') || lower.includes('outdoor')
+      ? 'outdoor'
+      : lower.includes('banquet') || lower.includes('hall') || lower.includes('indoor')
+      ? 'indoor'
+      : 'hybrid';
 
-    // Title construction
-    let title = `${eventType.charAt(0).toUpperCase() + eventType.slice(1)} Celebration`;
-    if (eventType === 'wedding') {
-      title = lower.includes('sister') ? "Sister's Grand Wedding" : 'Dream Wedding Celebration';
-    } else if (eventType === 'birthday') {
-      title = 'Milestone Birthday Party';
-    } else if (eventType === 'community') {
-      title = 'Community Cultural Utsav';
-    }
-
-    const followUps: string[] = [];
-    if (!guestMatch) followUps.push('Could you confirm your expected guest count?');
-    if (!lakhMatch && !lower.includes('budget')) followUps.push('What is your target budget ceiling?');
-    if (!lower.includes('indoor') && !lower.includes('outdoor')) followUps.push('Do you prefer an indoor banquet or open-air lawn?');
+    const title =
+      eventType === 'wedding'
+        ? `Grand Celebration in ${city}`
+        : eventType === 'birthday'
+        ? `Milestone Birthday Celebration in ${city}`
+        : `Community Cultural Gathering in ${city}`;
 
     const profile: EventProfile = {
+      id: `event-${Date.now()}`,
       title,
       type: eventType,
-      targetDate,
+      date,
       city,
-      guestCount,
-      totalBudget,
+      guest_count: guestCount,
+      total_budget: totalBudget,
       currency: 'INR',
-      vibe,
-      culturalTradition: lower.includes('gujarati') ? 'Gujarati Hindu' : 'Indian Contemporary',
-      dietaryMix,
-      indoorOutdoor: lower.includes('outdoor') ? 'outdoor' : lower.includes('both') ? 'both' : 'indoor',
-      priorities: ['Catering & Food Quality', 'Photographer & Moments', 'Guest Comfort']
+      vibe_theme: 'Festive, Elegant & Culturally Rooted',
+      culture_tradition: eventType === 'wedding' ? 'Traditional Indian' : 'Contemporary',
+      dietary_mix: dietaryMix,
+      indoor_outdoor: indoorOutdoor,
+      priorities: ['Catering & Culinary Excellence', 'Warm Aesthetic Decor', 'Memorable Hospitality'],
+      constraints: '10:00 PM sound restrictions; elderly accessibility required',
     };
 
     return {
       profile,
-      followUpQuestions: followUps.slice(0, 3),
-      confidence: 0.9
+      followUpQuestions: [
+        'Would you like a dedicated live food station (e.g. chaat, dessert bar)?',
+        'Do you have specific color palette preferences for the mandap or stage?',
+      ],
+      confidence: 0.88,
     };
   }
 
-  private sanitizeExtractedProfile(raw: Partial<EventProfile>): EventProfile {
+  private sanitizeExtractedProfile(raw: Record<string, unknown>): EventProfile {
     return {
-      title: raw.title || 'Special Celebration',
+      id: String(raw.id || `event-${Date.now()}`),
+      title: String(raw.title || 'Celebration Event'),
       type: (raw.type as EventType) || 'wedding',
-      targetDate: raw.targetDate || '2026-12-15',
-      city: raw.city || 'Ahmedabad',
-      guestCount: Math.max(10, Number(raw.guestCount) || 150),
-      totalBudget: Math.max(50000, Number(raw.totalBudget) || 500000),
-      currency: raw.currency || 'INR',
-      vibe: raw.vibe || 'Festive and Welcoming',
-      culturalTradition: raw.culturalTradition || 'Contemporary',
-      dietaryMix: Array.isArray(raw.dietaryMix) ? raw.dietaryMix : ['Standard Buffet'],
-      indoorOutdoor: (raw.indoorOutdoor as 'indoor' | 'outdoor' | 'both') || 'indoor',
-      priorities: Array.isArray(raw.priorities) ? raw.priorities : ['Food', 'Decor', 'Experience']
+      date: String(raw.date || raw.targetDate || '2026-12-18'),
+      city: String(raw.city || 'Ahmedabad'),
+      guest_count: Math.max(10, Number(raw.guest_count || raw.guestCount) || 150),
+      total_budget: Math.max(50000, Number(raw.total_budget || raw.totalBudget) || 500000),
+      currency: String(raw.currency || 'INR'),
+      vibe_theme: String(raw.vibe_theme || raw.vibe || 'Festive and Welcoming'),
+      culture_tradition: String(raw.culture_tradition || raw.culturalTradition || 'Contemporary'),
+      dietary_mix: String(raw.dietary_mix || raw.dietaryMix || 'Standard Vegetarian Feast'),
+      indoor_outdoor: (raw.indoor_outdoor as 'indoor' | 'outdoor' | 'hybrid') || 'outdoor',
+      priorities: Array.isArray(raw.priorities) ? raw.priorities.map(String) : ['Food', 'Decor', 'Experience'],
+      constraints: String(raw.constraints || ''),
     };
   }
 
   /**
    * Generates budget and timeline strictly using deterministic code math
    */
-  public generateDeterministicBudget(profile: EventProfile): EventBudget {
-    return calculateDefaultBudget(profile.totalBudget, profile.type, profile.currency);
+  public generateDeterministicBudget(profile: EventProfile): FullEventPlan['budget'] {
+    return calculateDefaultBudget(profile.total_budget, profile.type, profile.currency);
   }
 
-  public generateDeterministicTimeline(profile: EventProfile): TimelineTask[] {
-    return generateDefaultTimeline(profile.targetDate, profile.type);
+  public generateDeterministicTimeline(profile: EventProfile): { tasks: Task[]; run_of_show: RunOfShowItem[] } {
+    const tasks = generateDefaultTimeline(profile.date, profile.type);
+    const runOfShow: RunOfShowItem[] = [
+      { id: 'ros_1', time: '04:00 PM', title: 'Vendor Arrival & Sound Check', owner: 'Event Lead', location: 'Main Lawn', notes: 'Sound & lighting verification' },
+      { id: 'ros_2', time: '06:00 PM', title: 'Welcome Drinks & Guest Arrival', owner: 'Hospitality', location: 'Welcome Arch', notes: 'Traditional welcome & refreshers' },
+      { id: 'ros_3', time: '07:30 PM', title: 'Main Celebration Ceremony', owner: 'Host & Family', location: 'Stage / Mandap', notes: 'Key auspicious moments' },
+      { id: 'ros_4', time: '08:45 PM', title: 'Gourmet Dinner Service', owner: 'Catering Lead', location: 'Dining Hall', notes: 'Buffet & live dessert counters' },
+      { id: 'ros_5', time: '10:30 PM', title: 'Closing & Guest Farewell', owner: 'Host Family', location: 'Main Porch', notes: 'Gifts & farewell' },
+    ];
+    return { tasks, run_of_show: runOfShow };
   }
 
   /**
    * Generates creative ideas across decor, entertainment, food, and favors
    */
-  public async suggestIdeas(profile: EventProfile): Promise<CreativeIdea[]> {
+  public async suggestIdeas(profile: EventProfile): Promise<IdeaItem[]> {
     if (llmClient.isAvailable()) {
       try {
         const raw = await llmClient.generateContent(
@@ -194,17 +234,18 @@ export class AIService {
         );
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed.ideas)) {
-          return parsed.ideas.map((item: Partial<CreativeIdea>, idx: number) => ({
+          return parsed.ideas.map((item: Record<string, unknown>, idx: number) => ({
             id: `idea_${Date.now()}_${idx}`,
-            category: item.category || 'decor',
-            title: item.title || 'Creative Touch',
-            description: item.description || '',
-            estimatedCost: typeof item.estimatedCost === 'number' ? item.estimatedCost : 15000,
-            diyFeasibility: item.diyFeasibility || 'medium',
-            status: 'suggested'
+            category: String(item.category || 'Decor & Ambiance'),
+            title: String(item.title || 'Creative Touch'),
+            description: String(item.description || ''),
+            cost_range: String(item.cost_range || `₹${Math.round(profile.total_budget * 0.03).toLocaleString()}`),
+            effort_level: (item.effort_level as 'Low' | 'Medium' | 'High') || 'Medium',
+            tags: Array.isArray(item.tags) ? item.tags.map(String) : ['Creative', 'Personalized'],
+            saved: Boolean(item.saved),
           }));
         }
-      } catch (err) {
+      } catch (err: unknown) {
         logger.warn('LLM idea generation failed, using curated ideas', { err });
       }
     }
@@ -215,7 +256,7 @@ export class AIService {
   /**
    * Generates invitations in multiple formats and tones
    */
-  public async generateInvitations(profile: EventProfile): Promise<EventMessage[]> {
+  public async generateInvitations(profile: EventProfile): Promise<InvitationItem[]> {
     if (llmClient.isAvailable()) {
       try {
         const raw = await llmClient.generateContent(
@@ -223,17 +264,18 @@ export class AIService {
           JSON.stringify(profile)
         );
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed.messages)) {
-          return parsed.messages.map((m: Partial<EventMessage>, idx: number) => ({
-            id: `msg_${Date.now()}_${idx}`,
-            channel: m.channel || 'whatsapp',
-            tone: m.tone || 'warm',
-            title: m.title || 'Invitation',
-            content: m.content || '',
-            recipientGroup: m.recipientGroup || 'All Guests'
+        const variants = parsed.variants || parsed.messages || [];
+        if (Array.isArray(variants)) {
+          return variants.map((m: Record<string, unknown>, idx: number) => ({
+            id: `inv_${Date.now()}_${idx}`,
+            type: String(m.type || m.channel || 'WhatsApp Invite'),
+            language: String(m.language || 'English'),
+            tone: String(m.tone || 'Warm & Traditional'),
+            content: String(m.content || ''),
+            share_url: `https://wa.me/?text=${encodeURIComponent(String(m.content || ''))}`,
           }));
         }
-      } catch (err) {
+      } catch (err: unknown) {
         logger.warn('LLM invitation generation failed, using curated templates', { err });
       }
     }
@@ -253,19 +295,18 @@ export class AIService {
         );
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed.risks)) {
-          return parsed.risks.map((r: Partial<RiskItem>, idx: number) => ({
+          return parsed.risks.map((r: Record<string, unknown>, idx: number) => ({
             id: `risk_${Date.now()}_${idx}`,
-            category: r.category || 'logistics',
-            title: r.title || 'Operational Risk',
-            severity: r.severity || 'medium',
-            probability: r.probability || 'possible',
-            preventiveMeasure: r.preventiveMeasure || '',
-            contingencyPlan: r.contingencyPlan || '',
-            owner: 'Event Lead',
-            status: 'identified'
+            category: (r.category as RiskItem['category']) || 'General',
+            title: String(r.title || 'Operational Risk'),
+            severity: (r.severity as 'high' | 'medium' | 'low') || 'medium',
+            likelihood: (r.likelihood as 'high' | 'medium' | 'low') || 'medium',
+            why: String(r.why || r.preventiveMeasure || 'Event day contingency'),
+            mitigation: String(r.mitigation || r.preventiveMeasure || 'Pre-event checkpoint inspection'),
+            backup_plan: String(r.backup_plan || r.contingencyPlan || 'Standby vendor on call'),
           }));
         }
-      } catch (err) {
+      } catch (err: unknown) {
         logger.warn('LLM risk evaluation failed, using curated risk matrix', { err });
       }
     }
@@ -274,76 +315,80 @@ export class AIService {
   }
 
   // Curated fallbacks ensuring high-quality experience even without API key
-  private getCuratedIdeas(profile: EventProfile): CreativeIdea[] {
+  private getCuratedIdeas(profile: EventProfile): IdeaItem[] {
     const isWedding = profile.type === 'wedding';
     return [
       {
         id: 'idea_seed_1',
-        category: 'decor',
+        category: 'Decor & Ambiance',
         title: isWedding ? 'Heritage Brass & Marigold Canopy' : 'Warm Fairy Lights Canopy with Photo Wall',
         description: isWedding
           ? 'Use traditional brass urulis with floating tea-lights and fragrant marigold torans at the entrance gate for a warm, auspicious welcome.'
           : 'A cozy fairy light installation with instant polaroid photo clips celebrating memories.',
-        estimatedCost: Math.round(profile.totalBudget * 0.03),
-        diyFeasibility: 'medium',
-        status: 'suggested'
+        cost_range: `₹${Math.round(profile.total_budget * 0.025).toLocaleString()} - ₹${Math.round(profile.total_budget * 0.04).toLocaleString()}`,
+        effort_level: 'Low',
+        tags: ['Aesthetic', 'Welcome', 'Traditional'],
+        saved: true,
       },
       {
         id: 'idea_seed_2',
-        category: 'food',
+        category: 'Food & Culinary',
         title: 'Live Artisan Chaat & Mocktail Bar',
         description: 'Interactive counter featuring curated spiced treats, smoked tamarind coolers, and chilled tender coconut refreshers.',
-        estimatedCost: Math.round(profile.totalBudget * 0.05),
-        diyFeasibility: 'low',
-        status: 'suggested'
+        cost_range: `₹${Math.round(profile.total_budget * 0.04).toLocaleString()} - ₹${Math.round(profile.total_budget * 0.06).toLocaleString()}`,
+        effort_level: 'Medium',
+        tags: ['Culinary', 'Interactive', 'Gourmet'],
+        saved: true,
       },
       {
         id: 'idea_seed_3',
-        category: 'entertainment',
+        category: 'Entertainment',
         title: isWedding ? 'Acoustic Folk Sangeet & Live Dhol Welcome' : 'Live Acoustic Set & Interactive Trivia',
         description: 'Engage all age groups with authentic beats during peak arrival, transitioning into acoustic live melodies.',
-        estimatedCost: Math.round(profile.totalBudget * 0.04),
-        diyFeasibility: 'low',
-        status: 'accepted'
+        cost_range: `₹${Math.round(profile.total_budget * 0.03).toLocaleString()} - ₹${Math.round(profile.total_budget * 0.05).toLocaleString()}`,
+        effort_level: 'Low',
+        tags: ['Music', 'Vibe', 'Live'],
+        saved: false,
       },
       {
         id: 'idea_seed_4',
-        category: 'favors',
+        category: 'Favors & Gifting',
         title: 'Eco-Friendly Plantable Seed Paper & Artisanal Sweets',
         description: 'Zero-waste takeaway gifts packaged in handcrafted jute pouches with customized family tags.',
-        estimatedCost: Math.round(profile.totalBudget * 0.02),
-        diyFeasibility: 'high',
-        status: 'suggested'
-      }
+        cost_range: `₹${Math.round(profile.total_budget * 0.015).toLocaleString()} - ₹${Math.round(profile.total_budget * 0.025).toLocaleString()}`,
+        effort_level: 'Low',
+        tags: ['Eco-friendly', 'Gifts', 'Memories'],
+        saved: true,
+      },
     ];
   }
 
-  private getCuratedInvitations(profile: EventProfile): EventMessage[] {
+  private getCuratedInvitations(profile: EventProfile): InvitationItem[] {
     return [
       {
         id: 'msg_seed_1',
-        channel: 'whatsapp',
-        tone: 'warm',
-        title: 'WhatsApp Family & Friends Invitation',
-        content: `Namaste! 🙏\n\nWith immense joy and blessings, we warmly invite you to celebrate ${profile.title}.\n\n📅 Date: ${profile.targetDate}\n📍 City: ${profile.city}\n\nYour presence and blessings will make our special day complete. Kindly treat this as our heartfelt invitation!\n\nWarm regards,\nFamily`,
-        recipientGroup: 'Close Family & Friends'
+        type: 'WhatsApp Digital Invite',
+        language: 'English',
+        tone: 'Warm & Festive',
+        content: `Namaste! 🙏\n\nWith immense joy and blessings, we warmly invite you to celebrate ${profile.title}.\n\n📅 Date: ${profile.date}\n📍 City: ${profile.city}\n👥 Guests: ${profile.guest_count}\n\nYour presence and blessings will make our special day complete. Kindly treat this as our heartfelt invitation!\n\nWarm regards,\nFamily`,
+        share_url: `https://wa.me/?text=${encodeURIComponent(`Namaste! You are cordially invited to celebrate ${profile.title} on ${profile.date} in ${profile.city}!`)}`,
       },
       {
         id: 'msg_seed_2',
-        channel: 'email',
-        tone: 'formal',
-        title: 'Formal Email Invitation',
-        content: `Subject: Cordial Invitation to celebrate ${profile.title}\n\nDear {GuestName},\n\nWe take great pleasure in inviting you to join us on the auspicious occasion of ${profile.title}.\n\nDate: ${profile.targetDate}\nLocation: ${profile.city}\nDress Code: Festive Traditional\n\nPlease let us know your travel itinerary to assist with arrangements.\n\nWarm regards,\nHost Committee`,
-        recipientGroup: 'Dignitaries & Outstation Guests'
+        type: 'Formal Card Copy',
+        language: 'English',
+        tone: 'Formal & Royal',
+        content: `Cordial Invitation\n\nWe take great pleasure in inviting you to join us on the auspicious occasion of ${profile.title}.\n\nDate: ${profile.date}\nLocation: ${profile.city}\nDress Code: Festive Traditional\n\nPlease let us know your travel itinerary to assist with arrangements.\n\nWarm regards,\nHost Committee`,
+        share_url: '',
       },
       {
         id: 'msg_seed_3',
-        channel: 'sms',
-        tone: 'festive',
-        title: 'Save The Date SMS / Broadcast',
-        content: `✨ Save the Date! Join us for ${profile.title} on ${profile.targetDate} in ${profile.city}. Detailed invite to follow. Can't wait to celebrate together!`,
-        recipientGroup: 'All Guests'
-      }
+        type: 'Short SMS / WhatsApp Broadcast',
+        language: 'English',
+        tone: 'Joyful & Direct',
+        content: `✨ Save the Date! Join us for ${profile.title} on ${profile.date} in ${profile.city}. Detailed invite to follow. Can't wait to celebrate together!`,
+        share_url: `https://wa.me/?text=${encodeURIComponent(`Save the date for ${profile.title} on ${profile.date}!`)}`,
+      },
     ];
   }
 
@@ -351,37 +396,34 @@ export class AIService {
     return [
       {
         id: 'risk_seed_1',
-        category: 'logistics',
+        category: 'Food & Safety',
         title: 'Catering Headcount Overflow (+15% unexpected guests)',
         severity: 'high',
-        probability: 'likely',
-        preventiveMeasure: 'Mandate RSVP confirmations 5 days prior; request caterer for 15% buffer provision in raw materials.',
-        contingencyPlan: 'Pre-negotiated secondary fast-service live counter with 30-minute replenishment window.',
-        owner: 'Food Coordinator',
-        status: 'mitigated'
+        likelihood: 'high',
+        why: 'In Indian celebrations, extended families often arrive in larger groups than initially confirmed.',
+        mitigation: 'Mandate RSVP confirmations 5 days prior; contractually request caterer for 15% buffer provision in raw materials.',
+        backup_plan: 'Pre-negotiated secondary fast-service live counter with 30-minute replenishment window.',
       },
       {
         id: 'risk_seed_2',
-        category: 'weather',
-        title: profile.indoorOutdoor === 'outdoor' ? 'Sudden Unseasonal Rain or Extreme Wind' : 'Air Conditioning Overload with Full Banquet',
-        severity: 'critical',
-        probability: 'possible',
-        preventiveMeasure: profile.indoorOutdoor === 'outdoor' ? 'Reserve water-resistant German hanger canopy with side curtains.' : 'Verify venue transformer backup and run test load 48h prior.',
-        contingencyPlan: 'On-site 125 kVA silent generator stationed on standby with automatic changeover switch.',
-        owner: 'Venue Liaison',
-        status: 'identified'
+        category: 'Weather',
+        title: profile.indoor_outdoor === 'outdoor' ? 'Sudden Unseasonal Rain or Extreme Evening Dew' : 'Air Conditioning Overload with Full Banquet',
+        severity: 'high',
+        likelihood: 'medium',
+        why: profile.indoor_outdoor === 'outdoor' ? 'Winter evening dew and unexpected showers can disrupt lawn mandap setups.' : 'Full hall capacity can strain HVAC compressors.',
+        mitigation: profile.indoor_outdoor === 'outdoor' ? 'Reserve water-resistant German hanger canopy with side curtains.' : 'Verify venue transformer backup and run test load 48h prior.',
+        backup_plan: 'On-site 125 kVA silent generator stationed on standby with automatic changeover switch.',
       },
       {
         id: 'risk_seed_3',
-        category: 'vendor',
-        title: 'Primary Photographer or Sound Engineer Equipment Failure',
-        severity: 'high',
-        probability: 'unlikely',
-        preventiveMeasure: 'Contractually require dual-camera recording and secondary sound mixer in the agreement.',
-        contingencyPlan: 'Local studio backup crew on 1-hour on-call retainer.',
-        owner: 'Media Manager',
-        status: 'identified'
-      }
+        category: 'Timeline',
+        title: 'Baraat / Ceremony Delay Impacting Dinner Schedule',
+        severity: 'medium',
+        likelihood: 'high',
+        why: 'Traffic congestion and extended dance processions routinely push schedules back by 60-90 minutes.',
+        mitigation: 'Assign a dedicated Baraat coordinator with wireless comms to signal caterers at the 500-meter mark.',
+        backup_plan: 'Keep welcome appetizer stations fully loaded and circulating so arriving guests remain comfortable.',
+      },
     ];
   }
 }

@@ -154,3 +154,63 @@ export const DigestResponseSchema = z.object({
   urgent_actions: z.array(z.string()),
   motivational_tip: z.string(),
 });
+
+// 11. Expense, Member, and Comment Schemas
+export const ExpenseItemSchema = z.object({
+  id: z.string().default(() => `exp_${Date.now()}`),
+  category_id: z.string().default(""),
+  category_name: z.string().default("General"),
+  vendor_name: z.string().default("Vendor"),
+  amount: z.number().nonnegative(),
+  date: z.string().default(() => new Date().toISOString().split("T")[0]),
+  status: z.enum(["paid", "pending"]).default("paid"),
+  notes: z.string().optional(),
+});
+
+export const EventMemberSchema = z.object({
+  id: z.string().default(() => `mem_${Date.now()}`),
+  name: z.string().min(1),
+  email: z.string().email().or(z.string()),
+  role: z.enum(["owner", "editor", "viewer"]).default("editor"),
+});
+
+export const EventCommentSchema = z.object({
+  id: z.string().default(() => `comment_${Date.now()}`),
+  eventId: z.string(),
+  userId: z.string(),
+  userName: z.string(),
+  userAvatar: z.string().optional(),
+  section: z.string().default("general"),
+  targetId: z.string().optional(),
+  content: z.string().min(1),
+  createdAt: z.string().default(() => new Date().toISOString()),
+});
+
+// 12. Full Task & Vendor Schemas for Routes
+export const TimelineTaskSchema = z.object({
+  id: z.string().default(() => `task_${Date.now()}`),
+  title: z.string().min(1),
+  due_date: z.string(),
+  phase: z.enum(["6+ months", "3 months", "1 month", "1 week", "Day before", "Day-of"]).default("1 month"),
+  status: z.enum(["pending", "in_progress", "completed"]).default("pending"),
+  assignee: z.string().default("Host"),
+  linked_vendor: z.string().default("General"),
+  priority: z.enum(["high", "medium", "low"]).default("medium"),
+  notes: z.string().optional(),
+});
+
+export const EventVendorSchema = z.object({
+  id: z.string().default(() => `vendor_${Date.now()}`),
+  name: z.string().min(1),
+  category: z.string().default("General"),
+  contact: z.string().default(""),
+  quote: z.number().nonnegative().default(0),
+  advance_paid: z.number().nonnegative().default(0),
+  balance: z.number().nonnegative().default(0),
+  due_date: z.string().default(() => new Date().toISOString().split("T")[0]),
+  status: z.enum(["not_started", "contacted", "quote_received", "booked", "paid"]).default("contacted"),
+  place_id: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+

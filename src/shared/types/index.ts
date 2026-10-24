@@ -161,6 +161,28 @@ export interface ActivityLogItem {
   timestamp: string;
 }
 
+export interface AppNotification {
+  id: string;
+  eventId: string;
+  title: string;
+  message: string;
+  type: "alert" | "reminder" | "info";
+  read: boolean;
+  createdAt: string;
+}
+
+export interface EventComment {
+  id: string;
+  eventId: string;
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  section: string;
+  targetId?: string;
+  content: string;
+  createdAt: string;
+}
+
 export interface FullEventPlan {
   profile: EventProfile;
   budget: {
@@ -179,4 +201,21 @@ export interface FullEventPlan {
   invitations: InvitationItem[];
   collaborators: Collaborator[];
   activity_log: ActivityLogItem[];
+  notifications?: AppNotification[];
+  comments?: EventComment[];
 }
+
+// Canonical Type Aliases for Service & API Compatibility
+export type EventPlan = FullEventPlan;
+export type EventBudget = FullEventPlan['budget'];
+export type TimelineTask = Task;
+export type TaskStatus = Task['status'];
+export type EventVendor = VendorItem;
+export type Vendor = VendorPlace;
+export type VendorCategory = string;
+export type CreativeIdea = IdeaItem;
+export type EventMessage = InvitationItem;
+export type ExpenseItem = Expense;
+export type EventMember = Collaborator;
+export type ActivityLogEntry = ActivityLogItem;
+

@@ -13,6 +13,6 @@ export const extractProfile = asyncHandler(async (req: Request, res: Response) =
     data: result,
     profile: result.profile,
     follow_up_questions: result.followUpQuestions,
-    ai_summary: `Understood: ${result.profile.title} in ${result.profile.city} with ${result.profile.guestCount} guests.`
+    ai_summary: `Understood: ${result.profile.title} in ${result.profile.city} with ${result.profile.guest_count} guests.`
   });
 });

@@ -1,9 +1,9 @@
 import { eventRepository } from '../repositories/index.js';
-import { EventVendor, VendorStatus, ActivityLogEntry } from '../../shared/types/index.js';
+import { VendorItem, VendorStatus, ActivityLogItem } from '../../shared/types/index.js';
 import { NotFoundError } from '../errors/app-error.js';
 
 export class VendorService {
-  public async getEventVendors(eventId: string): Promise<EventVendor[]> {
+  public async getEventVendors(eventId: string): Promise<VendorItem[]> {
     const event = await eventRepository.findById(eventId);
     if (!event) throw new NotFoundError('Event not found');
     return event.vendors;
@@ -11,41 +11,44 @@ export class VendorService {
 
   public async addOrUpdateEventVendor(
     eventId: string,
-    vendorData: Omit<EventVendor, 'id'>,
+    vendorData: Omit<VendorItem, 'id'>,
     user: { id: string; name: string }
-  ): Promise<EventVendor> {
+  ): Promise<VendorItem> {
     const event = await eventRepository.findById(eventId);
     if (!event) throw new NotFoundError('Event not found');
 
-    const existingIndex = event.vendors.findIndex(v => v.vendorId === vendorData.vendorId);
-    let result: EventVendor;
+    const existingIndex = event.vendors.findIndex(
+      (v: VendorItem) => v.name.toLowerCase() === vendorData.name.toLowerCase()
+    );
+    let result: VendorItem;
 
     if (existingIndex !== -1) {
       event.vendors[existingIndex] = {
         ...event.vendors[existingIndex],
-        ...vendorData
+        ...vendorData,
+        edited_at: new Date().toISOString(),
       };
       result = event.vendors[existingIndex];
     } else {
       result = {
         ...vendorData,
-        id: `ev_vendor_${Date.now()}`
+        id: `ev_vendor_${Date.now()}`,
+        edited_at: new Date().toISOString(),
       };
       event.vendors.push(result);
     }
 
-    const activity: ActivityLogEntry = {
+    const activity: ActivityLogItem = {
       id: `act_${Date.now()}`,
-      userId: user.id,
-      userName: user.name,
+      user: user.name,
       action: 'updated_vendor',
-      details: `Updated vendor status to "${vendorData.status}" (Quote: ${vendorData.quotedPrice || 'N/A'})`,
-      timestamp: new Date().toISOString()
+      detail: `Updated vendor "${vendorData.name}" status to "${vendorData.status}" (Quote: ₹${vendorData.quote.toLocaleString()})`,
+      timestamp: new Date().toISOString(),
     };
 
     await eventRepository.update(eventId, {
       vendors: event.vendors,
-      activityLog: [activity, ...event.activityLog]
+      activity_log: [activity, ...event.activity_log],
     });
 
     return result;
@@ -56,27 +59,27 @@ export class VendorService {
     eventVendorId: string,
     status: VendorStatus,
     user: { id: string; name: string }
-  ): Promise<EventVendor> {
+  ): Promise<VendorItem> {
     const event = await eventRepository.findById(eventId);
     if (!event) throw new NotFoundError('Event not found');
 
-    const vendor = event.vendors.find(v => v.id === eventVendorId);
+    const vendor = event.vendors.find((v: VendorItem) => v.id === eventVendorId);
     if (!vendor) throw new NotFoundError('Event vendor not found');
 
     vendor.status = status;
+    vendor.edited_at = new Date().toISOString();
 
-    const activity: ActivityLogEntry = {
+    const activity: ActivityLogItem = {
       id: `act_${Date.now()}`,
-      userId: user.id,
-      userName: user.name,
+      user: user.name,
       action: 'updated_vendor',
-      details: `Changed vendor status to "${status}"`,
-      timestamp: new Date().toISOString()
+      detail: `Changed vendor "${vendor.name}" status to "${status}"`,
+      timestamp: new Date().toISOString(),
     };
 
     await eventRepository.update(eventId, {
       vendors: event.vendors,
-      activityLog: [activity, ...event.activityLog]
+      activity_log: [activity, ...event.activity_log],
     });
 
     return vendor;

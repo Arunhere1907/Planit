@@ -15,6 +15,8 @@ import { ReplanModal } from "./components/ReplanModal";
 import { PrintablePlanModal } from "./components/PrintablePlanModal";
 import { FullEventPlan, EventProfile, BudgetCategory, Task, Expense, VendorItem, IdeaItem, RiskItem, InvitationItem, Collaborator } from "./types";
 import { exportToICS, exportBudgetCSV, exportVendorsCSV } from "./lib/exportUtils";
+import { eventApi } from "./client/services/api/event-api.js";
+import { DemoUserProvider } from "./client/context/DemoUserContext.js";
 import seedWeddingData from "../data/seed_wedding.json";
 
 // Additional preset demo events for easy testing
@@ -108,34 +110,30 @@ export default function App() {
     );
   };
 
+  // Sync with seeded backend in-memory repository on mount
+  useEffect(() => {
+    eventApi.getAllEvents()
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setPlans(data);
+          setCurrentPlanId(data[0].profile.id);
+        }
+      })
+      .catch(() => {
+        // Keeps DEMO_EVENTS on any fetch failure
+      });
+  }, []);
+
   // 1. Intake creation of a completely new plan
   const handleIntakeGenerated = async (newProfile: EventProfile) => {
     setShowIntakeModal(false);
 
     try {
-      // Fetch initial budget split from API
-      const budgetRes = await fetch("/api/budget/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile: newProfile }),
-      });
-      const budgetData = await budgetRes.json();
-
-      // Fetch initial timeline backwards tasks
-      const timelineRes = await fetch("/api/timeline/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile: newProfile }),
-      });
-      const timelineData = await timelineRes.json();
-
-      // Fetch initial risks
-      const riskRes = await fetch("/api/risks/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile: newProfile, budgetData: { total_budget: newProfile.total_budget } }),
-      });
-      const riskData = await riskRes.json();
+      const [budgetData, timelineData, riskData] = await Promise.all([
+        eventApi.generateBudget(newProfile).catch(() => ({ categories: [] })),
+        eventApi.generateTimeline(newProfile).catch(() => ({ tasks: [], run_of_show: [] })),
+        eventApi.analyzeRisks(newProfile).catch(() => ({ risks: [] })),
+      ]);
 
       const newFullPlan: FullEventPlan = {
         profile: newProfile,
@@ -361,18 +359,24 @@ export default function App() {
 
   const handleResetDatabase = async () => {
     try {
-      await fetch('/api/dev/reset', { method: 'POST' });
-      setPlans(DEMO_EVENTS);
-      setCurrentPlanId(DEMO_EVENTS[0].profile.id);
-    } catch (err) {
-      // Fallback
+      await eventApi.resetDatabase();
+      const fresh = await eventApi.getAllEvents();
+      if (Array.isArray(fresh) && fresh.length > 0) {
+        setPlans(fresh);
+        setCurrentPlanId(fresh[0].profile.id);
+      } else {
+        setPlans(DEMO_EVENTS);
+        setCurrentPlanId(DEMO_EVENTS[0].profile.id);
+      }
+    } catch {
       setPlans(DEMO_EVENTS);
       setCurrentPlanId(DEMO_EVENTS[0].profile.id);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <DemoUserProvider>
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Top Header */}
       <Header
         currentProfile={activePlan.profile}
@@ -515,6 +519,7 @@ export default function App() {
           onClose={() => setShowPrintModal(false)}
         />
       )}
-    </div>
+      </div>
+    </DemoUserProvider>
   );
 }

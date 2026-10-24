@@ -1,10 +1,10 @@
 import { eventRepository } from '../repositories/index.js';
-import { EventBudget, ExpenseItem, ActivityLogEntry } from '../../shared/types/index.js';
+import { FullEventPlan, Expense, BudgetCategory, ActivityLogItem } from '../../shared/types/index.js';
 import { rebalanceBudgetWithLocks, validateBudgetTotals } from '../../shared/utils/deterministic-math.js';
 import { NotFoundError, ValidationError } from '../errors/app-error.js';
 
 export class BudgetService {
-  public async getBudget(eventId: string): Promise<EventBudget> {
+  public async getBudget(eventId: string): Promise<FullEventPlan['budget']> {
     const event = await eventRepository.findById(eventId);
     if (!event) throw new NotFoundError('Event not found');
     return event.budget;
@@ -12,41 +12,37 @@ export class BudgetService {
 
   public async addExpense(
     eventId: string,
-    expenseData: Omit<ExpenseItem, 'id' | 'createdAt'>,
+    expenseData: Omit<Expense, 'id'>,
     user: { id: string; name: string }
-  ): Promise<EventBudget> {
+  ): Promise<FullEventPlan['budget']> {
     const event = await eventRepository.findById(eventId);
     if (!event) throw new NotFoundError('Event not found');
 
-    const newExpense: ExpenseItem = {
+    const newExpense: Expense = {
       ...expenseData,
       id: `exp_${Date.now()}`,
-      createdAt: new Date().toISOString()
     };
 
-    const targetCategory = event.budget.categories.find(c => c.category === expenseData.category);
+    const targetCategory = event.budget.categories.find(
+      (c: BudgetCategory) => c.name === expenseData.category_name || c.id === expenseData.category_id
+    );
     if (!targetCategory) {
-      throw new ValidationError(`Category "${expenseData.category}" does not exist in event budget`);
+      throw new ValidationError(`Category "${expenseData.category_name}" does not exist in event budget`);
     }
 
-    targetCategory.spent = Math.round(targetCategory.spent + expenseData.amount);
-    event.budget.expenses.push(newExpense);
+    event.budget.expenses = [newExpense, ...event.budget.expenses];
 
-    // Recalculate totals deterministically
-    event.budget.totalSpent = event.budget.categories.reduce((acc, cat) => acc + cat.spent, 0);
-
-    const activity: ActivityLogEntry = {
+    const activity: ActivityLogItem = {
       id: `act_${Date.now()}`,
-      userId: user.id,
-      userName: user.name,
+      user: user.name,
       action: 'added_expense',
-      details: `Added expense "${expenseData.description}" of ${event.budget.currency} ${expenseData.amount.toLocaleString()} in ${expenseData.category}`,
-      timestamp: new Date().toISOString()
+      detail: `Added expense for "${expenseData.vendor_name}" of ${event.budget.currency} ${expenseData.amount.toLocaleString()} in ${expenseData.category_name}`,
+      timestamp: new Date().toISOString(),
     };
 
     const updated = await eventRepository.update(eventId, {
       budget: event.budget,
-      activityLog: [activity, ...event.activityLog]
+      activity_log: [activity, ...event.activity_log],
     });
 
     if (!updated) throw new NotFoundError('Failed updating budget');
@@ -55,28 +51,32 @@ export class BudgetService {
 
   public async updateCategoryAllocation(
     eventId: string,
-    categoryName: string,
+    categoryNameOrId: string,
     newAllocated: number,
     locked: boolean,
     user: { id: string; name: string }
-  ): Promise<EventBudget> {
+  ): Promise<FullEventPlan['budget']> {
     const event = await eventRepository.findById(eventId);
     if (!event) throw new NotFoundError('Event not found');
 
-    const targetIndex = event.budget.categories.findIndex(c => c.category === categoryName);
+    const targetIndex = event.budget.categories.findIndex(
+      (c: BudgetCategory) => c.name === categoryNameOrId || c.id === categoryNameOrId
+    );
     if (targetIndex === -1) {
-      throw new ValidationError(`Category "${categoryName}" not found`);
+      throw new ValidationError(`Category "${categoryNameOrId}" not found`);
     }
 
     // Set lock & value
-    event.budget.categories[targetIndex].allocated = Math.round(newAllocated);
-    event.budget.categories[targetIndex].isLocked = locked;
+    event.budget.categories[targetIndex].amount = Math.round(newAllocated);
+    event.budget.categories[targetIndex].is_locked = locked;
+    event.budget.categories[targetIndex].source = 'user';
+    event.budget.categories[targetIndex].edited_at = new Date().toISOString();
 
-    // Deterministically rebalance all unlocked categories so sum === totalBudget
+    // Deterministically rebalance all unlocked categories so sum === total_budget
     event.budget.categories = rebalanceBudgetWithLocks(
       event.budget.categories,
-      event.budget.totalBudget,
-      categoryName
+      event.budget.total_budget,
+      categoryNameOrId
     );
 
     // Audit sanity check
@@ -85,18 +85,17 @@ export class BudgetService {
       throw new ValidationError(`Budget calculation constraint failed: ${validation.message}`);
     }
 
-    const activity: ActivityLogEntry = {
+    const activity: ActivityLogItem = {
       id: `act_${Date.now()}`,
-      userId: user.id,
-      userName: user.name,
+      user: user.name,
       action: 'updated_budget',
-      details: `Adjusted allocation for ${categoryName} to ${event.budget.currency} ${newAllocated.toLocaleString()} (Locked: ${locked})`,
-      timestamp: new Date().toISOString()
+      detail: `Adjusted allocation for ${categoryNameOrId} to ${event.budget.currency} ${newAllocated.toLocaleString()} (Locked: ${locked})`,
+      timestamp: new Date().toISOString(),
     };
 
     const updated = await eventRepository.update(eventId, {
       budget: event.budget,
-      activityLog: [activity, ...event.activityLog]
+      activity_log: [activity, ...event.activity_log],
     });
 
     if (!updated) throw new NotFoundError('Failed updating budget');

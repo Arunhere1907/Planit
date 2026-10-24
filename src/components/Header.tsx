@@ -201,9 +201,9 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`whitespace-nowrap px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                className={`relative whitespace-nowrap px-3 py-2 rounded-lg transition-all cursor-pointer font-medium ${
                   isActive
-                    ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-200 shadow-2xs"
+                    ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-200 shadow-2xs after:content-[''] after:absolute after:bottom-0.5 after:left-3 after:right-3 after:h-[3px] after:bg-indigo-600 after:rounded-full"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >

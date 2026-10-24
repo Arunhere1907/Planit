@@ -20,28 +20,50 @@ declare global {
 }
 
 const DEMO_USERS: Record<string, AuthenticatedUser> = {
-  'user_owner_1': {
-    id: 'user_owner_1',
+  'user-demo-1': {
+    id: 'user-demo-1',
     name: 'Aarav Patel',
-    email: 'aarav@planit.demo',
+    email: 'aarav.patel@example.com',
     role: 'owner',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+  },
+  'user_owner_1': {
+    id: 'user-demo-1',
+    name: 'Aarav Patel',
+    email: 'aarav.patel@example.com',
+    role: 'owner',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+  },
+  'user-demo-2': {
+    id: 'user-demo-2',
+    name: 'Diya Shah',
+    email: 'diya.shah@example.com',
+    role: 'editor',
+    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
   },
   'user_editor_1': {
-    id: 'user_editor_1',
+    id: 'user-demo-2',
     name: 'Diya Shah',
-    email: 'diya@planit.demo',
+    email: 'diya.shah@example.com',
     role: 'editor',
-    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80'
+    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
+  },
+  'user-demo-3': {
+    id: 'user-demo-3',
+    name: 'Uncle Kirit',
+    email: 'kiritbhai@example.com',
+    role: 'viewer',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
   },
   'user_viewer_1': {
-    id: 'user_viewer_1',
+    id: 'user-demo-3',
     name: 'Uncle Kirit',
-    email: 'kirit@planit.demo',
+    email: 'kiritbhai@example.com',
     role: 'viewer',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80'
-  }
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+  },
 };
+
 
 /**
  * Resolves the acting user from the x-demo-user-id header, default to owner

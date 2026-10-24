@@ -16,7 +16,7 @@ router.get('/:id/budget', getBudget);
 router.post(
   '/:id/budget/expenses',
   requireRole('owner', 'editor'),
-  validateBody(ExpenseItemSchema.omit({ id: true, createdAt: true })),
+  validateBody(ExpenseItemSchema.omit({ id: true })),
   addExpense
 );
 router.put(

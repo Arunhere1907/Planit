@@ -9,8 +9,8 @@
     "start": "tsx src/server/server.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "seed:reset": "curl -s -X POST http://localhost:3000/api/dev/reset"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

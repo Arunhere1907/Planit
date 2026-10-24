@@ -9,7 +9,8 @@ export function validateBody<T>(schema: ZodSchema<T>): RequestHandler {
   return (req: Request, _res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-      const formatted = result.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
+      const issues = result.error.issues || [];
+      const formatted = issues.map((e: { path: PropertyKey[]; message: string }) => `${e.path.map(String).join(".")}: ${e.message}`).join(", ");
       return next(new ValidationError(`Validation failed: ${formatted}`, result.error.format()));
     }
     req.body = result.data;

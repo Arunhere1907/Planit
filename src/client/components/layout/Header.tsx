@@ -55,9 +55,9 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   // Calculate days left
-  const daysLeft = currentProfile?.targetDate
+  const daysLeft = currentProfile?.date
     ? Math.ceil(
-        (new Date(currentProfile.targetDate).getTime() - new Date().getTime()) /
+        (new Date(currentProfile.date).getTime() - new Date().getTime()) /
           (1000 * 60 * 60 * 24)
       )
     : 0;

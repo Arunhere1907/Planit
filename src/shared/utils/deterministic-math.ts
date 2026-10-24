@@ -225,3 +225,81 @@ export function checkBudgetSanity(
 
   return { isSane, perGuest, benchmarkRange: [benchmarkMin, benchmarkMax], feedback };
 }
+
+export const DEFAULT_BUDGET_SPLITS: Record<string, Array<{ name: string; percent: number; reasoning: string }>> = {
+  wedding: [
+    { name: "Venue & Facilities", percent: 30.0, reasoning: "Lawn/hall rental, green rooms, and venue infrastructure." },
+    { name: "Catering & Beverages", percent: 32.0, reasoning: "Full-course feast with welcome beverages, live food stations, and dessert." },
+    { name: "Decor & Floral Design", percent: 12.0, reasoning: "Mandap/stage setup, entry arch, and fresh floral artistry." },
+    { name: "Photography & Video", percent: 9.0, reasoning: "Candid photography, traditional videography, and drone footage." },
+    { name: "Music, DJ & Entertainment", percent: 5.0, reasoning: "Sound systems, DJ, and folk or live performers." },
+    { name: "Attire, Hair & Makeup", percent: 4.0, reasoning: "Bridal/groom styling, draping, and professional makeup." },
+    { name: "Invitations & Stationery", percent: 1.5, reasoning: "Digital RSVP portal, formal cards, and welcome boards." },
+    { name: "Transport & Logistics", percent: 1.5, reasoning: "Guest shuttles, vintage car, and tempo luggage logistics." },
+    { name: "Rituals & Miscellaneous", percent: 2.0, reasoning: "Ceremonial samagri, priest dakshina, and tokens." },
+    { name: "Contingency Fund", percent: 3.0, reasoning: "Unforeseen overtime or unexpected guest expansion buffer." },
+  ],
+  birthday: [
+    { name: "Venue & Space Rental", percent: 28.0, reasoning: "Private lounge/hall or rooftop space rental." },
+    { name: "Food, Cake & Drinks", percent: 35.0, reasoning: "Multi-course appetizers, gourmet cake, and beverage bar." },
+    { name: "Themed Decor & Balloons", percent: 15.0, reasoning: "Custom backdrop, neon signage, and balloon garlands." },
+    { name: "Entertainment & Games", percent: 10.0, reasoning: "Host emcee, music playlist/DJ, and interactive games." },
+    { name: "Photography & Reels", percent: 6.0, reasoning: "Event photographer and social media reel creator." },
+    { name: "Favors & Return Gifts", percent: 4.0, reasoning: "Personalized souvenirs for attendees." },
+    { name: "Contingency Buffer", percent: 2.0, reasoning: "Buffer for additional food or extended hours." },
+  ],
+  community: [
+    { name: "Venue & Public Permits", percent: 25.0, reasoning: "Grounds, community hall, municipal and sound permits." },
+    { name: "Community Refreshments & Food", percent: 30.0, reasoning: "Prasad/buffet, water stations, and tea/coffee stalls." },
+    { name: "Stage, Sound & Lighting", percent: 20.0, reasoning: "Stage platform, public address system, and ambient lighting." },
+    { name: "Decor, Seating & Signage", percent: 12.0, reasoning: "Chairs, tentage, welcome banners, and directional signage." },
+    { name: "Security, Sanitation & First Aid", percent: 8.0, reasoning: "Waste bins, security personnel, and basic first-aid setup." },
+    { name: "Contingency & Reserve", percent: 5.0, reasoning: "Inclement weather backup or utility buffer." },
+  ],
+};
+
+export function calculateDefaultBudget(totalBudget: number, eventType: string = "wedding", currency: string = "INR") {
+  const splits = DEFAULT_BUDGET_SPLITS[eventType] || DEFAULT_BUDGET_SPLITS.wedding;
+  const categories = calculateBudgetSplitFromPercents(totalBudget, splits);
+  return {
+    total_budget: totalBudget,
+    currency,
+    categories,
+    expenses: [],
+  };
+}
+
+export function validateBudgetTotals(budget: { total_budget: number; categories: BudgetCategory[] }): { isValid: boolean; message: string } {
+  const sum = budget.categories.reduce((acc, c) => acc + c.amount, 0);
+  const diff = Math.abs(sum - budget.total_budget);
+  if (diff > 5) {
+    return { isValid: false, message: `Sum of category allocations (₹${sum}) does not match total budget (₹${budget.total_budget})` };
+  }
+  return { isValid: true, message: "Valid" };
+}
+
+export function rebalanceBudgetWithLocks(
+  categories: BudgetCategory[],
+  totalBudget: number,
+  targetCategoryNameOrId: string
+): BudgetCategory[] {
+  const targetCat = categories.find((c) => c.name === targetCategoryNameOrId || c.id === targetCategoryNameOrId);
+  if (!targetCat) return categories;
+  return rebalanceBudgetCategories(totalBudget, categories, targetCat.id, targetCat.amount);
+}
+
+export function generateDefaultTimeline(eventDateStr: string, _eventType: string = "wedding"): Task[] {
+  const tasks = [
+    { title: "Finalize and secure main venue contract with advance", role: "Organizer", priority: "high" as const, phase: "6+ months" as const, offset_days: 180, linked_vendor: "Venue" },
+    { title: "Finalize catering menu tasting and guest count tiers", role: "Food Lead", priority: "high" as const, phase: "3 months" as const, offset_days: 90, linked_vendor: "Catering" },
+    { title: "Book candid photography and cinematic videographer", role: "Organizer", priority: "medium" as const, phase: "3 months" as const, offset_days: 75, linked_vendor: "Photography" },
+    { title: "Approve stage backdrop and floral decor theme", role: "Decor Lead", priority: "medium" as const, phase: "1 month" as const, offset_days: 30, linked_vendor: "Decor" },
+    { title: "Send digital RSVP invitations with schedule details", role: "Communication Lead", priority: "high" as const, phase: "1 month" as const, offset_days: 28, linked_vendor: "Invitations" },
+    { title: "Conduct full sound check and DJ playlist review", role: "Entertainment Lead", priority: "medium" as const, phase: "1 week" as const, offset_days: 7, linked_vendor: "Music" },
+    { title: "Reconfirm finalized guest headcount with caterer", role: "Food Lead", priority: "high" as const, phase: "1 week" as const, offset_days: 5, linked_vendor: "Catering" },
+    { title: "Walk through venue, backup power, and weather check", role: "Logistics Lead", priority: "high" as const, phase: "Day before" as const, offset_days: 1, linked_vendor: "Venue" },
+    { title: "Day-of vendor arrival and ceremony timeline coordination", role: "Lead Emcee", priority: "high" as const, phase: "Day-of" as const, offset_days: 0, linked_vendor: "General" },
+  ];
+  return calculateBackwardsDueDates(eventDateStr, tasks);
+}
+

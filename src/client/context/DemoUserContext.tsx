@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { UserRole } from '../../shared/types/index.js';
 
 export interface DemoUser {
@@ -6,31 +6,35 @@ export interface DemoUser {
   name: string;
   email: string;
   role: UserRole;
-  avatarUrl: string;
+  avatar: string;
+  title: string;
 }
 
 export const DEMO_USERS_LIST: DemoUser[] = [
   {
-    id: 'user_owner_1',
+    id: 'user-demo-1',
     name: 'Aarav Patel',
-    email: 'aarav@planit.demo',
+    email: 'aarav.patel@example.com',
     role: 'owner',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
+    avatar: 'AP',
+    title: 'Lead Host / Event Owner',
   },
   {
-    id: 'user_editor_1',
+    id: 'user-demo-2',
     name: 'Diya Shah',
-    email: 'diya@planit.demo',
+    email: 'diya.shah@example.com',
     role: 'editor',
-    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80'
+    avatar: 'DS',
+    title: 'Co-Planner / Editor',
   },
   {
-    id: 'user_viewer_1',
+    id: 'user-demo-3',
     name: 'Uncle Kirit',
-    email: 'kirit@planit.demo',
+    email: 'kiritbhai@example.com',
     role: 'viewer',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80'
-  }
+    avatar: 'UK',
+    title: 'Family Elder / Viewer Only',
+  },
 ];
 
 interface DemoUserContextType {
@@ -45,14 +49,15 @@ const DemoUserContext = createContext<DemoUserContextType | undefined>(undefined
 export const DemoUserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<DemoUser>(() => {
     const saved = localStorage.getItem('planit_demo_user');
-    return DEMO_USERS_LIST.find(u => u.id === saved) || DEMO_USERS_LIST[0];
+    return DEMO_USERS_LIST.find((u) => u.id === saved) || DEMO_USERS_LIST[0];
   });
 
   const switchUser = (userId: string) => {
-    const found = DEMO_USERS_LIST.find(u => u.id === userId);
+    const found = DEMO_USERS_LIST.find((u) => u.id === userId);
     if (found) {
       setCurrentUser(found);
       localStorage.setItem('planit_demo_user', found.id);
+      localStorage.setItem('planit_user_role', found.role);
     }
   };
 

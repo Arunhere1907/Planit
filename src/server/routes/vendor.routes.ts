@@ -13,7 +13,7 @@ import { z } from 'zod';
 const router = Router();
 
 const UpdateStatusSchema = z.object({
-  status: z.enum(['shortlisted', 'contacted', 'quoted', 'booked', 'rejected'])
+  status: z.enum(['not_started', 'contacted', 'quote_received', 'booked', 'paid'])
 });
 
 router.get('/search', searchVendors);

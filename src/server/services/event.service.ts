@@ -1,14 +1,21 @@
 import { eventRepository } from '../repositories/index.js';
-import { EventPlan, EventProfile, EventMember, EventComment, ActivityLogEntry } from '../../shared/types/index.js';
+import {
+  FullEventPlan,
+  EventProfile,
+  Collaborator,
+  EventComment,
+  ActivityLogItem,
+  AppNotification,
+} from '../../shared/types/index.js';
 import { aiService } from './ai/ai.service.js';
 import { NotFoundError } from '../errors/app-error.js';
 
 export class EventService {
-  public async getAllEvents(): Promise<EventPlan[]> {
+  public async getAllEvents(): Promise<FullEventPlan[]> {
     return eventRepository.findAll();
   }
 
-  public async getEventById(id: string): Promise<EventPlan> {
+  public async getEventById(id: string): Promise<FullEventPlan> {
     const event = await eventRepository.findById(id);
     if (!event) {
       throw new NotFoundError(`Event with id "${id}" not found`);
@@ -16,32 +23,29 @@ export class EventService {
     return event;
   }
 
-  public async createEventFromProfile(profile: EventProfile, creatorUserId: string): Promise<EventPlan> {
+  public async createEventFromProfile(profile: EventProfile, creatorUserId: string): Promise<FullEventPlan> {
     const budget = aiService.generateDeterministicBudget(profile);
     const timeline = aiService.generateDeterministicTimeline(profile);
     const ideas = await aiService.suggestIdeas(profile);
     const invitations = await aiService.generateInvitations(profile);
     const risks = await aiService.analyzeRisks(profile);
 
-    const initialMember: EventMember = {
+    const initialMember: Collaborator = {
       id: `member_${Date.now()}`,
-      userId: creatorUserId,
       name: 'Aarav Patel (Organizer)',
       email: 'aarav@planit.demo',
       role: 'owner',
-      joinedAt: new Date().toISOString()
     };
 
-    const initialActivity: ActivityLogEntry = {
+    const initialActivity: ActivityLogItem = {
       id: `act_${Date.now()}`,
-      userId: creatorUserId,
-      userName: 'Aarav Patel',
+      user: 'Aarav Patel',
       action: 'created_plan',
-      details: `Generated plan for ${profile.title} with budget of ${profile.currency} ${profile.totalBudget.toLocaleString()}`,
-      timestamp: new Date().toISOString()
+      detail: `Generated plan for ${profile.title} with budget of ${profile.currency} ${profile.total_budget.toLocaleString()}`,
+      timestamp: new Date().toISOString(),
     };
 
-    const newPlan: Omit<EventPlan, 'id' | 'createdAt' | 'updatedAt'> = {
+    const newPlan: FullEventPlan = {
       profile,
       budget,
       timeline,
@@ -49,31 +53,34 @@ export class EventService {
       ideas,
       invitations,
       risks,
-      members: [initialMember],
+      collaborators: [initialMember],
       notifications: [],
       comments: [],
-      activityLog: [initialActivity]
+      activity_log: [initialActivity],
     };
 
     return eventRepository.create(newPlan);
   }
 
-  public async updateProfile(eventId: string, patch: Partial<EventProfile>, actingUser: { id: string; name: string }): Promise<EventPlan> {
+  public async updateProfile(
+    eventId: string,
+    patch: Partial<EventProfile>,
+    actingUser: { id: string; name: string }
+  ): Promise<FullEventPlan> {
     const event = await this.getEventById(eventId);
     const updatedProfile: EventProfile = { ...event.profile, ...patch };
 
-    const activity: ActivityLogEntry = {
+    const activity: ActivityLogItem = {
       id: `act_${Date.now()}`,
-      userId: actingUser.id,
-      userName: actingUser.name,
+      user: actingUser.name,
       action: 'updated_profile',
-      details: 'Updated event profile details',
-      timestamp: new Date().toISOString()
+      detail: 'Updated event profile details',
+      timestamp: new Date().toISOString(),
     };
 
     const updated = await eventRepository.update(eventId, {
       profile: updatedProfile,
-      activityLog: [activity, ...event.activityLog]
+      activity_log: [activity, ...event.activity_log],
     });
 
     if (!updated) throw new NotFoundError('Event not found');
@@ -96,34 +103,35 @@ export class EventService {
       section: commentData.section,
       targetId: commentData.targetId,
       content: commentData.content,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
-    event.comments.push(newComment);
-    await eventRepository.update(eventId, { comments: event.comments });
+    const comments = [...(event.comments || []), newComment];
+    await eventRepository.update(eventId, { comments });
     return newComment;
   }
 
-  public async addMember(eventId: string, member: Omit<EventMember, 'id' | 'joinedAt'>): Promise<EventMember> {
+  public async addMember(
+    eventId: string,
+    member: Omit<Collaborator, 'id'>
+  ): Promise<Collaborator> {
     const event = await this.getEventById(eventId);
-    const newMember: EventMember = {
+    const newMember: Collaborator = {
       ...member,
       id: `mem_${Date.now()}`,
-      joinedAt: new Date().toISOString()
     };
 
-    event.members.push(newMember);
-    await eventRepository.update(eventId, { members: event.members });
+    const collaborators = [...event.collaborators, newMember];
+    await eventRepository.update(eventId, { collaborators });
     return newMember;
   }
 
   public async markNotificationRead(eventId: string, notificationId: string): Promise<void> {
     const event = await this.getEventById(eventId);
-    const notif = event.notifications.find(n => n.id === notificationId);
-    if (notif) {
-      notif.read = true;
-      await eventRepository.update(eventId, { notifications: event.notifications });
-    }
+    const notifications = (event.notifications || []).map((n: AppNotification) =>
+      n.id === notificationId ? { ...n, read: true } : n
+    );
+    await eventRepository.update(eventId, { notifications });
   }
 }
 

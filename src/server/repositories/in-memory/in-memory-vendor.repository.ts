@@ -21,6 +21,35 @@ export class InMemoryVendorRepository implements IVendorRepository {
     });
   }
 
+  public async searchVendors(params: {
+    category?: string;
+    city?: string;
+    query?: string;
+    limit?: number;
+  }): Promise<VendorPlace[]> {
+    const { category, city, query, limit = 10 } = params;
+    const all = this.store.getAll();
+    const cleanCity = city ? city.trim().toLowerCase() : "";
+    const cleanCat = category ? category.trim().toLowerCase() : "";
+    const cleanQuery = query ? query.trim().toLowerCase() : "";
+
+    const filtered = all.filter((v) => {
+      const matchCity = !cleanCity || v.city.toLowerCase().includes(cleanCity);
+      const matchCat =
+        !cleanCat ||
+        v.category.toLowerCase().includes(cleanCat) ||
+        cleanCat.includes(v.category.toLowerCase());
+      const matchQuery =
+        !cleanQuery ||
+        v.name.toLowerCase().includes(cleanQuery) ||
+        v.address.toLowerCase().includes(cleanQuery) ||
+        v.area.toLowerCase().includes(cleanQuery);
+      return matchCity && matchCat && matchQuery;
+    });
+
+    return filtered.slice(0, limit);
+  }
+
   public async findById(id: string): Promise<VendorPlace | null> {
     return this.store.getById(id);
   }

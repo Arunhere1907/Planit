@@ -24,6 +24,7 @@ export const BUDGET_THRESHOLDS = {
 
 export const TIMEOUTS = {
   LLM_CALL_MS: 10000,
+  LLM_TIMEOUT_MS: 10000,
   PLACES_API_MS: 5000,
 } as const;
 
@@ -31,6 +32,17 @@ export const RATE_LIMITS = {
   WINDOW_MS: 60 * 1000, // 1 minute
   MAX_AI_REQUESTS: 25,
   MAX_STANDARD_REQUESTS: 120,
+  DEFAULT_WINDOW_MAX: 120,
 } as const;
 
+
 export const DEFAULT_DEMO_USER_ID = "user-demo-1";
+
+export const CONSTANTS = {
+  HTTP_STATUS,
+  BUDGET_THRESHOLDS,
+  TIMEOUTS,
+  RATE_LIMITS,
+  DEFAULT_DEMO_USER_ID,
+} as const;
+

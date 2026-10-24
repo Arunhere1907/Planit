@@ -1,57 +1,63 @@
 import { apiFetch } from './client.js';
 import {
-  EventPlan,
+  FullEventPlan,
   EventProfile,
-  EventBudget,
-  TimelineTask,
-  Vendor,
-  CreativeIdea,
-  EventMessage,
-  RiskItem,
-  ExpenseItem,
+  BudgetCategory,
+  Expense,
+  Task,
   TaskStatus,
-  VendorCategory
+  VendorPlace,
+  IdeaItem,
+  InvitationItem,
+  RiskItem,
+  VendorCategory,
+  EventComment,
 } from '../../../shared/types/index.js';
 
 export const eventApi = {
   // Events
-  getAllEvents: () => apiFetch<EventPlan[]>('/api/events'),
-  getEventById: (id: string) => apiFetch<EventPlan>(`/api/events/${id}`),
+  getAllEvents: () => apiFetch<FullEventPlan[]>('/api/events'),
+  getEventById: (id: string) => apiFetch<FullEventPlan>(`/api/events/${id}`),
   createEvent: (profile: EventProfile) =>
-    apiFetch<EventPlan>('/api/events', {
+    apiFetch<FullEventPlan>('/api/events', {
       method: 'POST',
-      body: JSON.stringify(profile)
+      body: JSON.stringify(profile),
     }),
   updateProfile: (id: string, patch: Partial<EventProfile>) =>
-    apiFetch<EventPlan>(`/api/events/${id}/profile`, {
+    apiFetch<FullEventPlan>(`/api/events/${id}/profile`, {
       method: 'PATCH',
-      body: JSON.stringify(patch)
+      body: JSON.stringify(patch),
     }),
   addComment: (id: string, data: { section: string; targetId?: string; content: string }) =>
-    apiFetch<any>(`/api/events/${id}/comments`, {
+    apiFetch<EventComment>(`/api/events/${id}/comments`, {
       method: 'POST',
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     }),
   markNotificationRead: (eventId: string, notifId: string) =>
     apiFetch<void>(`/api/events/${eventId}/notifications/${notifId}/read`, {
-      method: 'PATCH'
+      method: 'PATCH',
     }),
 
   // Intake NLP
   extractIntake: (input: string) =>
-    apiFetch<{ profile: EventProfile; followUpQuestions: string[]; confidence: number }>(
+    apiFetch<{ profile: EventProfile; follow_up_questions: string[]; confidence: number }>(
       '/api/intake/extract',
       {
         method: 'POST',
-        body: JSON.stringify({ input })
+        body: JSON.stringify({ input }),
       }
     ),
 
   // Budget
-  addExpense: (eventId: string, expense: Omit<ExpenseItem, 'id' | 'createdAt'>) =>
-    apiFetch<EventBudget>(`/api/events/${eventId}/budget/expenses`, {
+  generateBudget: (profile: EventProfile) =>
+    apiFetch<{ categories: BudgetCategory[]; strategic_notes?: string }>('/api/budget/generate', {
       method: 'POST',
-      body: JSON.stringify(expense)
+      body: JSON.stringify({ profile }),
+    }),
+  addExpense: (eventId: string, expense: Omit<Expense, 'id'>) =>
+    apiFetch<FullEventPlan['budget']>(`/api/events/${eventId}/budget/expenses`, {
+      method: 'POST',
+      body: JSON.stringify(expense),
     }),
   updateCategoryAllocation: (
     eventId: string,
@@ -59,21 +65,29 @@ export const eventApi = {
     allocated: number,
     isLocked?: boolean
   ) =>
-    apiFetch<EventBudget>(`/api/events/${eventId}/budget/categories/${categoryName}`, {
+    apiFetch<FullEventPlan['budget']>(`/api/events/${eventId}/budget/categories/${encodeURIComponent(categoryName)}`, {
       method: 'PUT',
-      body: JSON.stringify({ allocated, isLocked })
+      body: JSON.stringify({ allocated, isLocked }),
     }),
 
   // Timeline
+  generateTimeline: (profile: EventProfile) =>
+    apiFetch<{ tasks: Task[]; run_of_show: FullEventPlan['timeline']['run_of_show'] }>(
+      '/api/timeline/generate',
+      {
+        method: 'POST',
+        body: JSON.stringify({ profile }),
+      }
+    ),
   updateTaskStatus: (eventId: string, taskId: string, status: TaskStatus) =>
-    apiFetch<TimelineTask>(`/api/events/${eventId}/timeline/tasks/${taskId}/status`, {
+    apiFetch<Task>(`/api/events/${eventId}/timeline/tasks/${taskId}/status`, {
       method: 'PATCH',
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status }),
     }),
-  addTask: (eventId: string, task: Omit<TimelineTask, 'id'>) =>
-    apiFetch<TimelineTask>(`/api/events/${eventId}/timeline/tasks`, {
+  addTask: (eventId: string, task: Omit<Task, 'id'>) =>
+    apiFetch<Task>(`/api/events/${eventId}/timeline/tasks`, {
       method: 'POST',
-      body: JSON.stringify(task)
+      body: JSON.stringify(task),
     }),
 
   // Vendors
@@ -83,18 +97,27 @@ export const eventApi = {
     if (params.city) searchParams.set('city', params.city);
     if (params.query) searchParams.set('query', params.query);
     if (params.maxResults) searchParams.set('maxResults', String(params.maxResults));
-    return apiFetch<Vendor[]>(`/api/vendors/search?${searchParams.toString()}`);
+    return apiFetch<{ data: VendorPlace[]; vendors: VendorPlace[] }>(`/api/vendors/search?${searchParams.toString()}`);
   },
 
   // AI Features
-  generateIdeas: (eventId: string) =>
-    apiFetch<CreativeIdea[]>(`/api/events/${eventId}/ideas/generate`, { method: 'POST' }),
-  generateInvitations: (eventId: string) =>
-    apiFetch<EventMessage[]>(`/api/events/${eventId}/invitations/generate`, { method: 'POST' }),
-  analyzeRisks: (eventId: string) =>
-    apiFetch<RiskItem[]>(`/api/events/${eventId}/risks/analyze`, { method: 'POST' }),
+  generateIdeas: (profile: EventProfile) =>
+    apiFetch<{ ideas: IdeaItem[] }>('/api/ideas/generate', {
+      method: 'POST',
+      body: JSON.stringify({ profile }),
+    }),
+  generateInvitations: (profile: EventProfile) =>
+    apiFetch<{ variants: InvitationItem[]; invitations: InvitationItem[] }>('/api/invitations/generate', {
+      method: 'POST',
+      body: JSON.stringify({ profile }),
+    }),
+  analyzeRisks: (profile: EventProfile) =>
+    apiFetch<{ risks: RiskItem[] }>('/api/risks/generate', {
+      method: 'POST',
+      body: JSON.stringify({ profile }),
+    }),
 
   // Dev / Debug
   resetDatabase: () =>
-    apiFetch<{ success: boolean; message: string }>('/api/dev/reset', { method: 'POST' })
+    apiFetch<{ success: boolean; message: string }>('/api/dev/reset', { method: 'POST' }),
 };

@@ -1,12 +1,12 @@
 import { eventRepository } from '../repositories/index.js';
-import { TimelineTask, TaskStatus, ActivityLogEntry } from '../../shared/types/index.js';
+import { Task, TaskStatus, ActivityLogItem } from '../../shared/types/index.js';
 import { NotFoundError } from '../errors/app-error.js';
 
 export class TimelineService {
-  public async getTimeline(eventId: string): Promise<TimelineTask[]> {
+  public async getTimeline(eventId: string): Promise<Task[]> {
     const event = await eventRepository.findById(eventId);
     if (!event) throw new NotFoundError('Event not found');
-    return event.timeline;
+    return event.timeline.tasks;
   }
 
   public async updateTaskStatus(
@@ -14,27 +14,27 @@ export class TimelineService {
     taskId: string,
     status: TaskStatus,
     user: { id: string; name: string }
-  ): Promise<TimelineTask> {
+  ): Promise<Task> {
     const event = await eventRepository.findById(eventId);
     if (!event) throw new NotFoundError('Event not found');
 
-    const task = event.timeline.find(t => t.id === taskId);
+    const task = event.timeline.tasks.find((t: Task) => t.id === taskId);
     if (!task) throw new NotFoundError(`Task "${taskId}" not found`);
 
     task.status = status;
+    task.edited_at = new Date().toISOString();
 
-    const activity: ActivityLogEntry = {
+    const activity: ActivityLogItem = {
       id: `act_${Date.now()}`,
-      userId: user.id,
-      userName: user.name,
+      user: user.name,
       action: 'completed_task',
-      details: `Marked task "${task.title}" as ${status}`,
-      timestamp: new Date().toISOString()
+      detail: `Marked task "${task.title}" as ${status}`,
+      timestamp: new Date().toISOString(),
     };
 
     await eventRepository.update(eventId, {
       timeline: event.timeline,
-      activityLog: [activity, ...event.activityLog]
+      activity_log: [activity, ...event.activity_log],
     });
 
     return task;
@@ -42,33 +42,35 @@ export class TimelineService {
 
   public async addTask(
     eventId: string,
-    taskData: Omit<TimelineTask, 'id'>,
+    taskData: Omit<Task, 'id'>,
     user: { id: string; name: string }
-  ): Promise<TimelineTask> {
+  ): Promise<Task> {
     const event = await eventRepository.findById(eventId);
     if (!event) throw new NotFoundError('Event not found');
 
-    const newTask: TimelineTask = {
+    const newTask: Task = {
       ...taskData,
-      id: `task_${Date.now()}`
+      id: `task_${Date.now()}`,
+      edited_at: new Date().toISOString(),
     };
 
-    event.timeline.push(newTask);
+    event.timeline.tasks.push(newTask);
     // Keep timeline sorted chronologically
-    event.timeline.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+    event.timeline.tasks.sort(
+      (a: Task, b: Task) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+    );
 
-    const activity: ActivityLogEntry = {
+    const activity: ActivityLogItem = {
       id: `act_${Date.now()}`,
-      userId: user.id,
-      userName: user.name,
+      user: user.name,
       action: 'added_task',
-      details: `Added new milestone "${newTask.title}" for ${newTask.dueDate}`,
-      timestamp: new Date().toISOString()
+      detail: `Added new milestone "${newTask.title}" for ${newTask.due_date}`,
+      timestamp: new Date().toISOString(),
     };
 
     await eventRepository.update(eventId, {
       timeline: event.timeline,
-      activityLog: [activity, ...event.activityLog]
+      activity_log: [activity, ...event.activity_log],
     });
 
     return newTask;
