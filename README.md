@@ -361,14 +361,191 @@ The UI adheres strictly to a semantic, accessible design token system defined in
 
 ---
 
-## 6. Scripts & Quality Verification
+## 6. Testing
+
+PlanIt includes a comprehensive test suite covering unit, service, API, repository, and frontend layers with deterministic execution and no external API dependencies.
+
+### Running Tests
+
+```bash
+# Run all tests once
+npm test
+
+# Run tests in watch mode (re-runs on file changes)
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+### Coverage Requirements
+
+The test suite enforces minimum coverage thresholds via `vitest.config.ts`:
+- **Overall:** 60% (lines, functions, branches, statements)
+- **Services & Lib:** 80% (lines, functions, statements), 75% (branches)
+
+Coverage reports are generated in the `coverage/` directory and displayed in the terminal after running `npm run test:coverage`.
+
+### What Is Covered
+
+| Layer | Test Files | What's Tested | Count |
+|-------|-----------|---------------|-------|
+| **Unit Tests** | `src/__tests__/unit/` | Pure functions: budget math, timeline calculations, formatters, schemas, export utilities | 180+ tests |
+| **Service Tests** | `src/__tests__/services/` | AI service (LLM integration), Places service (Google API), with mocked external clients | 70+ tests |
+| **API Tests** | `src/__tests__/api/` | Full HTTP integration tests for all routes using supertest | 50+ tests |
+| **Repository Tests** | `src/__tests__/repositories/` | In-memory store CRUD, event isolation, seed management | 40+ tests |
+| **Component Tests** | `src/__tests__/components/` | React components with React Testing Library | 20+ tests |
+
+**Total: 360+ tests**
+
+### Deterministic Testing
+
+All tests are **fully deterministic** with no flaky behavior:
+
+#### Fixed Time
+- All tests use **fake timers** with a fixed date: `2026-10-25T12:00:00Z`
+- Set up in `src/__tests__/setup.ts` using `vi.useFakeTimers()`
+- No real date dependencies - all date calculations use the fixed reference
+
+#### Mocked External APIs
+- **LLM Client (Gemini):** Mocked in `ai.service.test.ts` to return predefined JSON responses
+- **Google Places API:** Mocked in `places.service.test.ts` using global `fetch` mock
+- **Environment Variables:** Mocked via `vi.stubEnv()` in setup.ts
+- **Vite Server:** Mocked to prevent dev server startup in tests
+
+#### No Real API Calls
+Tests **never** make real HTTP requests to:
+- Gemini AI API
+- Google Places API
+- Any external service
+
+This ensures:
+- ✅ Tests run offline
+- ✅ Tests run in CI without API keys
+- ✅ Zero test flakiness from network issues
+- ✅ Zero cost from API usage during testing
+
+### Test Organization
+
+```
+src/__tests__/
+├── setup.ts                          # Global test configuration (fake timers, mocks)
+├── unit/
+│   ├── budget.test.ts               # Budget math (splits, rebalance, optimizer)
+│   ├── timeline.test.ts             # Timeline calculations (backwards dates)
+│   ├── formatters.test.ts           # INR formatting, date helpers, status thresholds
+│   ├── schemas.test.ts              # Zod schema validation
+│   └── export.test.ts               # CSV and ICS export (RFC 5545 compliance)
+├── services/
+│   ├── ai.service.test.ts           # AI service with mocked LLM
+│   └── places.service.test.ts       # Places service with mocked Google API
+├── api/
+│   └── api.integration.test.ts      # Full HTTP integration tests (supertest)
+├── repositories/
+│   └── event.repository.test.ts     # In-memory store tests
+└── components/
+    └── BudgetView.test.tsx          # React component tests (RTL)
+```
+
+### Key Test Features
+
+#### Budget Math Tests
+- Verifies `sum(categories) === total_budget` always holds
+- Tests locked category preservation during rebalancing
+- Validates proportional distribution across unlocked categories
+- Tests edge cases: all locked, single category, rounding
+
+#### Timeline Tests
+- Backwards date calculation from event date
+- Compressed timelines when event is imminent
+- Leap year and year boundary handling
+- Phase assignment and role mapping
+
+#### AI Service Tests
+- Intake extraction with schema validation
+- Budget generation (LLM reasoning + code math)
+- Timeline generation (LLM tasks + code dates)
+- Error handling (malformed JSON, network errors)
+- Fallback behavior when API key missing
+
+#### Places Service Tests
+- Vendor search with query parameters
+- Graceful degradation to local repository
+- API error handling (401, 429, 500)
+- Cache behavior and data mapping
+
+#### API Integration Tests
+- All CRUD operations (GET, POST, PUT, DELETE)
+- Validation error responses (400)
+- Not found errors (404)
+- Role-based access control (403)
+- Rate limiting (429)
+- Consistent error response shape
+
+#### Repository Tests
+- Event isolation (separate data per event)
+- CRUD operations with edge cases
+- Seed reset functionality
+- Concurrent operations handling
+
+#### Frontend Component Tests
+- Budget overspend warnings (red when >100%, amber when ≥90%)
+- Category allocation rendering and interactions
+- Expense tracking and deletion
+- Lock/unlock category toggles
+- Tab switching and state management
+
+### Adding New Tests
+
+1. **Create test file** in appropriate directory (`unit/`, `services/`, `api/`, `repositories/`, `components/`)
+2. **Import test utilities:**
+   ```typescript
+   import { describe, it, expect, vi } from 'vitest';
+   ```
+3. **Use fixed date from setup:**
+   ```typescript
+   // No need to set up fake timers - already done globally
+   // FIXED_DATE is 2026-10-25T12:00:00Z
+   ```
+4. **Mock external dependencies:**
+   ```typescript
+   vi.mock('../../services/ai/llm.client', () => ({
+     llmClient: {
+       generateContent: vi.fn().mockResolvedValue({ /* ... */ })
+     }
+   }));
+   ```
+5. **Run tests:**
+   ```bash
+   npm run test:watch  # Watches for changes
+   ```
+
+### Continuous Integration
+
+GitHub Actions CI workflow (`.github/workflows/ci.yml`) runs on every push and PR:
+1. ✅ Install dependencies
+2. ✅ Type check (`npm run typecheck`)
+3. ✅ Run full test suite with coverage (`npm run test:coverage`)
+4. ✅ Build production bundle (`npm run build`)
+
+Tests must pass before merging to main/master/develop branches.
+
+---
+
+## 7. Scripts & Quality Verification
 
 ```bash
 # Run full development server with backend and Vite HMR
 npm run dev
 
-# Run unit tests (deterministic math, formatters, repositories, schemas)
-npm run test
+# Run all tests once
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
 
 # Run TypeScript static type check
 npm run typecheck

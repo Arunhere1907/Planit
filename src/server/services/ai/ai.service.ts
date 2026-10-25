@@ -319,8 +319,8 @@ export class AIService {
     if (eventType === 'wedding') {
       return [
         { id: 'ros_1', time: '03:30 PM', title: 'Bridal Makeup & Styling Begins', owner: 'Bridal Stylist', location: 'Green Room', notes: 'HD airbrush and draping' },
-        { id: 'ros_2', time: '05:15 PM', title: 'Baraat Procession & Dhol Beats', owner: 'Groom's Family', location: 'Main Gate', notes: 'Traditional welcome' },
-        { id: 'ros_3', time: '06:00 PM', title: 'Bride's Family Welcome & Aarti', owner: 'Host Family', location: 'Welcome Arch', notes: 'Tilak and garland exchange' },
+        { id: 'ros_2', time: '05:15 PM', title: 'Baraat Procession & Dhol Beats', owner: 'Groom\'s Family', location: 'Main Gate', notes: 'Traditional welcome' },
+        { id: 'ros_3', time: '06:00 PM', title: 'Bride\'s Family Welcome & Aarti', owner: 'Host Family', location: 'Welcome Arch', notes: 'Tilak and garland exchange' },
         { id: 'ros_4', time: '06:30 PM', title: 'Jaimala Ceremony on Stage', owner: 'Emcee & Photography', location: 'Main Stage', notes: 'Varmala exchange with photo op' },
         { id: 'ros_5', time: '07:00 PM', title: 'Cocktail Hour & Dinner Service Begins', owner: 'Catering Team', location: 'Dining Pavilion', notes: 'Appetizers and welcome drinks' },
         { id: 'ros_6', time: '08:00 PM', title: 'Sacred Mandap Ceremony & Pheras', owner: 'Priest & Family', location: 'Mandap', notes: 'Traditional vows and saptapadi' },
