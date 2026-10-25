@@ -29,7 +29,8 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<typeof SpeechRecognition.prototype | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
 
   // Live "What I Understood" profile card
   const [draftProfile, setDraftProfile] = useState<EventProfile>({
@@ -50,7 +51,7 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
   });
 
   const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
-  const [aiSummary, setAiSummary] = useState<string>(
+  const [_aiSummary, setAiSummary] = useState<string>(
     "Ready to generate! Review or edit the parameters on the right."
   );
 
@@ -143,7 +144,7 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
       }
 
       setMessages((prev) => [...prev, { role: "assistant", content: assistantReply }]);
-    } catch (err: unknown) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: "I parsed your notes into the editable card on the right!" },

@@ -17,7 +17,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   onClose,
   onMarkTaskDone,
 }) => {
-  const { profile, timeline, vendors, budget } = plan;
+  const { profile: _profile, timeline, vendors, budget: _budget } = plan;
   const todayStr = new Date().toISOString().split("T")[0];
 
   // Auto-generate notifications based on live data

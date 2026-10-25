@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "./components/Header";
 import { DashboardView } from "./components/DashboardView";
 import { IntakeChat } from "./components/IntakeChat";
@@ -99,7 +99,7 @@ export default function App() {
   const [showPrintModal, setShowPrintModal] = useState<boolean>(false);
   const [showNotificationModal, setShowNotificationModal] = useState<boolean>(false);
   const [showOptimizerModal, setShowOptimizerModal] = useState<boolean>(false);
-  const [showAddExpenseDirectly, setShowAddExpenseDirectly] = useState<boolean>(false);
+  const [_showAddExpenseDirectly, _setShowAddExpenseDirectly] = useState<boolean>(false);
 
   // Active plan
   const activePlan = plans.find((p) => p.profile.id === currentPlanId) || plans[0];

@@ -10,7 +10,7 @@ interface ReplanModalProps {
 }
 
 export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, onClose }) => {
-  const { profile, budget, timeline } = plan;
+  const { profile, budget, timeline: _timeline } = plan;
 
   const [newDate, setNewDate] = useState(profile.date);
   const [newBudget, setNewBudget] = useState(profile.total_budget);
@@ -22,7 +22,7 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
   // Proposed Diffs
   const [proposedCategories, setProposedCategories] = useState<BudgetCategory[]>([]);
   const [proposedTasks, setProposedTasks] = useState<Task[]>([]);
-  const [acceptedItems, setAcceptedItems] = useState<Record<string, boolean>>({});
+  const [_acceptedItems, setAcceptedItems] = useState<Record<string, boolean>>({});
 
   const handleRunReplanPipeline = async () => {
     setIsSimulating(true);

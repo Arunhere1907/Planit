@@ -4,12 +4,12 @@ import {
   BudgetResponseSchema,
   TimelineResponseSchema,
   IdeasResponseSchema,
-  InvitationsResponseSchema,
+  // InvitationsResponseSchema - unused in tests
   RisksResponseSchema,
   OptimizerResponseSchema,
   ExpenseItemSchema,
   EventMemberSchema,
-  TimelineTaskSchema,
+  // TimelineTaskSchema - unused in tests
   EventVendorSchema,
 } from '../../shared/schemas/zod-schemas.js';
 

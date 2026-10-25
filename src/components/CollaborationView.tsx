@@ -7,7 +7,7 @@ import {
   Activity,
   Trash2,
 } from "lucide-react";
-import { Collaborator, ActivityLogItem } from "../types";
+import { Collaborator, ActivityLogItem, UserRole } from "../types";
 
 interface CollaborationViewProps {
   collaborators: Collaborator[];

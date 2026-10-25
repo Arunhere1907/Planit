@@ -64,11 +64,6 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
     .filter((e) => e.status === "paid")
     .reduce((sum, e) => sum + e.amount, 0);
 
-  const totalPending = expenses
-    .filter((e) => e.status === "pending")
-    .reduce((sum, e) => sum + e.amount, 0);
-
-  const totalCommitted = totalSpent + totalPending;
   const budgetUtilization = (totalSpent / totalBudget) * 100;
   const isOverBudget = totalSpent > totalBudget;
   const isNearBudgetLimit = totalSpent >= totalBudget * 0.9 && !isOverBudget;

@@ -9,7 +9,7 @@ interface PrintablePlanModalProps {
 }
 
 export const PrintablePlanModal: React.FC<PrintablePlanModalProps> = ({ plan, onClose }) => {
-  const { profile, budget, timeline, vendors, ideas, risks } = plan;
+  const { profile, budget, timeline, vendors, ideas: _ideas, risks } = plan;
 
   const handlePrint = () => {
     window.print();

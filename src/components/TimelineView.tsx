@@ -34,7 +34,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   onOpenReplanModal,
 }) => {
   const [viewMode, setViewMode] = useState<"phase" | "list" | "run_of_show">("phase");
-  const [phaseFilter, setPhaseFilter] = useState<string>("all");
+  const [phaseFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // New Task form state

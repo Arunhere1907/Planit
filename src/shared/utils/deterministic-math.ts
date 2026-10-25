@@ -93,7 +93,7 @@ export function rebalanceBudgetCategories(
   let distributedSum = 0;
   for (let i = 0; i < unlockedOthers.length; i++) {
     const cat = unlockedOthers[i];
-    let allocatedAmount = 0;
+    let allocatedAmount;
 
     if (remainder <= 0) {
       allocatedAmount = 0;
@@ -159,7 +159,7 @@ export function calculateBackwardsDueDates(
       taskDate.setTime(eventDate.getTime());
     }
 
-    let determinedPhase = t.phase;
+    let determinedPhase: "6+ months" | "3 months" | "1 month" | "1 week" | "Day before" | "Day-of";
     if (effectiveOffset >= 180) determinedPhase = "6+ months";
     else if (effectiveOffset >= 90) determinedPhase = "3 months";
     else if (effectiveOffset >= 30) determinedPhase = "1 month";
@@ -196,8 +196,8 @@ export function checkBudgetSanity(
   const guests = Math.max(1, guestCount);
   const perGuest = Math.round(totalBudget / guests);
 
-  let benchmarkMin = 1500;
-  let benchmarkMax = 6000;
+  let benchmarkMin;
+  let benchmarkMax;
 
   if (eventType === "birthday") {
     benchmarkMin = 800;
