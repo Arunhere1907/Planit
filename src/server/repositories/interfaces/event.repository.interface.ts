@@ -1,4 +1,4 @@
-import { FullEventPlan, EventProfile, BudgetCategory, Expense, Task, RunOfShowItem, IdeaItem, RiskItem, InvitationItem } from "../../../shared/types/index.js";
+import { FullEventPlan } from "../../../shared/types/index.js";
 
 export interface IEventRepository {
   findAll(): Promise<FullEventPlan[]>;

@@ -1,14 +1,7 @@
 import React, { useState } from "react";
 import {
   Bell,
-  Clock,
-  CheckCircle2,
-  AlertTriangle,
   X,
-  Sparkles,
-  Calendar,
-  CreditCard,
-  MessageSquare,
 } from "lucide-react";
 import { FullEventPlan } from "../types";
 import { formatDate, formatExactINR } from "../lib/formatters";

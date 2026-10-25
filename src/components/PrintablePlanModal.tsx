@@ -1,5 +1,5 @@
 import React from "react";
-import { Printer, X, FileDown, CheckCircle2 } from "lucide-react";
+import { Printer, X } from "lucide-react";
 import { FullEventPlan } from "../types";
 import { formatExactINR, formatDate } from "../lib/formatters";
 

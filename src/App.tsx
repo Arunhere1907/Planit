@@ -262,7 +262,13 @@ export default function App() {
     });
   };
 
-  const handleUpdateRunOfShow = (runOfShow: any[]) => {
+  const handleUpdateRunOfShow = (runOfShow: Array<{
+    time: string;
+    title: string;
+    owner: string;
+    location: string;
+    notes: string;
+  }>) => {
     updateCurrentPlan((prev) => ({
       ...prev,
       timeline: { ...prev.timeline, run_of_show: runOfShow },

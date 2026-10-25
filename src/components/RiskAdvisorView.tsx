@@ -1,20 +1,13 @@
 import React, { useState } from "react";
 import {
-  ShieldAlert,
   CloudRain,
   AlertTriangle,
   Scale,
-  Sparkles,
   RefreshCw,
   CheckCircle2,
-  Calendar,
-  Thermometer,
-  Wind,
-  Info,
   Loader2,
 } from "lucide-react";
 import { RiskItem, EventProfile } from "../types";
-import { formatExactINR } from "../lib/formatters";
 import { checkBudgetSanity } from "../lib/deterministicMath";
 
 interface RiskAdvisorViewProps {

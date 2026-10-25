@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Sparkles, Sliders, Check, ArrowRight, X, Loader2, AlertCircle, TrendingDown } from "lucide-react";
+import { Sliders, ArrowRight, X, Loader2 } from "lucide-react";
 import { BudgetCategory, EventProfile } from "../types";
 import { formatExactINR } from "../lib/formatters";
 
@@ -10,6 +10,20 @@ interface BudgetOptimizerModalProps {
   onClose: () => void;
 }
 
+interface OptimizerCutProposal {
+  category_name: string;
+  cut_percent: number;
+  specific_action: string;
+}
+
+interface OptimizerScenario {
+  name: string;
+  description: string;
+  total_savings: number;
+  experience_impact: string;
+  proposed_cuts: OptimizerCutProposal[];
+}
+
 export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
   categories,
   profile,
@@ -18,7 +32,7 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
 }) => {
   const [selectedCutPercent, setSelectedCutPercent] = useState<number>(15);
   const [isLoading, setIsLoading] = useState(false);
-  const [scenarios, setScenarios] = useState<any[]>([
+  const [scenarios, setScenarios] = useState<OptimizerScenario[]>([
     {
       name: "Minimal Impact (Surgical Polish)",
       description: "Trims non-essential print stationery and exotic out-of-season blooms while keeping gourmet catering and candid photography 100% untouched.",
@@ -79,10 +93,10 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
     }
   };
 
-  const handleApply = (scenario: any) => {
+  const handleApply = (scenario: OptimizerScenario) => {
     const updated = categories.map((cat) => {
       const cutRule = scenario.proposed_cuts.find(
-        (c: any) => c.category_name.toLowerCase() === cat.name.toLowerCase()
+        (c) => c.category_name.toLowerCase() === cat.name.toLowerCase()
       );
       if (cutRule) {
         const cutFactor = (100 - cutRule.cut_percent) / 100;
@@ -187,7 +201,7 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
                 <div className="bg-white p-3 rounded-lg border border-slate-200/80 space-y-1.5">
                   <div className="text-[11px] font-bold text-slate-700">Specific Trade-offs:</div>
                   <ul className="space-y-1 text-xs text-slate-600">
-                    {sc.proposed_cuts?.map((cut: any, cIdx: number) => (
+                    {sc.proposed_cuts?.map((cut, cIdx: number) => (
                       <li key={cIdx} className="flex items-start gap-1.5">
                         <span className="text-amber-500 font-bold">•</span>
                         <span>

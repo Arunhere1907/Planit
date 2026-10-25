@@ -3,12 +3,9 @@ import {
   Sparkles,
   Bookmark,
   BookmarkCheck,
-  RefreshCw,
-  Plus,
   Trash2,
   Tag,
   Loader2,
-  Filter,
 } from "lucide-react";
 import { IdeaItem, EventProfile } from "../types";
 

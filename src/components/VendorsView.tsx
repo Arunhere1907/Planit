@@ -2,25 +2,20 @@ import React, { useState, useEffect } from "react";
 import {
   Store,
   Phone,
-  Globe,
   Star,
   MapPin,
   ExternalLink,
   Plus,
-  HelpCircle,
   Scale,
   Sparkles,
   FileDown,
   Search,
-  Filter,
   CheckCircle2,
-  AlertCircle,
   Trash2,
   Loader2,
-  Calendar,
 } from "lucide-react";
 import { VendorItem, VendorPlace, VendorStatus, EventProfile } from "../types";
-import { formatExactINR, formatDate } from "../lib/formatters";
+import { formatExactINR } from "../lib/formatters";
 
 interface VendorsViewProps {
   vendors: VendorItem[];
@@ -48,13 +43,27 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
   // Questions Modal State
   const [showQuestionsModal, setShowQuestionsModal] = useState(false);
   const [questionsCategory, setQuestionsCategory] = useState("");
-  const [generatedQuestions, setGeneratedQuestions] = useState<any[]>([]);
+  const [generatedQuestions, setGeneratedQuestions] = useState<Array<{
+    category: string;
+    question: string;
+    why_it_matters: string;
+  }>>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
 
   // Compare Modal State
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [compareSelectedIds, setCompareSelectedIds] = useState<string[]>([]);
-  const [compareResult, setCompareResult] = useState<any>(null);
+  const [compareResult, setCompareResult] = useState<{
+    comparison_table: Array<{
+      vendor_name: string;
+      estimated_price: string;
+      pros: string[];
+      cons: string[];
+      score: number;
+    }>;
+    overall_recommendation: string;
+    negotiation_leverage: string;
+  } | null>(null);
   const [loadingCompare, setLoadingCompare] = useState(false);
 
   // New Vendor Form
@@ -694,7 +703,7 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
 
                   {/* Comparison Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {compareResult.comparison_table?.map((item: any, i: number) => (
+                    {compareResult.comparison_table?.map((item, i: number) => (
                       <div key={i} className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
                         <div className="flex items-center justify-between">
                           <h4 className="font-bold text-xs text-slate-900">{item.vendor_name}</h4>

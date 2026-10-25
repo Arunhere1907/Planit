@@ -3,19 +3,13 @@ import {
   Lock,
   Unlock,
   AlertTriangle,
-  TrendingDown,
-  Sparkles,
   Plus,
   FileDown,
-  Info,
-  CheckCircle2,
   Sliders,
-  RefreshCw,
   Trash2,
-  Layers,
 } from "lucide-react";
 import { BudgetCategory, Expense, EventProfile } from "../types";
-import { formatExactINR, formatCurrency, formatDate } from "../lib/formatters";
+import { formatExactINR, formatDate } from "../lib/formatters";
 import { rebalanceBudgetCategories } from "../lib/deterministicMath";
 
 interface BudgetViewProps {

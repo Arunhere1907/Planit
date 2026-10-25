@@ -1,18 +1,13 @@
 import React, { useState } from "react";
 import {
-  Users,
   UserPlus,
   Share2,
   Copy,
   Check,
-  Shield,
   Activity,
   Trash2,
-  ExternalLink,
-  MessageSquare,
 } from "lucide-react";
 import { Collaborator, ActivityLogItem } from "../types";
-import { formatDate } from "../lib/formatters";
 
 interface CollaborationViewProps {
   collaborators: Collaborator[];
@@ -237,7 +232,7 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
                 <label className="block text-xs font-bold text-slate-700 mb-1">Access Role</label>
                 <select
                   value={newRole}
-                  onChange={(e) => setNewRole(e.target.value as any)}
+                  onChange={(e) => setNewRole(e.target.value as "owner" | "editor" | "viewer")}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium"
                 >
                   <option value="editor">Editor (Can edit tasks, expenses & vendors)</option>

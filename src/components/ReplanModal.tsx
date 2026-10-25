@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { RefreshCw, Check, ArrowRight, X, Calendar, Users, IndianRupee, AlertCircle, Loader2 } from "lucide-react";
+import { RefreshCw, Check, ArrowRight, X, Loader2 } from "lucide-react";
 import { FullEventPlan, BudgetCategory, Task, EventProfile } from "../types";
 import { formatExactINR, formatDate } from "../lib/formatters";
 
@@ -56,8 +56,8 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
 
       // Default accept all
       const initialAccepts: Record<string, boolean> = {};
-      (budgetData.categories || []).forEach((c: any) => (initialAccepts[`cat-${c.id}`] = true));
-      (timelineData.tasks || []).forEach((t: any) => (initialAccepts[`task-${t.id}`] = true));
+      (budgetData.categories || []).forEach((c: BudgetCategory) => (initialAccepts[`cat-${c.id}`] = true));
+      (timelineData.tasks || []).forEach((t: Task) => (initialAccepts[`task-${t.id}`] = true));
       setAcceptedItems(initialAccepts);
 
       setDiffGenerated(true);

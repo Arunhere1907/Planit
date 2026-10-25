@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { ZodSchema, ZodError } from "zod";
+import { ZodSchema } from "zod";
 import { ValidationError } from "../errors/app-error.js";
 
 /**

@@ -6,18 +6,11 @@ import {
   Sparkles,
   CheckCircle2,
   AlertCircle,
-  HelpCircle,
-  Calendar,
-  MapPin,
-  Users,
-  IndianRupee,
-  Layers,
   ArrowRight,
   Loader2,
   X,
 } from "lucide-react";
 import { EventProfile } from "../types";
-import { formatCurrency, formatExactINR } from "../lib/formatters";
 
 interface IntakeChatProps {
   onPlanGenerated: (profile: EventProfile) => void;
@@ -36,7 +29,7 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   // Live "What I Understood" profile card
   const [draftProfile, setDraftProfile] = useState<EventProfile>({
@@ -64,14 +57,15 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
   // Web Speech API initialization
   useEffect(() => {
     const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      (window as Window & typeof globalThis & { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition || 
+      (window as Window & typeof globalThis & { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = "en-IN";
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         const transcript = event.results[0][0].transcript;
         setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
         setIsListening(false);
@@ -148,7 +142,7 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
       }
 
       setMessages((prev) => [...prev, { role: "assistant", content: assistantReply }]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: "I parsed your notes into the editable card on the right!" },
@@ -328,7 +322,7 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
                   <label className="block text-[11px] font-bold text-slate-600 mb-1">Event Type</label>
                   <select
                     value={draftProfile.type}
-                    onChange={(e) => setDraftProfile({ ...draftProfile, type: e.target.value as any })}
+                    onChange={(e) => setDraftProfile({ ...draftProfile, type: e.target.value as "wedding" | "birthday" | "community" | "general" })}
                     className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium text-slate-900"
                   >
                     <option value="wedding">Wedding</option>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FullEventPlan, EventProfile, Expense, TaskStatus, Task, BudgetCategory } from '../../shared/types/index.js';
+import { FullEventPlan, EventProfile, Expense, TaskStatus, Task } from '../../shared/types/index.js';
 import { eventApi } from '../services/api/event-api.js';
 
 export function usePlan() {

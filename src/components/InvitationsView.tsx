@@ -1,14 +1,9 @@
 import React, { useState } from "react";
 import {
-  Send,
   Copy,
   Check,
   Sparkles,
   Share2,
-  Calendar,
-  MapPin,
-  Clock,
-  Printer,
   ShieldCheck,
   Loader2,
 } from "lucide-react";

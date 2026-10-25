@@ -4,9 +4,7 @@ import {
   Bell,
   FileDown,
   RefreshCw,
-  PlusCircle,
   RotateCcw,
-  ShieldCheck,
   UserCheck
 } from 'lucide-react';
 import { EventProfile } from '../../../shared/types/index.js';

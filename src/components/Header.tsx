@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  Sparkles,
   Calendar,
-  Users,
   Bell,
   FileDown,
   RefreshCw,
-  Share2,
-  PlusCircle,
-  CheckCircle2,
   RotateCcw,
   UserCheck
 } from "lucide-react";
 import { EventProfile } from "../types";
-import { formatCurrency, getDaysRemaining } from "../lib/formatters";
+import { getDaysRemaining } from "../lib/formatters";
 
 interface HeaderProps {
   currentProfile: EventProfile;

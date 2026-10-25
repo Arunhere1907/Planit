@@ -5,12 +5,8 @@ import {
   CheckCircle2,
   List,
   Layers,
-  Sparkles,
   Download,
   Plus,
-  AlertCircle,
-  ChevronRight,
-  Filter,
   User,
   Trash2,
 } from "lucide-react";
@@ -517,7 +513,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                   <label className="block text-xs font-bold text-slate-700 mb-1">Priority</label>
                   <select
                     value={newTaskPriority}
-                    onChange={(e) => setNewTaskPriority(e.target.value as any)}
+                    onChange={(e) => setNewTaskPriority(e.target.value as "high" | "medium" | "low")}
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium"
                   >
                     <option value="high">High</option>
