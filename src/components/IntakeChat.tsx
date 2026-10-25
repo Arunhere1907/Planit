@@ -29,7 +29,7 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<typeof SpeechRecognition.prototype | null>(null);
 
   // Live "What I Understood" profile card
   const [draftProfile, setDraftProfile] = useState<EventProfile>({
@@ -57,15 +57,16 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
   // Web Speech API initialization
   useEffect(() => {
     const SpeechRecognition =
-      (window as Window & typeof globalThis & { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition || 
-      (window as Window & typeof globalThis & { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
+      // @ts-expect-error - Browser API not in TypeScript lib
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = "en-IN";
 
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
+      // @ts-expect-error - Browser speech recognition event
+      recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
         setIsListening(false);

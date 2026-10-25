@@ -263,15 +263,20 @@ export default function App() {
   };
 
   const handleUpdateRunOfShow = (runOfShow: Array<{
+    id?: string;
     time: string;
     title: string;
     owner: string;
     location: string;
     notes: string;
   }>) => {
+    const itemsWithIds = runOfShow.map((item, idx) => ({
+      ...item,
+      id: item.id || `ros-${Date.now()}-${idx}`,
+    }));
     updateCurrentPlan((prev) => ({
       ...prev,
-      timeline: { ...prev.timeline, run_of_show: runOfShow },
+      timeline: { ...prev.timeline, run_of_show: itemsWithIds },
     }));
   };
 

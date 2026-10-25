@@ -25,7 +25,7 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [newName, setNewName] = useState("");
-  const [newRole, setNewRole] = useState<"editor" | "viewer">("editor");
+  const [newRole, setNewRole] = useState<UserRole>("editor");
 
   const [shareLinkActive, setShareLinkActive] = useState(true);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -232,7 +232,7 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
                 <label className="block text-xs font-bold text-slate-700 mb-1">Access Role</label>
                 <select
                   value={newRole}
-                  onChange={(e) => setNewRole(e.target.value as "owner" | "editor" | "viewer")}
+                  onChange={(e) => setNewRole(e.target.value as UserRole)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium"
                 >
                   <option value="editor">Editor (Can edit tasks, expenses & vendors)</option>
