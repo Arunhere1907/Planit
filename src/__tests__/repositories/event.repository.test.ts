@@ -40,7 +40,7 @@ describe('In-Memory Event Repository - CRUD Operations', () => {
     ideas: [],
     invitations: [],
     risks: [],
-    members: [],
+    collaborators: [],
     activity_log: [],
   });
 
@@ -532,7 +532,7 @@ describe('In-Memory Event Repository - CRUD Operations', () => {
         ideas: [],
         invitations: [],
         risks: [],
-        members: [],
+        collaborators: [],
         activity_log: [],
       };
 
