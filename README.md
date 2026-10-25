@@ -36,7 +36,198 @@ graph TD
 
 ---
 
-## 1. Running with Dummy Data (No Database Required)
+## Problem Statement → Features Mapping
+
+| Problem Statement Requirement | Implementation | Location | Status |
+|-------------------------------|----------------|----------|--------|
+| **GenAI-powered planning assistant** | Gemini 2.5 Flash LLM integration with structured JSON output | `src/server/services/ai/` | ✅ |
+| Organize weddings, birthdays, community events | Three event types with distinct templates & workflows | `ai.service.ts`, seed data | ✅ |
+| **Budgets** | AI reasoning + deterministic math, rebalancing, expense tracker | `ai.service.ts`, `BudgetView.tsx` | ✅ |
+| **Timelines** | LLM-generated tasks + backwards date calculation | `ai.service.ts`, `TimelineView.tsx` | ✅ |
+| **Vendor checklists** | Status pipeline (5 stages), discovery with Google Places fallback | `VendorsView.tsx`, `places.service.ts` | ✅ |
+| **Personalized ideas** | LLM-generated based on vibe/culture/budget/guests | `ai.service.ts`, `IdeasView.tsx` | ✅ |
+| **Invitation generator** (extra) | Multi-format, multi-tone, WhatsApp integration | `ai.service.ts`, `InvitationsView.tsx` | ✅ |
+| **Risk advisor** (extra) | LLM analyzes context-specific risks with mitigation plans | `ai.service.ts`, `RiskAdvisorView.tsx` | ✅ |
+| **Budget optimizer** (extra) | What-if scenarios: maintain quality / moderate cuts / aggressive savings | `/api/budget/optimize`, `BudgetOptimizerModal.tsx` | ✅ |
+| **Vendor discovery** (extra) | Google Places API with curated fallback dataset | `places.service.ts`, `/api/vendors/search` | ✅ |
+| **Collaboration** (extra) | Role-based access (owner/editor/viewer), activity log | Middleware, `CollaborationView.tsx` | ✅ |
+| **Reminders** (extra) | In-process scheduler for due date notifications | `scheduler.ts`, `NotificationCenter.tsx` | ✅ |
+| **Export** (extra) | Budget CSV, Timeline ICS (RFC 5545), Vendor CSV | `exportUtils.ts`, all views | ✅ |
+
+---
+
+## 3-Minute Demo Script for Judges
+
+**Goal:** Experience all core features across different event types in under 3 minutes.
+
+### Setup (5 seconds)
+1. **Load app:** Navigate to `http://localhost:3000` → sees 3 pre-loaded events
+
+### Demo Flow (2 minutes 45 seconds)
+
+**Step 1: Explore Rich Wedding Event (30 sec)**
+- Click "Aarav & Diya's Royal Ahmedabad Wedding" from header dropdown
+- **Dashboard:** See 200 guests, ₹8 lakh budget, 53 days countdown
+- **Budget:** Observe 10 categories with AI reasoning (e.g., "₹2,56,000 for 200 guests with live chaat, dual Jain line")
+- **Timeline:** See 10 backward-scheduled tasks (vendor bookings 180 days out → day-of coordination)
+- **Run-of-Show:** Hour-by-hour wedding timeline (Baraat 5:15 PM → Pheras 8:00 PM → Bidaai 10:30 PM)
+
+**Step 2: Compare Birthday Event Type (25 sec)**
+- Switch to "Arjun's 30th Rooftop Milestone" (Mumbai birthday)
+- **Notice differences:**
+  - Budget: Only 7 categories (no "Rituals & Attire", added "Entertainment & Games")
+  - Vendors: Rooftop lounge, DJ, cake designer (not wedding mandap vendors)
+  - Ideas: "Live Saxophone & DJ Set" vs wedding's "Brass Urli Entrance"
+  - Invitation: Lighthearted tone ("30s will be legendary!") vs formal wedding
+
+**Step 3: View Community Event (20 sec)**
+- Switch to "Navratri Garba Mahotsav" (Ahmedabad community festival)
+- **Notice:**
+  - Budget: 6 categories prioritizing "Stage/Sound 25%", "Permits & Security 10%"
+  - Risks: Crowd management, sound curfew compliance (not wedding-specific)
+  - Invitation: Gujarati language, community-focused tone
+
+**Step 4: Test AI-Powered Intake (30 sec)**
+- Click "+ New Event" button in header
+- **Type:** "Plan a birthday party in Mumbai for 75 guests with ₹3 lakh budget in March"
+- **Observe:** AI extracts structured profile (type: birthday, city: Mumbai, guests: 75, budget: ₹300,000)
+- Auto-generates budget breakdown and timeline tasks
+- **Evidence of GenAI:** See AI reasoning for each budget category
+
+**Step 5: Vendor Discovery (15 sec)**
+- Go to **Vendors** tab
+- Click "Search Nearby Vendors"
+- Search for "Catering" in "Ahmedabad"
+- **See:** Google Places integration (or curated fallback) returns relevant vendors
+
+**Step 6: Budget Management (20 sec)**
+- Go to **Budget** tab on any event
+- Click lock icon on one category (e.g., "Catering")
+- Edit another category amount (e.g., increase "Venue" by ₹50,000)
+- **Observe:** Other unlocked categories automatically rebalance (deterministic math, sum always equals total)
+- **Note overspend warning:** If total expenses > budget, see red alert banner
+
+**Step 7: AI Features Showcase (25 sec)**
+- **Ideas:** Click "Generate New Ideas" → LLM creates 4 personalized ideas
+- **Invitations:** See 2-3 invitation variants (different tones: formal/casual/festive)
+- **Risk Advisor:** View context-specific risks (weather, food safety, timeline delays) with mitigation plans
+- **Budget Optimizer:** Open optimizer modal, select "Moderate Cuts" scenario → see optimized 20% reduction strategy
+
+**Step 8: Export & Collaboration (10 sec)**
+- **Export:** Click "Export CSV" on budget, "Export ICS" on timeline (downloads calendar file)
+- **Collaborators:** See role-based access (Owner/Editor/Viewer), activity log of all changes
+
+---
+
+## How the GenAI Works
+
+### Architecture: LLM for Creativity, Code for Math
+
+PlanIt uses a **hybrid approach** that leverages AI where it excels (natural language, reasoning, creativity) and code where precision matters (arithmetic, dates, validation).
+
+### GenAI Pipeline
+
+```
+User Input (Natural Language)
+    ↓
+[LLM: Gemini 2.5 Flash] ← System Prompt (Role, Constraints, JSON Schema)
+    ↓
+Structured JSON Output (Validated against Zod schemas)
+    ↓
+[Code: Deterministic Math] ← Exact calculations (budget sums, backward dates)
+    ↓
+Guaranteed Correct Result (No hallucinated math, no impossible dates)
+```
+
+### Meaningful GenAI Usage (Not Decorative)
+
+| Feature | What LLM Does | What Code Does | Why This Split |
+|---------|---------------|----------------|----------------|
+| **Intake Extraction** | Parses "I want a wedding in Ahmedabad for 200 guests with 8 lakh budget" → structured EventProfile JSON | Validates extracted values, applies guardrails (min budget, valid dates) | LLM understands conversational language; code enforces constraints |
+| **Budget Reasoning** | Explains WHY 30% venue, 32% catering makes sense for this event type/city/guest count | Calculates exact integer amounts so `sum(categories) === total_budget` | LLM provides context-aware reasoning; code guarantees penny-perfect math |
+| **Timeline Tasks** | Generates event-specific milestones (venue 180 days out, invitations 28 days, mandap setup 7 days) | Calculates exact due dates backward from event date, compresses if event is imminent | LLM knows planning sequences; code does calendar arithmetic |
+| **Ideas** | Creates personalized suggestions based on vibe, culture, budget, guest count | Formats cost ranges as percentages of budget | LLM generates creative ideas; code applies budget context |
+| **Invitations** | Writes invitation copy in multiple tones (formal/casual/festive) and languages | Formats dates, inserts placeholders, generates WhatsApp share URLs | LLM handles creative writing; code does string formatting |
+| **Risks** | Identifies context-specific risks (December dew in Ahmedabad, rooftop wind in Mumbai) | Categorizes by severity, stores in database | LLM analyzes event context; code structures data |
+| **Budget Optimizer** | Suggests where to cut costs (DIY decor, smaller venue, off-peak timing) | Recalculates budget splits, maintains sum integrity | LLM provides optimization strategies; code rebalances numbers |
+
+### Structured Output & Validation
+
+1. **System Prompts:** Each AI feature has a dedicated system prompt defining role, output schema, and constraints
+   - Location: `src/server/services/ai/prompts/event-prompts.ts`
+   - Example: `BUDGET_REASONING_SYSTEM_PROMPT` specifies percentage ranges for each event type
+
+2. **JSON Schema Enforcement:**
+   ```typescript
+   const response = await llmClient.generateContent({
+     model: 'gemini-2.5-flash',
+     config: {
+       responseMimeType: 'application/json',  // Forces JSON output
+       temperature: 0.2  // Low temperature for consistency
+     }
+   });
+   ```
+
+3. **Zod Validation:** All LLM outputs validated against TypeScript schemas before use
+   - Location: `src/shared/types/index.ts` and `src/schemas/zodSchemas.ts`
+
+### Robust Fallbacks
+
+**Every AI feature has a deterministic fallback** for when API keys are absent or rate limits hit:
+
+| Feature | Fallback Mechanism |
+|---------|-------------------|
+| Intake | Regex-based pattern extractor (detects event type, guest count, budget in lakhs/crores, city names) |
+| Budget | Event-type templates (`DEFAULT_BUDGET_SPLITS`) with industry-standard percentages |
+| Timeline | Event-type task lists with standard lead times (weddings 180 days, birthdays 60 days) |
+| Ideas | Curated library of 4 high-quality ideas per event type |
+| Invitations | Template bank with placeholders for personalization |
+| Risks | Risk matrix covering common scenarios (weather, vendors, food, timeline) |
+
+**Testing Fallbacks:**
+1. Set `GEMINI_API_KEY=` in `.env` (empty or absent)
+2. Run app → still fully functional with curated content
+3. Log message: `"No valid GEMINI_API_KEY configured. Running with intelligent deterministic fallback."`
+
+### GenAI Best Practices Followed
+
+✅ **Output is schema-validated JSON** - Never raw text, always structured  
+✅ **Math in code, not LLM** - Budget sums, date arithmetic done deterministically  
+✅ **Results change with inputs** - Same prompt twice = different creative output (temperature 0.2)  
+✅ **Follow-ups only for critical gaps** - Intake asks 2-3 questions only if date/budget/city missing  
+✅ **LLM not used where plain code suffices** - Date calculations, budget rebalancing, expense tracking all pure code  
+✅ **Guardrails prevent hallucination** - Budget percentages must sum to 100, dates can't be in past, guest count min 10  
+
+---
+
+## Running with Dummy Data (No Database Required)
+
+### Quick Start
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Arunhere1907/Planit.git
+cd Planit
+
+# 2. Copy environment template (all keys are optional)
+cp .env.example .env
+
+# 3. Install dependencies
+npm install
+
+# 4. Start the development server
+npm run dev
+
+# 5. Open your browser
+# Navigate to http://localhost:3000
+```
+
+The application will start on port 3000 with:
+- Express backend API on `/api/*`
+- Vite dev server middleware serving the React frontend
+- In-memory data store pre-seeded from `/data/seed/*.json`
+
+### Data Architecture
 
 This application runs **100% in-memory with zero external database dependencies**.
 - No Supabase, Postgres, or cloud database credentials are required.

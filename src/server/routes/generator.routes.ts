@@ -12,10 +12,10 @@ router.post(
   '/budget/generate',
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
-    const budget = aiService.generateDeterministicBudget(profile);
+    const result = await aiService.generateBudgetWithReasoning(profile);
     res.status(CONSTANTS.HTTP_STATUS.OK).json({
-      categories: budget.categories,
-      strategic_notes: 'Allocated with exact integer sum matching event budget ceiling.',
+      categories: result.categories,
+      strategic_notes: result.strategic_notes || 'Budget allocated with event-specific considerations.',
     });
   })
 );
@@ -25,7 +25,7 @@ router.post(
   '/timeline/generate',
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
-    const timeline = aiService.generateDeterministicTimeline(profile);
+    const timeline = await aiService.generateTimelineWithTasks(profile);
     res.status(CONSTANTS.HTTP_STATUS.OK).json({
       tasks: timeline.tasks,
       run_of_show: timeline.run_of_show,
@@ -85,6 +85,35 @@ router.post(
     const risks = await aiService.analyzeRisks(profile);
     res.status(CONSTANTS.HTTP_STATUS.OK).json({
       risks,
+    });
+  })
+);
+
+// 7. Budget Optimizer (What-if Scenarios)
+router.post(
+  '/budget/optimize',
+  asyncHandler(async (req: Request, res: Response) => {
+    const profile: EventProfile = req.body.profile || req.body;
+    const scenario: 'maintain_quality' | 'moderate_cuts' | 'aggressive_savings' = req.body.scenario || 'moderate_cuts';
+    const targetBudget = req.body.targetBudget || profile.total_budget;
+    
+    const optimized = await aiService.optimizeBudget(profile, scenario, targetBudget);
+    res.status(CONSTANTS.HTTP_STATUS.OK).json(optimized);
+  })
+);
+
+// 8. Replan Timeline (When Event Date Changes)
+router.post(
+  '/timeline/replan',
+  asyncHandler(async (req: Request, res: Response) => {
+    const profile: EventProfile = req.body.profile || req.body;
+    const newDate = req.body.newDate || profile.date;
+    
+    const timeline = await aiService.generateTimelineWithTasks({ ...profile, date: newDate });
+    res.status(CONSTANTS.HTTP_STATUS.OK).json({
+      tasks: timeline.tasks,
+      run_of_show: timeline.run_of_show,
+      message: `Timeline regenerated for new date: ${newDate}`,
     });
   })
 );

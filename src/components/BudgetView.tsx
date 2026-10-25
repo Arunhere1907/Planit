@@ -70,6 +70,15 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
     .filter((e) => e.status === "paid")
     .reduce((sum, e) => sum + e.amount, 0);
 
+  const totalPending = expenses
+    .filter((e) => e.status === "pending")
+    .reduce((sum, e) => sum + e.amount, 0);
+
+  const totalCommitted = totalSpent + totalPending;
+  const budgetUtilization = (totalSpent / totalBudget) * 100;
+  const isOverBudget = totalSpent > totalBudget;
+  const isNearBudgetLimit = totalSpent >= totalBudget * 0.9 && !isOverBudget;
+
   // Handle Lock toggle
   const toggleLock = (categoryId: string) => {
     const updated = categories.map((c) =>
@@ -110,6 +119,36 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Global Overspend Warning Banner */}
+      {isOverBudget && (
+        <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded-xl">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-red-900">Budget Exceeded!</h3>
+              <p className="text-xs text-red-700 mt-1">
+                Total expenses ({formatExactINR(totalSpent)}) have exceeded your budget of {formatExactINR(totalBudget)} by{" "}
+                <span className="font-bold">{formatExactINR(totalSpent - totalBudget)}</span>. Consider using the AI Budget Optimizer to rebalance.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isNearBudgetLimit && !isOverBudget && (
+        <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-xl">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-amber-900">Approaching Budget Limit</h3>
+              <p className="text-xs text-amber-700 mt-1">
+                You've spent {budgetUtilization.toFixed(1)}% of your total budget. Only {formatExactINR(totalBudget - totalSpent)} remaining.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top Banner: Total Allocation, Optimizer & Export */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
