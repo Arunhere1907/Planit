@@ -2,6 +2,7 @@ import { env } from '../../config/env.js';
 import { VendorPlace, VendorCategory } from '../../../shared/types/index.js';
 import { vendorRepository } from '../../repositories/index.js';
 import { logger } from '../../utils/logger.js';
+import { cacheService } from '../cache.service.js';
 
 interface GooglePlaceSearchResult {
   places?: Array<{
@@ -20,6 +21,7 @@ interface GooglePlaceSearchResult {
 export class PlacesService {
   /**
    * Search for vendors matching category and city, trying Places API or falling back to local database
+   * Results are cached for 10 minutes to reduce API calls
    */
   public async searchVendors(params: {
     category?: VendorCategory;
@@ -29,11 +31,21 @@ export class PlacesService {
   }): Promise<VendorPlace[]> {
     const { category, city, query, maxResults = 10 } = params;
 
+    // Check cache first
+    const cacheKey = cacheService.generateKey('places', { category, city, query, maxResults });
+    const cached = cacheService.get<VendorPlace[]>(cacheKey);
+    if (cached) {
+      logger.info('Places cache hit - skipping API call', { category, city, query });
+      return cached;
+    }
+
     // Check if live Google Places API is usable
     if (env.GOOGLE_MAPS_API_KEY && env.GOOGLE_MAPS_API_KEY !== 'MY_GOOGLE_MAPS_API_KEY') {
       try {
         const liveVendors = await this.queryGooglePlacesAPI({ category, city, query, maxResults });
         if (liveVendors.length > 0) {
+          // Cache for 10 minutes (Places data doesn't change frequently)
+          cacheService.set(cacheKey, liveVendors, 10 * 60 * 1000);
           return liveVendors;
         }
       } catch (err) {
@@ -42,12 +54,16 @@ export class PlacesService {
     }
 
     // Graceful fallback to rich local repository
-    return vendorRepository.searchVendors({
+    const fallbackVendors = vendorRepository.searchVendors({
       category,
       city,
       query,
       limit: maxResults,
     });
+    
+    // Cache fallback results too (shorter TTL since they're static)
+    cacheService.set(cacheKey, fallbackVendors, 30 * 60 * 1000); // 30 minutes
+    return fallbackVendors;
   }
 
   private async queryGooglePlacesAPI(params: {

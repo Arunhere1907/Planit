@@ -34,6 +34,11 @@ export class InMemoryEventRepository implements IEventRepository {
       throw new NotFoundError("Event", id);
     }
 
+    // Cap activity log to prevent unbounded growth (keep last 100 entries)
+    const MAX_ACTIVITY_LOG_SIZE = 100;
+    const activityLog = updates.activity_log || existing.activity_log;
+    const cappedActivityLog = activityLog.slice(0, MAX_ACTIVITY_LOG_SIZE);
+
     const merged: FullEventPlan = {
       ...existing,
       ...updates,
@@ -45,7 +50,7 @@ export class InMemoryEventRepository implements IEventRepository {
       risks: updates.risks || existing.risks,
       invitations: updates.invitations || existing.invitations,
       collaborators: updates.collaborators || existing.collaborators,
-      activity_log: updates.activity_log || existing.activity_log,
+      activity_log: cappedActivityLog,
     };
 
     this.store.set({

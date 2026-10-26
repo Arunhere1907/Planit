@@ -25,6 +25,11 @@ import {
   DEFAULT_BUDGET_SPLITS,
 } from '../../../shared/utils/deterministic-math.js';
 import { logger } from '../../utils/logger.js';
+import {
+  sanitizeDataForPrompt,
+  validateProfileBeforeLLM,
+  validateLLMOutput,
+} from './prompt-security.js';
 
 export class AIService {
   /**
@@ -41,16 +46,50 @@ export class AIService {
           INTAKE_EXTRACTION_SYSTEM_PROMPT,
           userInput
         );
-        const parsed = JSON.parse(rawJson);
-        return {
-          profile: this.sanitizeExtractedProfile(parsed.profile || parsed),
-          followUpQuestions: Array.isArray(parsed.follow_up_questions)
-            ? parsed.follow_up_questions
-            : Array.isArray(parsed.followUpQuestions)
-            ? parsed.followUpQuestions
-            : [],
-          confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.85,
-        };
+        
+        // Validate LLM output against expected structure
+        const validated = validateLLMOutput(rawJson, (parsed: unknown) => {
+          if (typeof parsed !== 'object' || parsed === null) {
+            return null;
+          }
+          
+          const obj = parsed as Record<string, unknown>;
+          
+          // Validate required fields exist
+          const profile = obj.profile || obj;
+          if (typeof profile !== 'object' || profile === null) {
+            return null;
+          }
+          
+          return parsed;
+        });
+        
+        if (validated) {
+          const parsed = validated as Record<string, unknown>;
+          
+          // Additional validation: check for injection attempts in profile
+          const profileObj = (parsed.profile || parsed) as Record<string, unknown>;
+          const securityCheck = validateProfileBeforeLLM(profileObj);
+          
+          if (!securityCheck.safe) {
+            logger.warn('LLM output contained suspicious patterns, using fallback', {
+              warnings: securityCheck.warnings,
+            });
+            return this.fallbackExtractProfile(userInput);
+          }
+          
+          return {
+            profile: this.sanitizeExtractedProfile((parsed.profile || parsed) as Record<string, unknown>),
+            followUpQuestions: Array.isArray(parsed.follow_up_questions)
+              ? parsed.follow_up_questions
+              : Array.isArray(parsed.followUpQuestions)
+              ? parsed.followUpQuestions
+              : [],
+            confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.85,
+          };
+        } else {
+          logger.warn('LLM output failed validation, using fallback');
+        }
       } catch (err: unknown) {
         logger.warn('LLM extraction failed or timed out, using deterministic fallback parser', { err });
       }
@@ -214,7 +253,8 @@ export class AIService {
   public async generateBudgetWithReasoning(profile: EventProfile): Promise<{ categories: BudgetCategory[]; strategic_notes?: string }> {
     if (llmClient.isAvailable()) {
       try {
-        const promptData = {
+        // Sanitize profile data before sending to LLM
+        const sanitizedProfile = sanitizeDataForPrompt({
           type: profile.type,
           city: profile.city,
           guest_count: profile.guest_count,
@@ -222,11 +262,11 @@ export class AIService {
           currency: profile.currency,
           vibe_theme: profile.vibe_theme,
           priorities: profile.priorities,
-        };
+        });
         
         const raw = await llmClient.generateContent(
           BUDGET_REASONING_SYSTEM_PROMPT,
-          JSON.stringify(promptData)
+          sanitizedProfile
         );
         
         const parsed = JSON.parse(raw);

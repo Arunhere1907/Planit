@@ -540,6 +540,7 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
                     {/* Place Photo */}
                     <div className="h-44 w-full bg-slate-100 relative overflow-hidden">
                       <img
+                        loading="lazy"
                         src={place.image}
                         alt={place.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform"

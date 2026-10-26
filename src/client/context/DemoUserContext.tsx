@@ -46,6 +46,17 @@ interface DemoUserContextType {
 
 const DemoUserContext = createContext<DemoUserContextType | undefined>(undefined);
 
+/**
+ * Demo User Provider - Manages client-side user selection
+ * 
+ * SECURITY MODEL:
+ * - localStorage stores ONLY user ID and role (no secrets, passwords, or tokens)
+ * - Client-side role (canEdit, isOwner) is for UI convenience ONLY
+ * - Server NEVER trusts client-side role - validates every request against event membership
+ * - All mutations require server-side authorization via requireEventRole() middleware
+ * - Tampering with localStorage CANNOT bypass server authorization or access other users' data
+ * - This is a demo/prototype system - production would use real authentication (JWT, session, OAuth)
+ */
 export const DemoUserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<DemoUser>(() => {
     const saved = localStorage.getItem('planit_demo_user');
@@ -61,6 +72,7 @@ export const DemoUserProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  // NOTE: These are UI hints only - server enforces actual permissions
   const canEdit = currentUser.role === 'owner' || currentUser.role === 'editor';
   const isOwner = currentUser.role === 'owner';
 

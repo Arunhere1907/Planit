@@ -4,12 +4,21 @@ import { placesService } from '../services/places/places.service.js';
 import { asyncHandler } from '../utils/async-handler.js';
 import { CONSTANTS } from '../config/constants.js';
 import { EventProfile, VendorCategory } from '../../shared/types/index.js';
+import { strictRateLimiter, externalApiRateLimiter } from '../middleware/rate-limit.js';
+import { validateBody, validateQuery } from '../middleware/validate.js';
+import { EventProfileInputSchema, VendorSearchSchema, ReplanRequestSchema } from '../validation/request-schemas.js';
 
 const router = Router();
+
+// Apply strict rate limiting to all AI generation routes
+const aiRateLimiter = strictRateLimiter();
+const placesRateLimiter = externalApiRateLimiter();
 
 // 1. Budget Generation
 router.post(
   '/budget/generate',
+  aiRateLimiter,
+  validateBody(EventProfileInputSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
     const result = await aiService.generateBudgetWithReasoning(profile);
@@ -23,6 +32,8 @@ router.post(
 // 2. Timeline Generation
 router.post(
   '/timeline/generate',
+  aiRateLimiter,
+  validateBody(EventProfileInputSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
     const timeline = await aiService.generateTimelineWithTasks(profile);
@@ -49,12 +60,14 @@ const handleVendorSearch = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-router.post('/vendors/search', handleVendorSearch);
-router.get('/vendors/search', handleVendorSearch);
+router.post('/vendors/search', placesRateLimiter, validateBody(VendorSearchSchema), handleVendorSearch);
+router.get('/vendors/search', placesRateLimiter, validateQuery(VendorSearchSchema), handleVendorSearch);
 
 // 4. Ideas Generation
 router.post(
   '/ideas/generate',
+  aiRateLimiter,
+  validateBody(EventProfileInputSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
     const ideas = await aiService.suggestIdeas(profile);
@@ -67,6 +80,8 @@ router.post(
 // 5. Invitations Generation
 router.post(
   '/invitations/generate',
+  aiRateLimiter,
+  validateBody(EventProfileInputSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
     const invitations = await aiService.generateInvitations(profile);
@@ -80,6 +95,8 @@ router.post(
 // 6. Risk Analysis
 router.post(
   '/risks/generate',
+  aiRateLimiter,
+  validateBody(EventProfileInputSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
     const risks = await aiService.analyzeRisks(profile);
@@ -92,6 +109,8 @@ router.post(
 // 7. Budget Optimizer (What-if Scenarios)
 router.post(
   '/budget/optimize',
+  aiRateLimiter,
+  validateBody(EventProfileInputSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
     const scenario: 'maintain_quality' | 'moderate_cuts' | 'aggressive_savings' = req.body.scenario || 'moderate_cuts';
@@ -105,6 +124,8 @@ router.post(
 // 8. Replan Timeline (When Event Date Changes)
 router.post(
   '/timeline/replan',
+  aiRateLimiter,
+  validateBody(ReplanRequestSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
     const newDate = req.body.newDate || profile.date;

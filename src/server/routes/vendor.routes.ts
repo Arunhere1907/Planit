@@ -5,29 +5,27 @@ import {
   addOrUpdateEventVendor,
   updateVendorStatus
 } from '../controllers/vendor.controller.js';
-import { validateBody } from '../middleware/validate.js';
+import { validateBody, validateParams, validateQuery } from '../middleware/validate.js';
 import { EventVendorSchema } from '../../shared/schemas/zod-schemas.js';
-import { requireRole } from '../middleware/demo-user.js';
-import { z } from 'zod';
+import { VendorSearchSchema, VendorUpdateSchema, VendorIdParamSchema, EventIdParamSchema } from '../validation/request-schemas.js';
+import { requireEventAccess, requireEventRole } from '../middleware/demo-user.js';
 
 const router = Router();
 
-const UpdateStatusSchema = z.object({
-  status: z.enum(['not_started', 'contacted', 'quote_received', 'booked', 'paid'])
-});
-
-router.get('/search', searchVendors);
-router.get('/:id/vendors', getEventVendors);
+router.get('/search', validateQuery(VendorSearchSchema), searchVendors);
+router.get('/:id/vendors', validateParams(EventIdParamSchema), requireEventAccess(), getEventVendors);
 router.post(
   '/:id/vendors',
-  requireRole('owner', 'editor'),
+  validateParams(EventIdParamSchema),
+  requireEventRole('owner', 'editor'),
   validateBody(EventVendorSchema.omit({ id: true })),
   addOrUpdateEventVendor
 );
 router.patch(
   '/:id/vendors/:vendorId/status',
-  requireRole('owner', 'editor'),
-  validateBody(UpdateStatusSchema),
+  validateParams(VendorIdParamSchema),
+  requireEventRole('owner', 'editor'),
+  validateBody(VendorUpdateSchema),
   updateVendorStatus
 );
 

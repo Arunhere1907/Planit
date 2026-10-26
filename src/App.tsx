@@ -1,23 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Header } from "./components/Header";
 import { DashboardView } from "./components/DashboardView";
-import { IntakeChat } from "./components/IntakeChat";
-import { BudgetView } from "./components/BudgetView";
-import { TimelineView } from "./components/TimelineView";
-import { VendorsView } from "./components/VendorsView";
-import { IdeasView } from "./components/IdeasView";
-import { InvitationsView } from "./components/InvitationsView";
-import { RiskAdvisorView } from "./components/RiskAdvisorView";
-import { CollaborationView } from "./components/CollaborationView";
-import { BudgetOptimizerModal } from "./components/BudgetOptimizerModal";
-import { NotificationCenter } from "./components/NotificationCenter";
-import { ReplanModal } from "./components/ReplanModal";
-import { PrintablePlanModal } from "./components/PrintablePlanModal";
 import { FullEventPlan, EventProfile, BudgetCategory, Task, Expense, VendorItem, IdeaItem, RiskItem, InvitationItem, Collaborator } from "./types";
 import { exportToICS, exportBudgetCSV, exportVendorsCSV } from "./lib/exportUtils";
 import { eventApi } from "./client/services/api/event-api.js";
 import { DemoUserProvider } from "./client/context/DemoUserContext.js";
 import seedWeddingData from "../data/seed_wedding.json";
+
+// Lazy load heavy components that are only shown in modals or specific tabs
+const IntakeChat = lazy(() => import("./components/IntakeChat").then(m => ({ default: m.IntakeChat })));
+const BudgetView = lazy(() => import("./components/BudgetView").then(m => ({ default: m.BudgetView })));
+const TimelineView = lazy(() => import("./components/TimelineView").then(m => ({ default: m.TimelineView })));
+const VendorsView = lazy(() => import("./components/VendorsView").then(m => ({ default: m.VendorsView })));
+const IdeasView = lazy(() => import("./components/IdeasView").then(m => ({ default: m.IdeasView })));
+const InvitationsView = lazy(() => import("./components/InvitationsView").then(m => ({ default: m.InvitationsView })));
+const RiskAdvisorView = lazy(() => import("./components/RiskAdvisorView").then(m => ({ default: m.RiskAdvisorView })));
+const CollaborationView = lazy(() => import("./components/CollaborationView").then(m => ({ default: m.CollaborationView })));
+const BudgetOptimizerModal = lazy(() => import("./components/BudgetOptimizerModal").then(m => ({ default: m.BudgetOptimizerModal })));
+const NotificationCenter = lazy(() => import("./components/NotificationCenter").then(m => ({ default: m.NotificationCenter })));
+const ReplanModal = lazy(() => import("./components/ReplanModal").then(m => ({ default: m.ReplanModal })));
+const PrintablePlanModal = lazy(() => import("./components/PrintablePlanModal").then(m => ({ default: m.PrintablePlanModal })));
 
 // Additional preset demo events for easy testing
 const DEMO_EVENTS: FullEventPlan[] = [
@@ -405,131 +407,134 @@ export default function App() {
 
       {/* Main Tab Views */}
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full">
-        {activeTab === "dashboard" && (
-          <DashboardView
-            plan={activePlan}
-            onNavigateTab={setActiveTab}
-            onToggleTaskStatus={handleToggleTaskStatus}
-            onOpenAddExpenseModal={() => {
-              setActiveTab("budget");
-            }}
-          />
-        )}
+        <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="text-slate-500">Loading...</div></div>}>
+          {activeTab === "dashboard" && (
+            <DashboardView
+              plan={activePlan}
+              onNavigateTab={setActiveTab}
+              onToggleTaskStatus={handleToggleTaskStatus}
+              onOpenAddExpenseModal={() => {
+                setActiveTab("budget");
+              }}
+            />
+          )}
 
-        {activeTab === "budget" && (
-          <BudgetView
-            categories={activePlan.budget.categories}
-            expenses={activePlan.budget.expenses}
-            profile={activePlan.profile}
-            onUpdateCategories={handleUpdateCategories}
-            onAddExpense={handleAddExpense}
-            onDeleteExpense={handleDeleteExpense}
-            onOpenOptimizerModal={() => setShowOptimizerModal(true)}
-            onExportCSV={() => exportBudgetCSV(activePlan)}
-          />
-        )}
+          {activeTab === "budget" && (
+            <BudgetView
+              categories={activePlan.budget.categories}
+              expenses={activePlan.budget.expenses}
+              profile={activePlan.profile}
+              onUpdateCategories={handleUpdateCategories}
+              onAddExpense={handleAddExpense}
+              onDeleteExpense={handleDeleteExpense}
+              onOpenOptimizerModal={() => setShowOptimizerModal(true)}
+              onExportCSV={() => exportBudgetCSV(activePlan)}
+            />
+          )}
 
-        {activeTab === "timeline" && (
-          <TimelineView
-            tasks={activePlan.timeline.tasks}
-            runOfShow={activePlan.timeline.run_of_show}
-            profile={activePlan.profile}
-            onUpdateTasks={handleUpdateTasks}
-            onUpdateRunOfShow={handleUpdateRunOfShow}
-            onExportICS={() => exportToICS(activePlan)}
-            onOpenReplanModal={() => setShowReplanModal(true)}
-          />
-        )}
+          {activeTab === "timeline" && (
+            <TimelineView
+              tasks={activePlan.timeline.tasks}
+              runOfShow={activePlan.timeline.run_of_show}
+              profile={activePlan.profile}
+              onUpdateTasks={handleUpdateTasks}
+              onUpdateRunOfShow={handleUpdateRunOfShow}
+              onExportICS={() => exportToICS(activePlan)}
+              onOpenReplanModal={() => setShowReplanModal(true)}
+            />
+          )}
 
-        {activeTab === "vendors" && (
-          <VendorsView
-            vendors={activePlan.vendors}
-            profile={activePlan.profile}
-            onUpdateVendors={handleUpdateVendors}
-            onExportCSV={() => exportVendorsCSV(activePlan)}
-          />
-        )}
+          {activeTab === "vendors" && (
+            <VendorsView
+              vendors={activePlan.vendors}
+              profile={activePlan.profile}
+              onUpdateVendors={handleUpdateVendors}
+              onExportCSV={() => exportVendorsCSV(activePlan)}
+            />
+          )}
 
-        {activeTab === "ideas" && (
-          <IdeasView
-            ideas={activePlan.ideas}
-            profile={activePlan.profile}
-            onUpdateIdeas={handleUpdateIdeas}
-          />
-        )}
+          {activeTab === "ideas" && (
+            <IdeasView
+              ideas={activePlan.ideas}
+              profile={activePlan.profile}
+              onUpdateIdeas={handleUpdateIdeas}
+            />
+          )}
 
-        {activeTab === "invitations" && (
-          <InvitationsView
-            invitations={activePlan.invitations}
-            profile={activePlan.profile}
-            onUpdateInvitations={handleUpdateInvitations}
-          />
-        )}
+          {activeTab === "invitations" && (
+            <InvitationsView
+              invitations={activePlan.invitations}
+              profile={activePlan.profile}
+              onUpdateInvitations={handleUpdateInvitations}
+            />
+          )}
 
-        {activeTab === "risks" && (
-          <RiskAdvisorView
-            risks={activePlan.risks}
-            profile={activePlan.profile}
-            totalBudget={activePlan.budget.total_budget}
-            onUpdateRisks={handleUpdateRisks}
-          />
-        )}
+          {activeTab === "risks" && (
+            <RiskAdvisorView
+              risks={activePlan.risks}
+              profile={activePlan.profile}
+              totalBudget={activePlan.budget.total_budget}
+              onUpdateRisks={handleUpdateRisks}
+            />
+          )}
 
-        {activeTab === "collaborators" && (
-          <CollaborationView
-            collaborators={activePlan.collaborators}
-            activityLog={activePlan.activity_log}
-            onAddCollaborator={handleAddCollaborator}
-            onRemoveCollaborator={handleRemoveCollaborator}
-          />
-        )}
+          {activeTab === "collaborators" && (
+            <CollaborationView
+              collaborators={activePlan.collaborators}
+              activityLog={activePlan.activity_log}
+              onAddCollaborator={handleAddCollaborator}
+              onRemoveCollaborator={handleRemoveCollaborator}
+            />
+          )}
+        </Suspense>
       </main>
 
       {/* MODALS */}
+      <Suspense fallback={null}>
+        {/* 1. Conversational Intake Modal */}
+        {showIntakeModal && (
+          <IntakeChat
+            onPlanGenerated={handleIntakeGenerated}
+            onCancel={() => setShowIntakeModal(false)}
+          />
+        )}
 
-      {/* 1. Conversational Intake Modal */}
-      {showIntakeModal && (
-        <IntakeChat
-          onPlanGenerated={handleIntakeGenerated}
-          onCancel={() => setShowIntakeModal(false)}
-        />
-      )}
+        {/* 2. Budget Optimizer Modal */}
+        {showOptimizerModal && (
+          <BudgetOptimizerModal
+            categories={activePlan.budget.categories}
+            profile={activePlan.profile}
+            onApplyScenario={handleUpdateCategories}
+            onClose={() => setShowOptimizerModal(false)}
+          />
+        )}
 
-      {/* 2. Budget Optimizer Modal */}
-      {showOptimizerModal && (
-        <BudgetOptimizerModal
-          categories={activePlan.budget.categories}
-          profile={activePlan.profile}
-          onApplyScenario={handleUpdateCategories}
-          onClose={() => setShowOptimizerModal(false)}
-        />
-      )}
+        {/* 3. Replan Modal */}
+        {showReplanModal && (
+          <ReplanModal
+            plan={activePlan}
+            onApplyReplan={handleApplyReplan}
+            onClose={() => setShowReplanModal(false)}
+          />
+        )}
 
-      {/* 3. Replan Modal */}
-      {showReplanModal && (
-        <ReplanModal
-          plan={activePlan}
-          onApplyReplan={handleApplyReplan}
-          onClose={() => setShowReplanModal(false)}
-        />
-      )}
+        {/* 4. Notification Center Slide-out */}
+        {showNotificationModal && (
+          <NotificationCenter
+            plan={activePlan}
+            onClose={() => setShowNotificationModal(false)}
+            onMarkTaskDone={handleToggleTaskStatus}
+          />
+        )}
 
-      {/* 4. Notification Center Slide-out */}
-      {showNotificationModal && (
-        <NotificationCenter
-          plan={activePlan}
-          onClose={() => setShowNotificationModal(false)}
-          onMarkTaskDone={handleToggleTaskStatus}
-        />
-      )}
-
-      {/* 5. Printable / PDF Dossier Modal */}
-      {showPrintModal && (
-        <PrintablePlanModal
-          plan={activePlan}
-          onClose={() => setShowPrintModal(false)}
-        />
-      )}
+        {/* 5. Printable / PDF Dossier Modal */}
+        {showPrintModal && (
+          <PrintablePlanModal
+            plan={activePlan}
+            onClose={() => setShowPrintModal(false)}
+          />
+        )}
+      </Suspense>
       </div>
     </DemoUserProvider>
   );

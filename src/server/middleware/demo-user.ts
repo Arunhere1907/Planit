@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserRole } from '../../shared/types/index.js';
-import { ForbiddenError, UnauthorizedError } from '../errors/app-error.js';
+import { ForbiddenError, UnauthorizedError, NotFoundError } from '../errors/app-error.js';
+import { eventRepository } from '../repositories/index.js';
 
 export interface AuthenticatedUser {
   id: string;
@@ -76,7 +77,7 @@ export function demoUserMiddleware(req: Request, _res: Response, next: NextFunct
 }
 
 /**
- * Middleware that requires one of the allowed roles
+ * Middleware that requires one of the allowed roles (for global actions)
  */
 export function requireRole(...allowedRoles: UserRole[]) {
   return (req: Request, _res: Response, next: NextFunction): void => {
@@ -92,4 +93,67 @@ export function requireRole(...allowedRoles: UserRole[]) {
     }
     next();
   };
+}
+
+/**
+ * IDOR Protection: Verify user is a member/owner of the event before allowing access
+ * This middleware prevents users from accessing events they don't belong to
+ * 
+ * @param requiredRoles - Optional roles required for the action (e.g., ['owner', 'editor'])
+ */
+export function requireEventAccess(requiredRoles?: UserRole[]) {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+    try {
+      // Ensure user is authenticated
+      if (!req.user) {
+        return next(new UnauthorizedError('Authentication required'));
+      }
+
+      // Extract event ID from params (supports :id, :eventId patterns)
+      const eventId = req.params.id || req.params.eventId;
+      if (!eventId) {
+        return next(new Error('Event ID parameter missing'));
+      }
+
+      // Fetch the event
+      const event = await eventRepository.findById(eventId);
+      if (!event) {
+        return next(new NotFoundError(`Event with id '${eventId}' not found`));
+      }
+
+      // Check if user is a collaborator/member of this event
+      const member = event.collaborators?.find((c) => c.id === req.user!.id);
+      if (!member) {
+        return next(
+          new ForbiddenError(`You do not have access to event '${eventId}'`)
+        );
+      }
+
+      // If specific roles are required, verify the user's role within THIS event
+      if (requiredRoles && requiredRoles.length > 0) {
+        if (!requiredRoles.includes(member.role)) {
+          return next(
+            new ForbiddenError(
+              `Action requires role in [${requiredRoles.join(', ')}] for this event. Your role: '${member.role}'`
+            )
+          );
+        }
+      }
+
+      // Attach event-specific role to request for downstream use
+      req.user.role = member.role;
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
+/**
+ * Combined middleware: Check event access AND require specific roles
+ * This is the recommended approach for most routes
+ */
+export function requireEventRole(...allowedRoles: UserRole[]) {
+  return requireEventAccess(allowedRoles);
 }

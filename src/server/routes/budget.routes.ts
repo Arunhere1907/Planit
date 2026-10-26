@@ -1,28 +1,25 @@
 import { Router } from 'express';
 import { getBudget, addExpense, updateCategoryAllocation } from '../controllers/budget.controller.js';
-import { validateBody } from '../middleware/validate.js';
+import { validateBody, validateParams } from '../middleware/validate.js';
 import { ExpenseItemSchema } from '../../shared/schemas/zod-schemas.js';
-import { requireRole } from '../middleware/demo-user.js';
-import { z } from 'zod';
+import { BudgetCategoryUpdateSchema, CategoryNameParamSchema, EventIdParamSchema } from '../validation/request-schemas.js';
+import { requireEventAccess, requireEventRole } from '../middleware/demo-user.js';
 
 const router = Router();
 
-const UpdateAllocationSchema = z.object({
-  allocated: z.number().int().nonnegative(),
-  isLocked: z.boolean().optional()
-});
-
-router.get('/:id/budget', getBudget);
+router.get('/:id/budget', validateParams(EventIdParamSchema), requireEventAccess(), getBudget);
 router.post(
   '/:id/budget/expenses',
-  requireRole('owner', 'editor'),
+  validateParams(EventIdParamSchema),
+  requireEventRole('owner', 'editor'),
   validateBody(ExpenseItemSchema.omit({ id: true })),
   addExpense
 );
 router.put(
   '/:id/budget/categories/:categoryName',
-  requireRole('owner', 'editor'),
-  validateBody(UpdateAllocationSchema),
+  validateParams(CategoryNameParamSchema),
+  requireEventRole('owner', 'editor'),
+  validateBody(BudgetCategoryUpdateSchema),
   updateCategoryAllocation
 );
 

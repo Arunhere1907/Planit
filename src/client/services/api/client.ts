@@ -1,5 +1,12 @@
 /**
  * Standard fetch wrapper sending demo-user header and parsing errors
+ * 
+ * SECURITY NOTE:
+ * - localStorage only stores user ID (no secrets, tokens, or passwords)
+ * - The client-side user ID and role are NOT trusted by the server
+ * - Server validates EVERY request against event membership (see requireEventAccess middleware)
+ * - Users can only access events they are collaborators on, regardless of localStorage tampering
+ * - Changing localStorage values CANNOT escalate privileges or access other users' data
  */
 export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const activeUserId = localStorage.getItem('planit_demo_user') || 'user_owner_1';
