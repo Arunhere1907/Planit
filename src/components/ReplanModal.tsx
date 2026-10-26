@@ -109,8 +109,9 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Event Date</label>
+                <label htmlFor="replan-date" className="block text-xs font-bold text-slate-700 mb-1">Event Date</label>
                 <input
+                  id="replan-date"
                   type="date"
                   value={newDate}
                   onChange={(e) => setNewDate(e.target.value)}
@@ -120,8 +121,9 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Total Budget (INR)</label>
+                <label htmlFor="replan-budget" className="block text-xs font-bold text-slate-700 mb-1">Total Budget (INR)</label>
                 <input
+                  id="replan-budget"
                   type="number"
                   step="10000"
                   value={newBudget}
@@ -132,8 +134,9 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Guest Count</label>
+                <label htmlFor="replan-guests" className="block text-xs font-bold text-slate-700 mb-1">Guest Count</label>
                 <input
+                  id="replan-guests"
                   type="number"
                   value={newGuests}
                   onChange={(e) => setNewGuests(parseInt(e.target.value) || 0)}

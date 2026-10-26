@@ -1,7 +1,10 @@
-// @ts-expect-error - expect is used implicitly by vitest matchers
 import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+import { toHaveNoViolations } from 'jest-axe';
+
+// Extend Vitest matchers with jest-axe
+expect.extend(toHaveNoViolations);
 
 // Cleanup after each test case
 afterEach(() => {

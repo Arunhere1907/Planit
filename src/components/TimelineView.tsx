@@ -156,6 +156,11 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Main heading for timeline view */}
+      <h1 className="sr-only" tabIndex={-1}>
+        Timeline and Run-of-Show - {profile.title}
+      </h1>
+      
       {/* Top Banner with Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
@@ -486,8 +491,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
             <h3 className="text-base font-bold text-slate-900 mb-4">Add Custom Milestone Task</h3>
             <form onSubmit={handleCreateTask} className="space-y-3.5 text-xs sm:text-sm">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Task Title</label>
+                <label htmlFor="task-title" className="block text-xs font-bold text-slate-700 mb-1">Task Title</label>
                 <input
+                  id="task-title"
                   type="text"
                   required
                   placeholder="e.g. Conduct sound check with sound technician"
@@ -499,8 +505,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Assignee Role</label>
+                  <label htmlFor="task-role" className="block text-xs font-bold text-slate-700 mb-1">Assignee Role</label>
                   <input
+                    id="task-role"
                     type="text"
                     required
                     value={newTaskRole}
@@ -510,8 +517,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Priority</label>
+                  <label htmlFor="task-priority" className="block text-xs font-bold text-slate-700 mb-1">Priority</label>
                   <select
+                    id="task-priority"
                     value={newTaskPriority}
                     onChange={(e) => setNewTaskPriority(e.target.value as "high" | "medium" | "low")}
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium"
@@ -525,8 +533,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Due Date</label>
+                  <label htmlFor="task-due-date" className="block text-xs font-bold text-slate-700 mb-1">Due Date</label>
                   <input
+                    id="task-due-date"
                     type="date"
                     required
                     value={newTaskDueDate}
@@ -536,8 +545,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Linked Category</label>
+                  <label htmlFor="task-category" className="block text-xs font-bold text-slate-700 mb-1">Linked Category</label>
                   <input
+                    id="task-category"
                     type="text"
                     value={newTaskLinkedVendor}
                     onChange={(e) => setNewTaskLinkedVendor(e.target.value)}
@@ -547,8 +557,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Operational Notes</label>
+                <label htmlFor="task-notes" className="block text-xs font-bold text-slate-700 mb-1">Operational Notes</label>
                 <textarea
+                  id="task-notes"
                   rows={2}
                   value={newTaskNotes}
                   onChange={(e) => setNewTaskNotes(e.target.value)}
@@ -585,8 +596,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
             <form onSubmit={handleCreateRosItem} className="space-y-3.5 text-xs sm:text-sm">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Time</label>
+                  <label htmlFor="ros-time" className="block text-xs font-bold text-slate-700 mb-1">Time</label>
                   <input
+                    id="ros-time"
                     type="text"
                     required
                     placeholder="e.g. 05:45 PM"
@@ -597,8 +609,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Location</label>
+                  <label htmlFor="ros-location" className="block text-xs font-bold text-slate-700 mb-1">Location</label>
                   <input
+                    id="ros-location"
                     type="text"
                     required
                     placeholder="e.g. Main Gate / Mandap"
@@ -610,8 +623,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Activity / Ceremony Title</label>
+                <label htmlFor="ros-title" className="block text-xs font-bold text-slate-700 mb-1">Activity / Ceremony Title</label>
                 <input
+                  id="ros-title"
                   type="text"
                   required
                   placeholder="e.g. Groom Baraat Swagat & High Tea"
@@ -622,8 +636,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Owner / Lead Responsible</label>
+                <label htmlFor="ros-owner" className="block text-xs font-bold text-slate-700 mb-1">Owner / Lead Responsible</label>
                 <input
+                  id="ros-owner"
                   type="text"
                   required
                   placeholder="e.g. Bride's Brother & Emcee"
@@ -634,8 +649,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Coordination Instructions</label>
+                <label htmlFor="ros-notes" className="block text-xs font-bold text-slate-700 mb-1">Coordination Instructions</label>
                 <input
+                  id="ros-notes"
                   type="text"
                   placeholder="e.g. Ensure flutist is seated before guests arrive"
                   value={rosNotes}

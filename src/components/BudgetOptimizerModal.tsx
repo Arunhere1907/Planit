@@ -137,7 +137,7 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
 
         {/* Goal Selector */}
         <div className="my-5">
-          <label className="block text-xs font-bold text-slate-700 mb-2">Select Optimization Goal:</label>
+          <div className="block text-xs font-bold text-slate-700 mb-2" role="group" aria-label="Select optimization goal">Select Optimization Goal:</div>
           <div className="grid grid-cols-3 gap-2.5">
             {[10, 15, 20].map((pct) => (
               <button

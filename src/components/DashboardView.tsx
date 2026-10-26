@@ -92,6 +92,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Main heading for dashboard */}
+      <h1 className="sr-only" tabIndex={-1}>
+        Event Dashboard - {profile.title}
+      </h1>
+      
       {/* Overdue alert banner if any (semantic warning/danger) */}
       {overdueTasks.length > 0 && (
         <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-xs flex items-center justify-between">

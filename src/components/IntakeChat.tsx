@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { EventProfile } from "../types";
+import { LiveRegion } from "../client/components/ui/LiveRegion";
 
 interface IntakeChatProps {
   onPlanGenerated: (profile: EventProfile) => void;
@@ -29,6 +30,7 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [liveAnnouncement, setLiveAnnouncement] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
 
@@ -108,6 +110,7 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
     setMessages(updatedHistory);
     setInput("");
     setIsLoading(true);
+    setLiveAnnouncement("Processing your request. Please wait.");
 
     try {
       const res = await fetch("/api/intake", {
@@ -129,6 +132,7 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
           ...profileData,
           id: prev.id,
         }));
+        setLiveAnnouncement("Event profile updated with your details.");
       }
 
       const questions = data.follow_up_questions || data.data?.followUpQuestions || [];
@@ -144,11 +148,13 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
       }
 
       setMessages((prev) => [...prev, { role: "assistant", content: assistantReply }]);
+      setLiveAnnouncement(`AI response received. ${questions.length > 0 ? `${questions.length} follow-up questions available.` : 'Profile is complete.'}`);
     } catch {
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: "I parsed your notes into the editable card on the right!" },
       ]);
+      setLiveAnnouncement("Profile updated with your information.");
     } finally {
       setIsLoading(false);
     }
@@ -160,7 +166,9 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <>
+      <LiveRegion message={liveAnnouncement} politeness="polite" clearAfter={5000} />
+      <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl overflow-hidden flex flex-col my-auto max-h-[92vh]">
         {/* Modal Top Header */}
         <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -310,8 +318,9 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
             {/* Editable Profile Inputs */}
             <div className="space-y-3 flex-1 text-xs">
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">Event Title</label>
+                <label htmlFor="intake-event-title" className="block text-[11px] font-bold text-slate-600 mb-1">Event Title</label>
                 <input
+                  id="intake-event-title"
                   type="text"
                   value={draftProfile.title}
                   onChange={(e) => setDraftProfile({ ...draftProfile, title: e.target.value })}
@@ -321,8 +330,9 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Event Type</label>
+                  <label htmlFor="intake-event-type" className="block text-[11px] font-bold text-slate-600 mb-1">Event Type</label>
                   <select
+                    id="intake-event-type"
                     value={draftProfile.type}
                     onChange={(e) => setDraftProfile({ ...draftProfile, type: e.target.value as "wedding" | "birthday" | "community" | "general" })}
                     className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium text-slate-900"
@@ -335,8 +345,9 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Event Date</label>
+                  <label htmlFor="intake-event-date" className="block text-[11px] font-bold text-slate-600 mb-1">Event Date</label>
                   <input
+                    id="intake-event-date"
                     type="date"
                     value={draftProfile.date}
                     onChange={(e) => setDraftProfile({ ...draftProfile, date: e.target.value })}
@@ -347,8 +358,9 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
 
               <div className="grid grid-cols-3 gap-2.5">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">City</label>
+                  <label htmlFor="intake-city" className="block text-[11px] font-bold text-slate-600 mb-1">City</label>
                   <input
+                    id="intake-city"
                     type="text"
                     value={draftProfile.city}
                     onChange={(e) => setDraftProfile({ ...draftProfile, city: e.target.value })}
@@ -357,8 +369,9 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Guests</label>
+                  <label htmlFor="intake-guests" className="block text-[11px] font-bold text-slate-600 mb-1">Guests</label>
                   <input
+                    id="intake-guests"
                     type="number"
                     value={draftProfile.guest_count}
                     onChange={(e) =>
@@ -369,8 +382,9 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Budget (INR)</label>
+                  <label htmlFor="intake-budget" className="block text-[11px] font-bold text-slate-600 mb-1">Budget (INR)</label>
                   <input
+                    id="intake-budget"
                     type="number"
                     step="10000"
                     value={draftProfile.total_budget}
@@ -384,8 +398,9 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Vibe & Theme</label>
+                  <label htmlFor="intake-vibe" className="block text-[11px] font-bold text-slate-600 mb-1">Vibe & Theme</label>
                   <input
+                    id="intake-vibe"
                     type="text"
                     value={draftProfile.vibe_theme}
                     onChange={(e) => setDraftProfile({ ...draftProfile, vibe_theme: e.target.value })}
@@ -394,8 +409,9 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Dietary Preferences</label>
+                  <label htmlFor="intake-dietary" className="block text-[11px] font-bold text-slate-600 mb-1">Dietary Preferences</label>
                   <input
+                    id="intake-dietary"
                     type="text"
                     value={draftProfile.dietary_mix}
                     onChange={(e) => setDraftProfile({ ...draftProfile, dietary_mix: e.target.value })}
@@ -405,8 +421,9 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">Key Priorities & Constraints</label>
+                <label htmlFor="intake-constraints" className="block text-[11px] font-bold text-slate-600 mb-1">Key Priorities & Constraints</label>
                 <input
+                  id="intake-constraints"
                   type="text"
                   value={draftProfile.constraints}
                   onChange={(e) => setDraftProfile({ ...draftProfile, constraints: e.target.value })}
@@ -449,5 +466,6 @@ export const IntakeChat: React.FC<IntakeChatProps> = ({ onPlanGenerated, onCance
         </div>
       </div>
     </div>
+    </>
   );
 };

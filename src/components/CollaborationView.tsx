@@ -56,6 +56,11 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Main heading for collaboration view */}
+      <h1 className="sr-only" tabIndex={-1}>
+        Team and Activity Log
+      </h1>
+      
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
@@ -205,8 +210,9 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
             <h3 className="text-base font-bold text-slate-900 mb-4">Invite Team Member</h3>
             <form onSubmit={handleInvite} className="space-y-3.5 text-xs sm:text-sm">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+                <label htmlFor="collab-name" className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
                 <input
+                  id="collab-name"
                   type="text"
                   required
                   placeholder="e.g. Diya Shah"
@@ -217,8 +223,9 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+                <label htmlFor="collab-email" className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
                 <input
+                  id="collab-email"
                   type="email"
                   required
                   placeholder="diya@example.com"
@@ -229,8 +236,9 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Access Role</label>
+                <label htmlFor="collab-role" className="block text-xs font-bold text-slate-700 mb-1">Access Role</label>
                 <select
+                  id="collab-role"
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value as UserRole)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium"

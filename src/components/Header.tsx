@@ -62,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs" role="banner">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top bar */}
         <div className="flex items-center justify-between h-16 gap-3">
@@ -96,6 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
                     onSelectEvent(e.target.value);
                   }
                 }}
+                aria-label="Select event"
                 className="bg-slate-100 hover:bg-slate-200/80 text-slate-800 text-xs sm:text-sm font-semibold rounded-lg pl-3 pr-8 py-1.5 border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 cursor-pointer max-w-[200px] sm:max-w-[280px] truncate"
               >
                 {eventsList.map((ev) => (
@@ -147,9 +148,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenReplanModal}
               title="Replan when budget, guests or date changes"
+              aria-label="Replan event when budget, guests, or date changes"
               className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200 cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
+              <RefreshCw className="w-3.5 h-3.5 text-slate-500" aria-hidden="true" />
               <span>Replan</span>
             </button>
 
@@ -157,9 +159,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenPrintModal}
               title="Export complete plan to PDF or print"
+              aria-label="Export complete plan to PDF or print"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-xs transition-colors cursor-pointer"
             >
-              <FileDown className="w-3.5 h-3.5" />
+              <FileDown className="w-3.5 h-3.5" aria-hidden="true" />
               <span className="hidden sm:inline">Export Plan</span>
             </button>
 
@@ -168,10 +171,11 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenNotificationModal}
               className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
               title="Reminders & Notifications"
+              aria-label={`Reminders and notifications${unreadNotificationsCount > 0 ? ` (${unreadNotificationsCount} unread)` : ''}`}
             >
-              <Bell className="w-5 h-5" />
+              <Bell className="w-5 h-5" aria-hidden="true" />
               {unreadNotificationsCount > 0 && (
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-indigo-600 rounded-full ring-2 ring-white animate-pulse" />
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-indigo-600 rounded-full ring-2 ring-white animate-pulse" aria-hidden="true" />
               )}
             </button>
 
@@ -180,22 +184,28 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={onResetDatabase}
                 title="Reset database to initial seed data"
+                aria-label="Reset database to initial seed data"
                 className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
               >
-                <RotateCcw className="w-4 h-4" />
+                <RotateCcw className="w-4 h-4" aria-hidden="true" />
               </button>
             )}
           </div>
         </div>
 
         {/* Navigation Tabs (Strictly Indigo Active State, NO RED!) */}
-        <nav className="flex space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar py-1.5 border-t border-slate-100 text-xs sm:text-sm font-medium">
+        <nav 
+          className="flex space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar py-1.5 border-t border-slate-100 text-xs sm:text-sm font-medium"
+          aria-label="Main navigation"
+          role="navigation"
+        >
           {navItems.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
+                aria-current={isActive ? "page" : undefined}
                 className={`relative whitespace-nowrap px-3 py-2 rounded-lg transition-all cursor-pointer font-medium ${
                   isActive
                     ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-200 shadow-2xs after:content-[''] after:absolute after:bottom-0.5 after:left-3 after:right-3 after:h-[3px] after:bg-indigo-600 after:rounded-full"

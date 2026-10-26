@@ -250,6 +250,11 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Main heading for vendors view */}
+      <h1 className="sr-only" tabIndex={-1}>
+        Vendors and Places - {profile.title}
+      </h1>
+      
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
@@ -754,8 +759,9 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
             <h3 className="text-base font-bold text-slate-900 mb-4">Add Vendor to Checklist</h3>
             <form onSubmit={handleSaveCustomVendor} className="space-y-3.5 text-xs sm:text-sm">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Vendor Name</label>
+                <label htmlFor="vendor-name" className="block text-xs font-bold text-slate-700 mb-1">Vendor Name</label>
                 <input
+                  id="vendor-name"
                   type="text"
                   required
                   placeholder="e.g. Drishti Candid Photography"
@@ -766,8 +772,9 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Category</label>
+                <label htmlFor="vendor-category" className="block text-xs font-bold text-slate-700 mb-1">Category</label>
                 <select
+                  id="vendor-category"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium"
@@ -781,8 +788,9 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Contact / Phone / Email</label>
+                <label htmlFor="vendor-contact" className="block text-xs font-bold text-slate-700 mb-1">Contact / Phone / Email</label>
                 <input
+                  id="vendor-contact"
                   type="text"
                   placeholder="+91 98980 00000"
                   value={newContact}
@@ -793,8 +801,9 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Quote (INR)</label>
+                  <label htmlFor="vendor-quote" className="block text-xs font-bold text-slate-700 mb-1">Quote (INR)</label>
                   <input
+                    id="vendor-quote"
                     type="number"
                     step="1000"
                     required
@@ -805,8 +814,9 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Advance Paid (INR)</label>
+                  <label htmlFor="vendor-advance" className="block text-xs font-bold text-slate-700 mb-1">Advance Paid (INR)</label>
                   <input
+                    id="vendor-advance"
                     type="number"
                     step="1000"
                     required
@@ -819,8 +829,9 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Due Date</label>
+                  <label htmlFor="vendor-due-date" className="block text-xs font-bold text-slate-700 mb-1">Due Date</label>
                   <input
+                    id="vendor-due-date"
                     type="date"
                     required
                     value={newDueDate}
@@ -830,8 +841,9 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Initial Status</label>
+                  <label htmlFor="vendor-status" className="block text-xs font-bold text-slate-700 mb-1">Initial Status</label>
                   <select
+                    id="vendor-status"
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value as VendorStatus)}
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-medium"
@@ -846,8 +858,9 @@ export const VendorsView: React.FC<VendorsViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Notes</label>
+                <label htmlFor="vendor-notes" className="block text-xs font-bold text-slate-700 mb-1">Notes</label>
                 <input
+                  id="vendor-notes"
                   type="text"
                   placeholder="e.g. Includes drone aerial coverage and leather album"
                   value={newNotes}

@@ -91,6 +91,11 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Main heading for invitations view */}
+      <h1 className="sr-only" tabIndex={-1}>
+        Invitations and Copy - {profile.title}
+      </h1>
+      
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
@@ -118,8 +123,9 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
       {/* Control Bar: Type, Language & Tone */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
-          <label className="block text-xs font-bold text-slate-700 mb-1">Message Type</label>
+          <label htmlFor="invite-type" className="block text-xs font-bold text-slate-700 mb-1">Message Type</label>
           <select
+            id="invite-type"
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
             className="w-full bg-slate-50 border border-slate-300 font-semibold rounded-xl px-3 py-2 text-xs text-slate-900"
@@ -133,8 +139,9 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-slate-700 mb-1">Language</label>
+          <label htmlFor="invite-language" className="block text-xs font-bold text-slate-700 mb-1">Language</label>
           <select
+            id="invite-language"
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
             className="w-full bg-slate-50 border border-slate-300 font-semibold rounded-xl px-3 py-2 text-xs text-slate-900"
@@ -148,8 +155,9 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-slate-700 mb-1">Tone & Voice</label>
+          <label htmlFor="invite-tone" className="block text-xs font-bold text-slate-700 mb-1">Tone & Voice</label>
           <select
+            id="invite-tone"
             value={selectedTone}
             onChange={(e) => setSelectedTone(e.target.value)}
             className="w-full bg-slate-50 border border-slate-300 font-semibold rounded-xl px-3 py-2 text-xs text-slate-900"
@@ -203,6 +211,7 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
                 rows={9}
                 value={inv.content}
                 onChange={(e) => handleContentEdit(inv.id, e.target.value)}
+                lang={inv.language === "Hindi" ? "hi" : inv.language === "Gujarati" ? "gu" : "en"}
                 className="w-full p-3 bg-slate-50/70 hover:bg-white focus:bg-white border border-slate-200 focus:border-rose-500 rounded-xl text-xs sm:text-sm font-sans leading-relaxed text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-rose-500 transition-colors resize-y"
               />
             </div>

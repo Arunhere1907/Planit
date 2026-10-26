@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense, useRef } from "react";
 import { Header } from "./components/Header";
 import { DashboardView } from "./components/DashboardView";
 import { FullEventPlan, EventProfile, BudgetCategory, Task, Expense, VendorItem, IdeaItem, RiskItem, InvitationItem, Collaborator } from "./types";
@@ -95,6 +95,9 @@ export default function App() {
   const [currentPlanId, setCurrentPlanId] = useState<string>(DEMO_EVENTS[0].profile.id);
   const [activeTab, setActiveTab] = useState<string>("dashboard");
 
+  // Main content ref for skip-to-content functionality
+  const mainContentRef = useRef<HTMLDivElement>(null);
+
   // Modals state
   const [showIntakeModal, setShowIntakeModal] = useState<boolean>(false);
   const [showReplanModal, setShowReplanModal] = useState<boolean>(false);
@@ -125,6 +128,33 @@ export default function App() {
         // Keeps DEMO_EVENTS on any fetch failure
       });
   }, []);
+
+  // Update page title dynamically based on active tab and event
+  useEffect(() => {
+    const tabTitles: Record<string, string> = {
+      dashboard: "Dashboard",
+      budget: "Budget & Expenses",
+      timeline: "Timeline & Run-of-Show",
+      vendors: "Vendors & Places",
+      ideas: "Curated Ideas",
+      invitations: "Invitations & Copy",
+      risks: "Risk Advisor",
+      collaborators: "Team & Log",
+    };
+    
+    const tabTitle = tabTitles[activeTab] || "Dashboard";
+    document.title = `${tabTitle} - ${activePlan.profile.title} | PlanIt`;
+  }, [activeTab, activePlan.profile.title]);
+
+  // Focus management: move focus to main heading when tab changes
+  useEffect(() => {
+    if (mainContentRef.current) {
+      const heading = mainContentRef.current.querySelector('h1');
+      if (heading && heading instanceof HTMLElement) {
+        heading.focus();
+      }
+    }
+  }, [activeTab]);
 
   // 1. Intake creation of a completely new plan
   const handleIntakeGenerated = async (newProfile: EventProfile) => {
@@ -390,6 +420,14 @@ export default function App() {
   return (
     <DemoUserProvider>
       <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+      {/* Skip to main content link for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-lg focus:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      >
+        Skip to main content
+      </a>
+      
       {/* Top Header */}
       <Header
         currentProfile={activePlan.profile}
@@ -406,7 +444,13 @@ export default function App() {
       />
 
       {/* Main Tab Views */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full">
+      <main 
+        id="main-content"
+        ref={mainContentRef}
+        className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full"
+        role="main"
+        aria-label="Event planning content"
+      >
         <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="text-slate-500">Loading...</div></div>}>
           {activeTab === "dashboard" && (
             <DashboardView

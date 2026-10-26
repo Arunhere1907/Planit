@@ -108,6 +108,11 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Main heading for budget view */}
+      <h1 className="sr-only" tabIndex={-1}>
+        Budget and Expenses - {profile.title}
+      </h1>
+      
       {/* Global Overspend Warning Banner */}
       {isOverBudget && (
         <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded-xl">
@@ -431,8 +436,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
 
             <form onSubmit={handleSaveExpense} className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Category</label>
+                <label htmlFor="expense-category" className="block font-bold text-slate-700 mb-1">Category</label>
                 <select
+                  id="expense-category"
                   value={newExpCategory}
                   onChange={(e) => setNewExpCategory(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 font-medium"
@@ -446,8 +452,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Vendor / Payee Name</label>
+                <label htmlFor="expense-vendor" className="block font-bold text-slate-700 mb-1">Vendor / Payee Name</label>
                 <input
+                  id="expense-vendor"
                   type="text"
                   required
                   placeholder="e.g. Royal Caterers, DJ Beats"
@@ -459,8 +466,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Amount (INR)</label>
+                  <label htmlFor="expense-amount" className="block font-bold text-slate-700 mb-1">Amount (INR)</label>
                   <input
+                    id="expense-amount"
                     type="number"
                     step="500"
                     required
@@ -470,8 +478,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Payment Status</label>
+                  <label htmlFor="expense-status" className="block font-bold text-slate-700 mb-1">Payment Status</label>
                   <select
+                    id="expense-status"
                     value={newExpStatus}
                     onChange={(e) => setNewExpStatus(e.target.value as "paid" | "pending")}
                     className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 font-medium"
@@ -483,8 +492,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Date</label>
+                <label htmlFor="expense-date" className="block font-bold text-slate-700 mb-1">Date</label>
                 <input
+                  id="expense-date"
                   type="date"
                   value={newExpDate}
                   onChange={(e) => setNewExpDate(e.target.value)}
@@ -493,8 +503,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Notes / Invoice #</label>
+                <label htmlFor="expense-notes" className="block font-bold text-slate-700 mb-1">Notes / Invoice #</label>
                 <textarea
+                  id="expense-notes"
                   rows={2}
                   placeholder="e.g. Token advance 25% paid via UPI"
                   value={newExpNotes}

@@ -55,6 +55,11 @@ export const RiskAdvisorView: React.FC<RiskAdvisorViewProps> = ({
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Main heading for risk advisor view */}
+      <h1 className="sr-only" tabIndex={-1}>
+        Risk Advisor - {profile.title}
+      </h1>
+      
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
