@@ -41,6 +41,7 @@ export function sanitizeUserInput(input: string): string {
   }
   
   // Remove control characters that could manipulate output
+  // eslint-disable-next-line no-control-regex
   sanitized = sanitized.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
   
   return sanitized.trim();
