@@ -9,7 +9,11 @@ import { z } from "zod";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const rootDataDir = path.resolve(__dirname, "../../../data");
+const projectRoot = fs.existsSync(path.resolve(process.cwd(), "data"))
+  ? process.cwd()
+  : path.resolve(__dirname, "../../..");
+const rootDataDir = path.resolve(projectRoot, "data");
+const rootTemplatesDir = path.resolve(projectRoot, "templates");
 
 let cachedSeedEvents: FullEventPlan[] = [];
 let cachedSeedVendors: VendorPlace[] = [];
@@ -151,11 +155,11 @@ export function getDemoUsers(): DemoUser[] {
 
 export function loadEventTemplate(type: string): Record<string, unknown> {
   const safeType = ["wedding", "birthday", "community"].includes(type) ? type : "wedding";
-  const templatePath = path.join(rootDataDir, "../templates", `${safeType}.json`);
+  const templatePath = path.join(rootTemplatesDir, `${safeType}.json`);
   try {
     return JSON.parse(fs.readFileSync(templatePath, "utf-8"));
   } catch {
-    const fallbackPath = path.join(rootDataDir, "../templates", "wedding.json");
+    const fallbackPath = path.join(rootTemplatesDir, "wedding.json");
     return JSON.parse(fs.readFileSync(fallbackPath, "utf-8"));
   }
 }

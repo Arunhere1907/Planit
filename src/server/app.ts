@@ -54,8 +54,8 @@ export async function createApp(): Promise<Express> {
   // Mount central API router
   app.use('/api', apiRouter);
 
-  // Mount Vite development server middleware in non-production
-  if (env.NODE_ENV !== 'production') {
+  // Mount Vite development server middleware in non-production (skip on Vercel)
+  if (env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa'
