@@ -68,12 +68,14 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
       error: {
         code: string;
         message: string;
+        statusCode: number;
         details?: unknown;
       };
     } = {
       error: {
         code: err.code,
         message: err.message,
+        statusCode: err.statusCode,
       },
     };
     
@@ -104,6 +106,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     error: {
       code: ErrorCode.INTERNAL_ERROR,
       message: clientMessage,
+      statusCode: 500,
       // Stack trace NEVER included in response (security risk)
     },
   });

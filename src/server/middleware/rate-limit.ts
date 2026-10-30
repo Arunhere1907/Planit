@@ -27,7 +27,7 @@ export function inMemoryRateLimiter(
 ) {
   return (req: Request, res: Response, next: NextFunction): void => {
     // Demo environment bypass for testing/automated requests
-    if (process.env.NODE_ENV === 'test') {
+    if (process.env.NODE_ENV === 'test' && maxRequests >= 100) {
       return next();
     }
 
@@ -84,4 +84,8 @@ export function externalApiRateLimiter() {
  */
 export function standardRateLimiter() {
   return inMemoryRateLimiter(100, 60000); // 100 requests per minute
+}
+
+export function resetRateLimits(): void {
+  windowMap.clear();
 }

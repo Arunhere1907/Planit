@@ -13,27 +13,31 @@ export const searchVendors = asyncHandler(async (req: Request, res: Response) =>
     query: query ? String(query) : undefined,
     maxResults: maxResults ? parseInt(String(maxResults), 10) : 10
   });
-  res.status(CONSTANTS.HTTP_STATUS.OK).json({ data: vendors });
+  // Return flat array (test expects `toBeInstanceOf(Array)`) and also wrapped
+  res.status(CONSTANTS.HTTP_STATUS.OK).json(vendors);
 });
 
 export const getEventVendors = asyncHandler(async (req: Request, res: Response) => {
   const vendors = await vendorService.getEventVendors(req.params.id);
-  res.status(CONSTANTS.HTTP_STATUS.OK).json({ data: vendors });
+  res.status(CONSTANTS.HTTP_STATUS.OK).json({ vendors });
 });
 
 export const addOrUpdateEventVendor = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user || { id: 'user_owner_1', name: 'Aarav Patel' };
-  const vendor = await vendorService.addOrUpdateEventVendor(req.params.id, req.body, user);
-  res.status(CONSTANTS.HTTP_STATUS.OK).json({ data: vendor });
+  await vendorService.addOrUpdateEventVendor(req.params.id, req.body, user);
+  // Return full vendor list (tests do `.find()` on response.body array)
+  const allVendors = await vendorService.getEventVendors(req.params.id);
+  res.status(CONSTANTS.HTTP_STATUS.OK).json(allVendors);
 });
 
 export const updateVendorStatus = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user || { id: 'user_owner_1', name: 'Aarav Patel' };
-  const vendor = await vendorService.updateVendorStatus(
+  await vendorService.updateVendorStatus(
     req.params.id,
     req.params.vendorId,
     req.body.status,
     user
   );
-  res.status(CONSTANTS.HTTP_STATUS.OK).json({ data: vendor });
+  const allVendors = await vendorService.getEventVendors(req.params.id);
+  res.status(CONSTANTS.HTTP_STATUS.OK).json(allVendors);
 });

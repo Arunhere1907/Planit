@@ -5,22 +5,26 @@ import { CONSTANTS } from '../config/constants.js';
 
 export const getTimeline = asyncHandler(async (req: Request, res: Response) => {
   const timeline = await timelineService.getTimeline(req.params.id);
-  res.status(CONSTANTS.HTTP_STATUS.OK).json({ data: timeline });
+  res.status(CONSTANTS.HTTP_STATUS.OK).json({ tasks: timeline });
 });
 
 export const updateTaskStatus = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user || { id: 'user_owner_1', name: 'Aarav Patel' };
-  const task = await timelineService.updateTaskStatus(
+  const status = req.body.status;
+  await timelineService.updateTaskStatus(
     req.params.id,
     req.params.taskId,
-    req.body.status,
+    status,
     user
   );
-  res.status(CONSTANTS.HTTP_STATUS.OK).json({ data: task });
+  // Return updated task list for convenience
+  const allTasks = await timelineService.getTimeline(req.params.id);
+  res.status(CONSTANTS.HTTP_STATUS.OK).json({ tasks: allTasks });
 });
 
 export const addTask = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user || { id: 'user_owner_1', name: 'Aarav Patel' };
-  const task = await timelineService.addTask(req.params.id, req.body, user);
-  res.status(CONSTANTS.HTTP_STATUS.CREATED).json({ data: task });
+  await timelineService.addTask(req.params.id, req.body, user);
+  const allTasks = await timelineService.getTimeline(req.params.id);
+  res.status(CONSTANTS.HTTP_STATUS.OK).json({ tasks: allTasks });
 });

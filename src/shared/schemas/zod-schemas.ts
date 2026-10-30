@@ -158,7 +158,7 @@ export const DigestResponseSchema = z.object({
 // 11. Expense, Member, and Comment Schemas
 export const ExpenseItemSchema = z.object({
   id: z.string().default(() => `exp_${Date.now()}`),
-  category_id: z.string().default(""),
+  category_id: z.string().optional().default(""),
   category_name: z.string().default("General"),
   vendor_name: z.string().default("Vendor"),
   amount: z.number().nonnegative(),

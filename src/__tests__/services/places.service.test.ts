@@ -18,6 +18,7 @@ vi.mock('../../server/repositories/index.js', () => ({
 // Mock logger
 vi.mock('../../server/utils/logger.js', () => ({
   logger: {
+    debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
@@ -29,6 +30,7 @@ global.fetch = vi.fn();
 
 // Get the mocked function after mocking
 const { vendorRepository } = await import('../../server/repositories/index.js');
+const { env } = await import('../../server/config/env.js');
 const mockSearchVendors = vendorRepository.searchVendors as ReturnType<typeof vi.fn>;
 
 
@@ -225,16 +227,13 @@ describe('Places Service - Fallback to Local Repository', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    env.GOOGLE_MAPS_API_KEY = 'test-api-key';
     placesService = new PlacesService();
   });
 
   it('should fall back to local repository when API key missing', async () => {
     // Mock missing API key
-    vi.doMock('../../server/config/env.js', () => ({
-      env: {
-        GOOGLE_MAPS_API_KEY: undefined,
-      },
-    }));
+    env.GOOGLE_MAPS_API_KEY = '';
 
     const mockLocalVendors = [
       {
@@ -376,7 +375,7 @@ describe('Places Service - Cache Behavior', () => {
     placesService = new PlacesService();
   });
 
-  it('should make fresh API call for each search', async () => {
+  it('should use cache to avoid redundant API calls', async () => {
     const mockApiResponse = {
       places: [
         {
@@ -401,13 +400,37 @@ describe('Places Service - Cache Behavior', () => {
       city: 'Ahmedabad',
     });
 
-    // Should call API twice (no caching in current implementation)
-    expect(global.fetch).toHaveBeenCalledTimes(2);
+    // Should call API once due to caching
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
-  // Note: If caching is added later, add test here
-  it.skip('should use cache to avoid redundant API calls', async () => {
-    // Future test when caching is implemented
+  it('should make fresh API call for different search parameters', async () => {
+    const mockApiResponse = {
+      places: [
+        {
+          id: 'place-1',
+          displayName: { text: 'Vendor 1' },
+        },
+      ],
+    };
+
+    (global.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => mockApiResponse,
+    });
+
+    await placesService.searchVendors({
+      category: 'Venue & Facilities',
+      city: 'Ahmedabad',
+    });
+
+    await placesService.searchVendors({
+      category: 'Catering',
+      city: 'Mumbai',
+    });
+
+    // Should call API twice for different searches
+    expect(global.fetch).toHaveBeenCalledTimes(2);
   });
 });
 

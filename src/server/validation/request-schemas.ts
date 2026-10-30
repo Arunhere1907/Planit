@@ -38,14 +38,19 @@ export const EventProfileInputSchema = z.object({
 
 // Chat/Intake Message Validation
 export const IntakeChatMessageSchema = z.object({
-  message: z.string().min(1, 'Message cannot be empty').max(MAX_TEXT_LENGTH),
+  message: z.string().min(1, 'Message cannot be empty').max(MAX_TEXT_LENGTH).optional(),
+  input: z.string().min(1, 'Input cannot be empty').max(MAX_TEXT_LENGTH).optional(),
+  userInput: z.string().min(1, 'User input cannot be empty').max(MAX_TEXT_LENGTH).optional(),
   conversationHistory: z.array(
     z.object({
       role: z.enum(['user', 'assistant']),
       content: z.string().max(MAX_TEXT_LENGTH),
     })
   ).max(50).optional(), // Limit conversation history
-}).strict();
+}).refine(
+  (data) => Boolean((data.message && data.message.trim().length > 0) || (data.input && data.input.trim().length > 0) || (data.userInput && data.userInput.trim().length > 0)),
+  { message: 'Message, input, or userInput cannot be empty' }
+);
 
 // Task Update Validation
 export const TaskUpdateSchema = z.object({

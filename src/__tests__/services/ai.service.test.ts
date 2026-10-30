@@ -3,10 +3,12 @@ import { AIService } from '../../server/services/ai/ai.service.js';
 import type { EventProfile } from '../../shared/types/index.js';
 
 // Mock the LLM client
-vi.mock('../../server/services/ai/llm.client.js', () => {
-  const mockGenerateContent = vi.fn();
-  const mockIsAvailable = vi.fn(() => true);
+const { mockGenerateContent, mockIsAvailable } = vi.hoisted(() => ({
+  mockGenerateContent: vi.fn(),
+  mockIsAvailable: vi.fn(() => true),
+}));
 
+vi.mock('../../server/services/ai/llm.client.js', () => {
   return {
     llmClient: {
       isAvailable: mockIsAvailable,
@@ -22,11 +24,16 @@ vi.mock('../../server/services/ai/llm.client.js', () => {
 // Mock logger to prevent console noise
 vi.mock('../../server/utils/logger.js', () => ({
   logger: {
+    debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
   },
 }));
+
+beforeEach(() => {
+  mockIsAvailable.mockReturnValue(true);
+});
 
 describe('AI Service - Intake Extraction', () => {
   let aiService: AIService;

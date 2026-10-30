@@ -21,8 +21,9 @@ router.post(
   validateBody(EventVendorSchema.omit({ id: true })),
   addOrUpdateEventVendor
 );
+// Support both /vendors/:vendorId/status and /vendors/:vendorId (PATCH)
 router.patch(
-  '/:id/vendors/:vendorId/status',
+  ['/:id/vendors/:vendorId/status', '/:id/vendors/:vendorId'],
   validateParams(VendorIdParamSchema),
   requireEventRole('owner', 'editor'),
   validateBody(VendorUpdateSchema),

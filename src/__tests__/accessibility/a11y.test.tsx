@@ -322,9 +322,9 @@ describe('Accessibility Tests - Keyboard Navigation', () => {
       <div>
         <button>Button</button>
         <a href="#link">Link</a>
-        <input type="text" />
-        <select><option>Option</option></select>
-        <textarea></textarea>
+        <input type="text" aria-label="Input field" />
+        <select aria-label="Select option"><option>Option</option></select>
+        <textarea aria-label="Text area"></textarea>
       </div>
     );
 

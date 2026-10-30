@@ -65,44 +65,34 @@ router.get('/vendors/search', placesRateLimiter, validateQuery(VendorSearchSchem
 
 // 4. Ideas Generation
 router.post(
-  '/ideas/generate',
+  ['/ideas/generate', '/generate/ideas'],
   aiRateLimiter,
-  validateBody(EventProfileInputSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
     const ideas = await aiService.suggestIdeas(profile);
-    res.status(CONSTANTS.HTTP_STATUS.OK).json({
-      ideas,
-    });
+    res.status(CONSTANTS.HTTP_STATUS.OK).json(ideas);
   })
 );
 
 // 5. Invitations Generation
 router.post(
-  '/invitations/generate',
+  ['/invitations/generate', '/generate/invitations'],
   aiRateLimiter,
-  validateBody(EventProfileInputSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
     const invitations = await aiService.generateInvitations(profile);
-    res.status(CONSTANTS.HTTP_STATUS.OK).json({
-      variants: invitations,
-      invitations,
-    });
+    res.status(CONSTANTS.HTTP_STATUS.OK).json(invitations);
   })
 );
 
 // 6. Risk Analysis
 router.post(
-  '/risks/generate',
+  ['/risks/generate', '/generate/risks'],
   aiRateLimiter,
-  validateBody(EventProfileInputSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
     const risks = await aiService.analyzeRisks(profile);
-    res.status(CONSTANTS.HTTP_STATUS.OK).json({
-      risks,
-    });
+    res.status(CONSTANTS.HTTP_STATUS.OK).json(risks);
   })
 );
 

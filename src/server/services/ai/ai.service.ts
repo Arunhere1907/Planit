@@ -30,6 +30,8 @@ import {
   validateProfileBeforeLLM,
   validateLLMOutput,
 } from './prompt-security.js';
+import { fallbackDataService } from './fallback-data.service.js';
+import { aiResponseValidator } from './ai-response-validator.js';
 
 export class AIService {
   /**
@@ -75,7 +77,7 @@ export class AIService {
             logger.warn('LLM output contained suspicious patterns, using fallback', {
               warnings: securityCheck.warnings,
             });
-            return this.fallbackExtractProfile(userInput);
+            return fallbackDataService.extractProfileFromText(userInput);
           }
           
           return {
@@ -95,139 +97,12 @@ export class AIService {
       }
     }
 
-    return this.fallbackExtractProfile(userInput);
+    return fallbackDataService.extractProfileFromText(userInput);
   }
 
   /**
-   * Deterministic pattern extractor for intake
+   * Sanitizes extracted profile data
    */
-  private fallbackExtractProfile(text: string): {
-    profile: EventProfile;
-    followUpQuestions: string[];
-    confidence: number;
-  } {
-    const lower = text.toLowerCase();
-
-    // 1. Detect Type
-    let eventType: EventType = 'wedding';
-    if (lower.includes('birthday') || lower.includes('bday') || lower.includes('turning')) {
-      eventType = 'birthday';
-    } else if (
-      lower.includes('garba') ||
-      lower.includes('community') ||
-      lower.includes('festival') ||
-      lower.includes('gathering')
-    ) {
-      eventType = 'community';
-    } else if (lower.includes('conference') || lower.includes('anniversary')) {
-      eventType = 'general';
-    }
-
-    // 2. Detect Guest Count
-    const guestMatch =
-      lower.match(/(\d+)\s*(guests?|people|pax|members|attendees?)/i) ||
-      lower.match(/guests?:\s*(\d+)/i);
-    const guestCount = guestMatch ? parseInt(guestMatch[1], 10) : 150;
-
-    // 3. Detect Budget (INR Lakhs or raw numbers)
-    let totalBudget = 500000;
-    const lakhMatch = lower.match(/(\d+(?:\.\d+)?)\s*(?:lakh|lac|l|lakhs)/i);
-    if (lakhMatch) {
-      totalBudget = Math.round(parseFloat(lakhMatch[1]) * 100000);
-    } else {
-      const croreMatch = lower.match(/(\d+(?:\.\d+)?)\s*(?:crore|cr)/i);
-      if (croreMatch) {
-        totalBudget = Math.round(parseFloat(croreMatch[1]) * 10000000);
-      } else {
-        const rawBudgetMatch = lower.match(/(?:rs\.?|inr|budget:?)\s*(\d[\d,]+)/i);
-        if (rawBudgetMatch) {
-          totalBudget = parseInt(rawBudgetMatch[1].replace(/,/g, ''), 10);
-        }
-      }
-    }
-
-    // 4. Detect City
-    let city = 'Ahmedabad';
-    const cities = [
-      'Ahmedabad',
-      'Mumbai',
-      'Delhi',
-      'Bengaluru',
-      'Jaipur',
-      'Udaipur',
-      'Surat',
-      'Vadodara',
-      'Pune',
-      'Goa',
-      'Hyderabad',
-      'Chennai',
-      'Kolkata',
-    ];
-    for (const c of cities) {
-      if (lower.includes(c.toLowerCase())) {
-        city = c;
-        break;
-      }
-    }
-
-    // 5. Detect Date (e.g. December 2026 or YYYY-MM-DD)
-    let date = '2026-12-18';
-    const dateMatch = lower.match(/(\d{4}-\d{2}-\d{2})/);
-    if (dateMatch) {
-      date = dateMatch[1];
-    } else if (lower.includes('december') || lower.includes('dec')) {
-      date = '2026-12-18';
-    } else if (lower.includes('november') || lower.includes('nov')) {
-      date = '2026-11-20';
-    } else if (lower.includes('january') || lower.includes('jan')) {
-      date = '2027-01-22';
-    }
-
-    // 6. Food & Vibe heuristics
-    let dietaryMix = 'Vegetarian & Jain friendly';
-    if (lower.includes('jain')) dietaryMix = 'Strict Jain & Pure Vegetarian counters';
-    else if (lower.includes('non-veg') || lower.includes('chicken')) dietaryMix = 'Mixed Gourmet Non-Veg & Veg';
-
-    const indoorOutdoor: 'indoor' | 'outdoor' | 'hybrid' = lower.includes('rooftop') || lower.includes('lawn') || lower.includes('outdoor')
-      ? 'outdoor'
-      : lower.includes('banquet') || lower.includes('hall') || lower.includes('indoor')
-      ? 'indoor'
-      : 'hybrid';
-
-    const title =
-      eventType === 'wedding'
-        ? `Grand Celebration in ${city}`
-        : eventType === 'birthday'
-        ? `Milestone Birthday Celebration in ${city}`
-        : `Community Cultural Gathering in ${city}`;
-
-    const profile: EventProfile = {
-      id: `event-${Date.now()}`,
-      title,
-      type: eventType,
-      date,
-      city,
-      guest_count: guestCount,
-      total_budget: totalBudget,
-      currency: 'INR',
-      vibe_theme: 'Festive, Elegant & Culturally Rooted',
-      culture_tradition: eventType === 'wedding' ? 'Traditional Indian' : 'Contemporary',
-      dietary_mix: dietaryMix,
-      indoor_outdoor: indoorOutdoor,
-      priorities: ['Catering & Culinary Excellence', 'Warm Aesthetic Decor', 'Memorable Hospitality'],
-      constraints: '10:00 PM sound restrictions; elderly accessibility required',
-    };
-
-    return {
-      profile,
-      followUpQuestions: [
-        'Would you like a dedicated live food station (e.g. chaat, dessert bar)?',
-        'Do you have specific color palette preferences for the mandap or stage?',
-      ],
-      confidence: 0.88,
-    };
-  }
-
   private sanitizeExtractedProfile(raw: Record<string, unknown>): EventProfile {
     return {
       id: String(raw.id || `event-${Date.now()}`),
@@ -266,27 +141,33 @@ export class AIService {
         
         const raw = await llmClient.generateContent(
           BUDGET_REASONING_SYSTEM_PROMPT,
-          sanitizedProfile
+          JSON.stringify(sanitizedProfile)
         );
         
-        const parsed = JSON.parse(raw);
-        
-        if (Array.isArray(parsed.categories) && parsed.categories.length > 0) {
-          // LLM provides percentages and reasoning, code does exact math
-          const categories = calculateBudgetSplitFromPercents(
-            profile.total_budget,
-            parsed.categories.map((c: Record<string, unknown>) => ({
-              name: String(c.name || 'Category'),
-              percent: Number(c.percent || 10),
-              reasoning: String(c.reasoning || 'Budget allocation'),
-            }))
-          );
-          
-          return {
-            categories,
-            strategic_notes: String(parsed.strategic_notes || parsed.notes || ''),
-          };
+        // Parse and validate response
+        const parseResult = aiResponseValidator.safeParseJSON(raw);
+        if (!parseResult.success) {
+          logger.warn('Budget response JSON parse failed', { error: parseResult.error });
+          throw new Error('Invalid JSON response');
         }
+        
+        const validation = aiResponseValidator.validateBudgetCategories(parseResult.data);
+        if (!validation.isValid) {
+          logger.warn('Budget response validation failed', { errors: validation.errors });
+          throw new Error('Invalid budget structure');
+        }
+        
+        // Use validated data
+        const validatedData = validation.data!;
+        const categories = calculateBudgetSplitFromPercents(
+          profile.total_budget,
+          validatedData.categories
+        );
+        
+        return {
+          categories,
+          strategic_notes: validatedData.strategic_notes || `Budget allocated using AI-powered analysis for ${profile.type} event in ${profile.city}.`,
+        };
       } catch (err: unknown) {
         logger.warn('LLM budget reasoning failed, using deterministic fallback', { err });
       }
@@ -322,25 +203,25 @@ export class AIService {
           JSON.stringify(promptData)
         );
         
-        const parsed = JSON.parse(raw);
-        
-        if (Array.isArray(parsed.tasks) && parsed.tasks.length > 0) {
-          // LLM provides task descriptions and offsets, code calculates exact dates
-          const taskTemplates = parsed.tasks.map((t: Record<string, unknown>) => ({
-            title: String(t.title || 'Milestone Task'),
-            role: String(t.role || t.assignee || 'Organizer'),
-            priority: (t.priority as 'high' | 'medium' | 'low') || 'medium',
-            phase: (t.phase as Task['phase']) || '1 month',
-            offset_days: Number(t.offset_days || 30),
-            linked_vendor: String(t.linked_vendor || 'General'),
-            notes: String(t.notes || ''),
-          }));
-          
-          const tasks = calculateBackwardsDueDates(profile.date, taskTemplates);
-          const runOfShow = this.generateRunOfShowForType(profile.type, profile.date);
-          
-          return { tasks, run_of_show: runOfShow };
+        // Parse and validate response
+        const parseResult = aiResponseValidator.safeParseJSON(raw);
+        if (!parseResult.success) {
+          logger.warn('Timeline response JSON parse failed', { error: parseResult.error });
+          throw new Error('Invalid JSON response');
         }
+        
+        const validation = aiResponseValidator.validateTimelineTasks(parseResult.data);
+        if (!validation.isValid) {
+          logger.warn('Timeline response validation failed', { errors: validation.errors });
+          throw new Error('Invalid timeline structure');
+        }
+        
+        // Use validated data - LLM provides task descriptions and offsets, code calculates exact dates
+        const validatedData = validation.data!;
+        const tasks = calculateBackwardsDueDates(profile.date, validatedData.tasks);
+        const runOfShow = this.generateRunOfShowForType(profile.type, profile.date);
+        
+        return { tasks, run_of_show: runOfShow };
       } catch (err: unknown) {
         logger.warn('LLM timeline generation failed, using deterministic fallback', { err });
       }
@@ -543,25 +424,38 @@ export class AIService {
           IDEA_GENERATION_SYSTEM_PROMPT,
           JSON.stringify(profile)
         );
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed.ideas)) {
-          return parsed.ideas.map((item: Record<string, unknown>, idx: number) => ({
-            id: `idea_${Date.now()}_${idx}`,
-            category: String(item.category || 'Decor & Ambiance'),
-            title: String(item.title || 'Creative Touch'),
-            description: String(item.description || ''),
-            cost_range: String(item.cost_range || `₹${Math.round(profile.total_budget * 0.03).toLocaleString()}`),
-            effort_level: (item.effort_level as 'Low' | 'Medium' | 'High') || 'Medium',
-            tags: Array.isArray(item.tags) ? item.tags.map(String) : ['Creative', 'Personalized'],
-            saved: Boolean(item.saved),
-          }));
+        
+        // Parse and validate response
+        const parseResult = aiResponseValidator.safeParseJSON(raw);
+        if (!parseResult.success) {
+          logger.warn('Ideas response JSON parse failed', { error: parseResult.error });
+          throw new Error('Invalid JSON response');
         }
+        
+        const validation = aiResponseValidator.validateIdeas(parseResult.data);
+        if (!validation.isValid) {
+          logger.warn('Ideas response validation failed', { errors: validation.errors });
+          throw new Error('Invalid ideas structure');
+        }
+        
+        // Map validated data to IdeaItem format
+        const validatedData = validation.data!;
+        return validatedData.ideas.map((item, idx) => ({
+          id: `idea_${Date.now()}_${idx}`,
+          category: item.category,
+          title: item.title,
+          description: item.description,
+          cost_range: item.cost_range,
+          effort_level: item.effort_level,
+          tags: item.tags,
+          saved: item.saved,
+        }));
       } catch (err: unknown) {
         logger.warn('LLM idea generation failed, using curated ideas', { err });
       }
     }
 
-    return this.getCuratedIdeas(profile);
+    return fallbackDataService.getCuratedIdeas(profile);
   }
 
   /**
@@ -591,7 +485,7 @@ export class AIService {
       }
     }
 
-    return this.getCuratedInvitations(profile);
+    return fallbackDataService.getCuratedInvitations(profile);
   }
 
   /**
@@ -604,139 +498,41 @@ export class AIService {
           RISK_ANALYSIS_SYSTEM_PROMPT,
           JSON.stringify(profile)
         );
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed.risks)) {
-          return parsed.risks.map((r: Record<string, unknown>, idx: number) => ({
-            id: `risk_${Date.now()}_${idx}`,
-            category: (r.category as RiskItem['category']) || 'General',
-            title: String(r.title || 'Operational Risk'),
-            severity: (r.severity as 'high' | 'medium' | 'low') || 'medium',
-            likelihood: (r.likelihood as 'high' | 'medium' | 'low') || 'medium',
-            why: String(r.why || r.preventiveMeasure || 'Event day contingency'),
-            mitigation: String(r.mitigation || r.preventiveMeasure || 'Pre-event checkpoint inspection'),
-            backup_plan: String(r.backup_plan || r.contingencyPlan || 'Standby vendor on call'),
-          }));
+        
+        // Parse and validate response
+        const parseResult = aiResponseValidator.safeParseJSON(raw);
+        if (!parseResult.success) {
+          logger.warn('Risks response JSON parse failed', { error: parseResult.error });
+          throw new Error('Invalid JSON response');
         }
+        
+        const validation = aiResponseValidator.validateRisks(parseResult.data);
+        if (!validation.isValid) {
+          logger.warn('Risks response validation failed', { errors: validation.errors });
+          throw new Error('Invalid risks structure');
+        }
+        
+        // Map validated data to RiskItem format
+        const validatedData = validation.data!;
+        return validatedData.risks.map((r, idx) => ({
+          id: `risk_${Date.now()}_${idx}`,
+          category: r.category as RiskItem['category'],
+          title: r.title,
+          severity: r.severity,
+          likelihood: r.likelihood,
+          why: r.why,
+          mitigation: r.mitigation,
+          backup_plan: r.backup_plan,
+        }));
       } catch (err: unknown) {
         logger.warn('LLM risk evaluation failed, using curated risk matrix', { err });
       }
     }
 
-    return this.getCuratedRisks(profile);
+    return fallbackDataService.getCuratedRisks(profile);
   }
 
-  // Curated fallbacks ensuring high-quality experience even without API key
-  private getCuratedIdeas(profile: EventProfile): IdeaItem[] {
-    const isWedding = profile.type === 'wedding';
-    return [
-      {
-        id: 'idea_seed_1',
-        category: 'Decor & Ambiance',
-        title: isWedding ? 'Heritage Brass & Marigold Canopy' : 'Warm Fairy Lights Canopy with Photo Wall',
-        description: isWedding
-          ? 'Use traditional brass urulis with floating tea-lights and fragrant marigold torans at the entrance gate for a warm, auspicious welcome.'
-          : 'A cozy fairy light installation with instant polaroid photo clips celebrating memories.',
-        cost_range: `₹${Math.round(profile.total_budget * 0.025).toLocaleString()} - ₹${Math.round(profile.total_budget * 0.04).toLocaleString()}`,
-        effort_level: 'Low',
-        tags: ['Aesthetic', 'Welcome', 'Traditional'],
-        saved: true,
-      },
-      {
-        id: 'idea_seed_2',
-        category: 'Food & Culinary',
-        title: 'Live Artisan Chaat & Mocktail Bar',
-        description: 'Interactive counter featuring curated spiced treats, smoked tamarind coolers, and chilled tender coconut refreshers.',
-        cost_range: `₹${Math.round(profile.total_budget * 0.04).toLocaleString()} - ₹${Math.round(profile.total_budget * 0.06).toLocaleString()}`,
-        effort_level: 'Medium',
-        tags: ['Culinary', 'Interactive', 'Gourmet'],
-        saved: true,
-      },
-      {
-        id: 'idea_seed_3',
-        category: 'Entertainment',
-        title: isWedding ? 'Acoustic Folk Sangeet & Live Dhol Welcome' : 'Live Acoustic Set & Interactive Trivia',
-        description: 'Engage all age groups with authentic beats during peak arrival, transitioning into acoustic live melodies.',
-        cost_range: `₹${Math.round(profile.total_budget * 0.03).toLocaleString()} - ₹${Math.round(profile.total_budget * 0.05).toLocaleString()}`,
-        effort_level: 'Low',
-        tags: ['Music', 'Vibe', 'Live'],
-        saved: false,
-      },
-      {
-        id: 'idea_seed_4',
-        category: 'Favors & Gifting',
-        title: 'Eco-Friendly Plantable Seed Paper & Artisanal Sweets',
-        description: 'Zero-waste takeaway gifts packaged in handcrafted jute pouches with customized family tags.',
-        cost_range: `₹${Math.round(profile.total_budget * 0.015).toLocaleString()} - ₹${Math.round(profile.total_budget * 0.025).toLocaleString()}`,
-        effort_level: 'Low',
-        tags: ['Eco-friendly', 'Gifts', 'Memories'],
-        saved: true,
-      },
-    ];
-  }
-
-  private getCuratedInvitations(profile: EventProfile): InvitationItem[] {
-    return [
-      {
-        id: 'msg_seed_1',
-        type: 'WhatsApp Digital Invite',
-        language: 'English',
-        tone: 'Warm & Festive',
-        content: `Namaste! 🙏\n\nWith immense joy and blessings, we warmly invite you to celebrate ${profile.title}.\n\n📅 Date: ${profile.date}\n📍 City: ${profile.city}\n👥 Guests: ${profile.guest_count}\n\nYour presence and blessings will make our special day complete. Kindly treat this as our heartfelt invitation!\n\nWarm regards,\nFamily`,
-        share_url: `https://wa.me/?text=${encodeURIComponent(`Namaste! You are cordially invited to celebrate ${profile.title} on ${profile.date} in ${profile.city}!`)}`,
-      },
-      {
-        id: 'msg_seed_2',
-        type: 'Formal Card Copy',
-        language: 'English',
-        tone: 'Formal & Royal',
-        content: `Cordial Invitation\n\nWe take great pleasure in inviting you to join us on the auspicious occasion of ${profile.title}.\n\nDate: ${profile.date}\nLocation: ${profile.city}\nDress Code: Festive Traditional\n\nPlease let us know your travel itinerary to assist with arrangements.\n\nWarm regards,\nHost Committee`,
-        share_url: '',
-      },
-      {
-        id: 'msg_seed_3',
-        type: 'Short SMS / WhatsApp Broadcast',
-        language: 'English',
-        tone: 'Joyful & Direct',
-        content: `✨ Save the Date! Join us for ${profile.title} on ${profile.date} in ${profile.city}. Detailed invite to follow. Can't wait to celebrate together!`,
-        share_url: `https://wa.me/?text=${encodeURIComponent(`Save the date for ${profile.title} on ${profile.date}!`)}`,
-      },
-    ];
-  }
-
-  private getCuratedRisks(profile: EventProfile): RiskItem[] {
-    return [
-      {
-        id: 'risk_seed_1',
-        category: 'Food & Safety',
-        title: 'Catering Headcount Overflow (+15% unexpected guests)',
-        severity: 'high',
-        likelihood: 'high',
-        why: 'In Indian celebrations, extended families often arrive in larger groups than initially confirmed.',
-        mitigation: 'Mandate RSVP confirmations 5 days prior; contractually request caterer for 15% buffer provision in raw materials.',
-        backup_plan: 'Pre-negotiated secondary fast-service live counter with 30-minute replenishment window.',
-      },
-      {
-        id: 'risk_seed_2',
-        category: 'Weather',
-        title: profile.indoor_outdoor === 'outdoor' ? 'Sudden Unseasonal Rain or Extreme Evening Dew' : 'Air Conditioning Overload with Full Banquet',
-        severity: 'high',
-        likelihood: 'medium',
-        why: profile.indoor_outdoor === 'outdoor' ? 'Winter evening dew and unexpected showers can disrupt lawn mandap setups.' : 'Full hall capacity can strain HVAC compressors.',
-        mitigation: profile.indoor_outdoor === 'outdoor' ? 'Reserve water-resistant German hanger canopy with side curtains.' : 'Verify venue transformer backup and run test load 48h prior.',
-        backup_plan: 'On-site 125 kVA silent generator stationed on standby with automatic changeover switch.',
-      },
-      {
-        id: 'risk_seed_3',
-        category: 'Timeline',
-        title: 'Baraat / Ceremony Delay Impacting Dinner Schedule',
-        severity: 'medium',
-        likelihood: 'high',
-        why: 'Traffic congestion and extended dance processions routinely push schedules back by 60-90 minutes.',
-        mitigation: 'Assign a dedicated Baraat coordinator with wireless comms to signal caterers at the 500-meter mark.',
-        backup_plan: 'Keep welcome appetizer stations fully loaded and circulating so arriving guests remain comfortable.',
-      },
-    ];
-  }
+  // Curated fallbacks moved to fallback-data.service.ts for better organization
 }
 
 export const aiService = new AIService();

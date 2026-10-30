@@ -31,6 +31,7 @@ vi.mock('../../server/config/env.js', () => ({
 
 vi.mock('../../server/utils/logger.js', () => ({
   logger: {
+    debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
@@ -108,7 +109,7 @@ describe('API Integration Tests - Event Routes', () => {
         .expect(400);
 
       expect(response.body).toHaveProperty('error');
-      expect(response.body.error.message).toContain('validation');
+      expect(response.body.error.message).toMatch(/validation/i);
     });
 
     it('should return 400 for missing required fields', async () => {
@@ -132,7 +133,7 @@ describe('API Integration Tests - Event Routes', () => {
         })
         .expect(403);
 
-      expect(response.body.error.message).toContain('permission');
+      expect(response.body.error.message).toMatch(/permission/i);
     });
   });
 
@@ -142,7 +143,7 @@ describe('API Integration Tests - Event Routes', () => {
         .get('/api/events/nonexistent-id-12345')
         .expect(404);
 
-      expect(response.body.error.message).toContain('not found');
+      expect(response.body.error.message).toMatch(/not found/i);
     });
   });
 });
@@ -633,7 +634,7 @@ describe('API Integration Tests - Error Response Shape', () => {
       .expect(403);
 
     expect(response.body).toHaveProperty('error');
-    expect(response.body.error.message).toContain('permission');
+    expect(response.body.error.message).toMatch(/permission/i);
   });
 });
 

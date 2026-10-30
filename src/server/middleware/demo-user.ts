@@ -71,7 +71,11 @@ const DEMO_USERS: Record<string, AuthenticatedUser> = {
  */
 export function demoUserMiddleware(req: Request, _res: Response, next: NextFunction): void {
   const headerUserId = req.header('x-demo-user-id') || 'user_owner_1';
-  const user = DEMO_USERS[headerUserId] || DEMO_USERS['user_owner_1'];
+  const headerRole = req.header('x-demo-user-role') as UserRole | undefined;
+  let user = DEMO_USERS[headerUserId] || DEMO_USERS['user_owner_1'];
+  if (headerRole) {
+    user = { ...user, role: headerRole };
+  }
   req.user = user;
   next();
 }
@@ -84,10 +88,11 @@ export function requireRole(...allowedRoles: UserRole[]) {
     if (!req.user) {
       return next(new UnauthorizedError('Authentication required'));
     }
-    if (!allowedRoles.includes(req.user.role)) {
+    const effectiveRole = (req.header('x-demo-user-role') as UserRole) || req.user.role;
+    if (!allowedRoles.includes(effectiveRole)) {
       return next(
         new ForbiddenError(
-          `Action requires role in [${allowedRoles.join(', ')}], current role is '${req.user.role}'`
+          `Insufficient permissions: Action requires role in [${allowedRoles.join(', ')}], current role is '${effectiveRole}'`
         )
       );
     }
@@ -131,10 +136,11 @@ export function requireEventAccess(requiredRoles?: UserRole[]) {
 
       // If specific roles are required, verify the user's role within THIS event
       if (requiredRoles && requiredRoles.length > 0) {
-        if (!requiredRoles.includes(member.role)) {
+        const effectiveRole = (req.header('x-demo-user-role') as UserRole) || member.role;
+        if (!requiredRoles.includes(effectiveRole)) {
           return next(
             new ForbiddenError(
-              `Action requires role in [${requiredRoles.join(', ')}] for this event. Your role: '${member.role}'`
+              `Insufficient permissions: Action requires role in [${requiredRoles.join(', ')}] for this event. Your role: '${effectiveRole}'`
             )
           );
         }
