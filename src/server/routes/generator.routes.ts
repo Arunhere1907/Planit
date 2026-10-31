@@ -1,9 +1,10 @@
-import { Router, Request, Response } from 'express';
+import type { Request, Response } from 'express';
+import { Router } from 'express';
 import { aiService } from '../services/ai/ai.service.js';
 import { placesService } from '../services/places/places.service.js';
 import { asyncHandler } from '../utils/async-handler.js';
 import { CONSTANTS } from '../config/constants.js';
-import { EventProfile, VendorCategory } from '../../shared/types/index.js';
+import type { EventProfile, VendorCategory } from '../../shared/types/index.js';
 import { strictRateLimiter, externalApiRateLimiter } from '../middleware/rate-limit.js';
 import { validateBody, validateQuery } from '../middleware/validate.js';
 import { EventProfileInputSchema, VendorSearchSchema, ReplanRequestSchema } from '../validation/request-schemas.js';

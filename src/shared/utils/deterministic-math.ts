@@ -1,4 +1,4 @@
-import { BudgetCategory, Task } from "../types/index.js";
+import type { BudgetCategory, Task } from "../types/index.js";
 
 /**
  * Computes exact category amounts from percentages against the total budget.

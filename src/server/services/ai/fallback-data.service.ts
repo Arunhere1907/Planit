@@ -5,7 +5,7 @@
  * This ensures the app remains fully functional without API keys.
  */
 
-import {
+import type {
   EventProfile,
   EventType,
   IdeaItem,

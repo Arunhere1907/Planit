@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { resetDatabaseToSeed } from '../repositories/seed-loader.js';
 import { inProcessScheduler } from '../services/notifications/scheduler.js';
 import { asyncHandler } from '../utils/async-handler.js';

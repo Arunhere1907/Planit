@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { eventService } from '../services/event.service.js';
 import { aiService } from '../services/ai/ai.service.js';
 import { eventRepository } from '../repositories/index.js';

@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { placesService } from '../services/places/places.service.js';
 import { vendorService } from '../services/vendor.service.js';
 import { asyncHandler } from '../utils/async-handler.js';
 import { CONSTANTS } from '../config/constants.js';
-import { VendorCategory } from '../../shared/types/index.js';
+import type { VendorCategory } from '../../shared/types/index.js';
 
 export const searchVendors = asyncHandler(async (req: Request, res: Response) => {
   const { category, city, query, maxResults } = req.query;

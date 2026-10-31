@@ -1,5 +1,5 @@
 import { eventRepository } from '../repositories/index.js';
-import { FullEventPlan, Expense, BudgetCategory, ActivityLogItem } from '../../shared/types/index.js';
+import type { FullEventPlan, Expense, BudgetCategory, ActivityLogItem } from '../../shared/types/index.js';
 import { rebalanceBudgetWithLocks, validateBudgetTotals } from '../../shared/utils/deterministic-math.js';
 import { NotFoundError, ValidationError } from '../errors/app-error.js';
 

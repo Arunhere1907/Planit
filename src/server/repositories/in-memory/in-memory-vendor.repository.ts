@@ -1,5 +1,5 @@
-import { IVendorRepository } from "../interfaces/vendor.repository.interface.js";
-import { VendorPlace } from "../../../shared/types/index.js";
+import type { IVendorRepository } from "../interfaces/vendor.repository.interface.js";
+import type { VendorPlace } from "../../../shared/types/index.js";
 import { InMemoryStore } from "./store.js";
 
 export class InMemoryVendorRepository implements IVendorRepository {

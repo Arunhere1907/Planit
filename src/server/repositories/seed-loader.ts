@@ -3,7 +3,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { eventRepository } from "./in-memory/in-memory-event.repository.js";
 import { vendorRepository } from "./in-memory/in-memory-vendor.repository.js";
-import { FullEventPlan, VendorPlace, DemoUser } from "../../shared/types/index.js";
+import type { FullEventPlan, VendorPlace, DemoUser } from "../../shared/types/index.js";
 import { logger } from "../utils/logger.js";
 import { z } from "zod";
 

@@ -7,7 +7,7 @@ import {
   RotateCcw,
   UserCheck
 } from 'lucide-react';
-import { EventProfile } from '../../../shared/types/index.js';
+import type { EventProfile } from '../../../shared/types/index.js';
 import { useDemoUser, DEMO_USERS_LIST } from '../../context/DemoUserContext.js';
 import { Badge } from '../ui/Badge.js';
 import { Button } from '../ui/Button.js';

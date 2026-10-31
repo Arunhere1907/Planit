@@ -1,5 +1,5 @@
 import { eventRepository } from '../repositories/index.js';
-import {
+import type {
   FullEventPlan,
   EventProfile,
   Collaborator,

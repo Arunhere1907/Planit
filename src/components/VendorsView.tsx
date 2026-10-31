@@ -14,7 +14,7 @@ import {
   Trash2,
   Loader2,
 } from "lucide-react";
-import { VendorItem, VendorPlace, VendorStatus, EventProfile } from "../types";
+import type { VendorItem, VendorPlace, VendorStatus, EventProfile } from "../types";
 import { formatExactINR } from "../lib/formatters";
 
 interface VendorsViewProps {

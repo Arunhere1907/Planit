@@ -46,18 +46,39 @@ export default [
       ...prettierConfig.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
+      
+      // Code Quality - Complexity and Size Limits
+      'max-lines': ['error', { max: 300, skipBlankLines: true, skipComments: true }],
+      'max-lines-per-function': ['error', { max: 80, skipBlankLines: true, skipComments: true }],
+      'complexity': ['error', 10],
+      'max-depth': ['error', 3],
+      'max-params': ['error', 4],
+      'no-nested-ternary': 'error',
+      
+      // TypeScript Strict Rules
       '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'error',
+      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+      // Type-aware rules disabled (require parserOptions.project configuration)
+      // '@typescript-eslint/no-floating-promises': 'error',
+      // '@typescript-eslint/no-misused-promises': 'error',
+      // '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
+      
+      // Variable and Import Management
       'no-unused-vars': 'off', // Disabled in favor of unused-imports
       '@typescript-eslint/no-unused-vars': 'off', // Disabled in favor of unused-imports
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
-        'warn',
+        'error',
         { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' }
       ],
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      
+      // Code Style and Best Practices
+      'no-console': ['error', { allow: ['warn', 'error'] }],
       'prefer-const': 'error',
+      'eqeqeq': ['error', 'always'],
       'no-var': 'error',
       'no-undef': 'off', // TypeScript handles this
       

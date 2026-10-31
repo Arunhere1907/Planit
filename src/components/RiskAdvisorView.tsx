@@ -7,7 +7,7 @@ import {
   CheckCircle2,
   Loader2,
 } from "lucide-react";
-import { RiskItem, EventProfile } from "../types";
+import type { RiskItem, EventProfile } from "../types";
 import { checkBudgetSanity } from "../lib/deterministicMath";
 
 interface RiskAdvisorViewProps {

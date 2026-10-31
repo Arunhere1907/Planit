@@ -7,7 +7,7 @@ import {
   ShieldCheck,
   Loader2,
 } from "lucide-react";
-import { InvitationItem, EventProfile } from "../types";
+import type { InvitationItem, EventProfile } from "../types";
 import { formatDate } from "../lib/formatters";
 
 interface InvitationsViewProps {

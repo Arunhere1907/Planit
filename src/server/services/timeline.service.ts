@@ -1,5 +1,5 @@
 import { eventRepository } from '../repositories/index.js';
-import { Task, TaskStatus, ActivityLogItem } from '../../shared/types/index.js';
+import type { Task, TaskStatus, ActivityLogItem } from '../../shared/types/index.js';
 import { NotFoundError } from '../errors/app-error.js';
 
 export class TimelineService {

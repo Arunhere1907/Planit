@@ -1,5 +1,5 @@
 import { env } from '../../config/env.js';
-import { VendorPlace, VendorCategory } from '../../../shared/types/index.js';
+import type { VendorPlace, VendorCategory } from '../../../shared/types/index.js';
 import { vendorRepository } from '../../repositories/index.js';
 import { logger } from '../../utils/logger.js';
 import { cacheService } from '../cache.service.js';

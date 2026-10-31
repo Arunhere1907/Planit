@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Sliders, ArrowRight, X, Loader2 } from "lucide-react";
-import { BudgetCategory, EventProfile } from "../types";
+import type { BudgetCategory, EventProfile } from "../types";
 import { formatExactINR } from "../lib/formatters";
 
 interface BudgetOptimizerModalProps {

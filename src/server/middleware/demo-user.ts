@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { UserRole } from '../../shared/types/index.js';
+import type { Request, Response, NextFunction } from 'express';
+import type { UserRole } from '../../shared/types/index.js';
 import { ForbiddenError, UnauthorizedError, NotFoundError } from '../errors/app-error.js';
 import { eventRepository } from '../repositories/index.js';
 

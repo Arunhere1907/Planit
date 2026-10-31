@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { aiService } from '../services/ai/ai.service.js';
 import { asyncHandler } from '../utils/async-handler.js';
 import { CONSTANTS } from '../config/constants.js';

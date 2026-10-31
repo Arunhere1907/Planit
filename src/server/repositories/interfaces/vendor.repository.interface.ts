@@ -1,4 +1,4 @@
-import { VendorPlace } from "../../../shared/types/index.js";
+import type { VendorPlace } from "../../../shared/types/index.js";
 
 export interface IVendorRepository {
   findPlaces(category?: string, city?: string, minRating?: number): Promise<VendorPlace[]>;

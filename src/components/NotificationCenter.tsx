@@ -3,7 +3,7 @@ import {
   Bell,
   X,
 } from "lucide-react";
-import { FullEventPlan } from "../types";
+import type { FullEventPlan } from "../types";
 import { formatDate, formatExactINR } from "../lib/formatters";
 
 interface NotificationCenterProps {

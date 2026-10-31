@@ -1,7 +1,7 @@
 import { eventRepository } from '../../repositories/index.js';
 import { mailer } from './mailer.js';
 import { logger } from '../../utils/logger.js';
-import { AppNotification, FullEventPlan, Expense } from '../../../shared/types/index.js';
+import type { AppNotification, FullEventPlan, Expense } from '../../../shared/types/index.js';
 
 export class InProcessScheduler {
   private timer: NodeJS.Timeout | null = null;

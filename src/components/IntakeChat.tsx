@@ -10,7 +10,7 @@ import {
   Loader2,
   X,
 } from "lucide-react";
-import { EventProfile } from "../types";
+import type { EventProfile } from "../types";
 import { LiveRegion } from "../client/components/ui/LiveRegion";
 
 interface IntakeChatProps {

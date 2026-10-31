@@ -7,7 +7,7 @@ import {
   Tag,
   Loader2,
 } from "lucide-react";
-import { IdeaItem, EventProfile } from "../types";
+import type { IdeaItem, EventProfile } from "../types";
 
 interface IdeasViewProps {
   ideas: IdeaItem[];

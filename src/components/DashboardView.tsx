@@ -11,7 +11,7 @@ import {
   ChevronRight,
   Plus,
 } from "lucide-react";
-import { FullEventPlan } from "../types";
+import type { FullEventPlan } from "../types";
 import { formatExactINR, formatDate, getDaysRemaining } from "../lib/formatters";
 
 interface DashboardViewProps {

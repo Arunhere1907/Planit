@@ -7,7 +7,7 @@ import {
   RotateCcw,
   UserCheck
 } from "lucide-react";
-import { EventProfile } from "../types";
+import type { EventProfile } from "../types";
 import { getDaysRemaining } from "../lib/formatters";
 
 interface HeaderProps {

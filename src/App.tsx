@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense, useRef } from "react";
 import { Header } from "./components/Header";
 import { DashboardView } from "./components/DashboardView";
-import { FullEventPlan, EventProfile, BudgetCategory, Task, Expense, VendorItem, IdeaItem, RiskItem, InvitationItem, Collaborator } from "./types";
+import type { FullEventPlan, EventProfile, BudgetCategory, Task, Expense, VendorItem, IdeaItem, RiskItem, InvitationItem, Collaborator } from "./types";
 import { exportToICS, exportBudgetCSV, exportVendorsCSV } from "./lib/exportUtils";
 import { eventApi } from "./client/services/api/event-api.js";
 import { DemoUserProvider } from "./client/context/DemoUserContext.js";

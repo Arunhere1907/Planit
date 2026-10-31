@@ -1,4 +1,4 @@
-import { FullEventPlan } from "../../../shared/types/index.js";
+import type { FullEventPlan } from "../../../shared/types/index.js";
 
 export interface IEventRepository {
   findAll(): Promise<FullEventPlan[]>;

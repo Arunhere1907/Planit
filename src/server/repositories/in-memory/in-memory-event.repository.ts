@@ -1,5 +1,5 @@
-import { IEventRepository } from "../interfaces/event.repository.interface.js";
-import { FullEventPlan } from "../../../shared/types/index.js";
+import type { IEventRepository } from "../interfaces/event.repository.interface.js";
+import type { FullEventPlan } from "../../../shared/types/index.js";
 import { InMemoryStore } from "./store.js";
 import { NotFoundError } from "../../errors/app-error.js";
 

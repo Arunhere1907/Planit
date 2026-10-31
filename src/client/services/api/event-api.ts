@@ -1,5 +1,5 @@
 import { apiFetch } from './client.js';
-import {
+import type {
   FullEventPlan,
   EventProfile,
   BudgetCategory,

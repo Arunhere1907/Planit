@@ -1,6 +1,6 @@
 import React from "react";
 import { Printer, X } from "lucide-react";
-import { FullEventPlan } from "../types";
+import type { FullEventPlan } from "../types";
 import { formatExactINR, formatDate } from "../lib/formatters";
 
 interface PrintablePlanModalProps {

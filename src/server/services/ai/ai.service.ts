@@ -8,7 +8,7 @@ import {
   TIMELINE_GENERATION_SYSTEM_PROMPT,
   BUDGET_OPTIMIZER_SYSTEM_PROMPT,
 } from './prompts/event-prompts.js';
-import {
+import type {
   EventProfile,
   EventType,
   FullEventPlan,

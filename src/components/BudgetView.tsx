@@ -8,7 +8,7 @@ import {
   Sliders,
   Trash2,
 } from "lucide-react";
-import { BudgetCategory, Expense, EventProfile } from "../types";
+import type { BudgetCategory, Expense, EventProfile } from "../types";
 import { formatExactINR, formatDate } from "../lib/formatters";
 import { rebalanceBudgetCategories } from "../lib/deterministicMath";
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { RefreshCw, Check, ArrowRight, X, Loader2 } from "lucide-react";
-import { FullEventPlan, BudgetCategory, Task, EventProfile } from "../types";
+import type { FullEventPlan, BudgetCategory, Task, EventProfile } from "../types";
 import { formatExactINR, formatDate } from "../lib/formatters";
 
 interface ReplanModalProps {

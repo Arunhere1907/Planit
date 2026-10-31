@@ -11,7 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import confetti from "canvas-confetti";
-import { Task, RunOfShowItem, EventProfile } from "../types";
+import type { Task, RunOfShowItem, EventProfile } from "../types";
 import { formatDate } from "../lib/formatters";
 
 interface TimelineViewProps {

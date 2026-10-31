@@ -1,4 +1,4 @@
-import { FullEventPlan } from "../types/index.js";
+import type { FullEventPlan } from "../types/index.js";
 
 /**
  * Security utilities for preventing injection attacks in exports

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { UserRole } from '../../shared/types/index.js';
+import type { UserRole } from '../../shared/types/index.js';
 
 export interface DemoUser {
   id: string;
