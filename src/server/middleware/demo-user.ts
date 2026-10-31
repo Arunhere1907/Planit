@@ -127,7 +127,7 @@ export function requireEventAccess(requiredRoles?: UserRole[]) {
       }
 
       // Check if user is a collaborator/member of this event
-      const member = event.collaborators?.find((c) => c.id === req.user!.id);
+      const member = event.collaborators?.find((c) => c.id === req.user?.id);
       if (!member) {
         return next(
           new ForbiddenError(`You do not have access to event '${eventId}'`)

@@ -94,7 +94,11 @@ export class LLMClient {
     const callPromise = (async () => {
       const startTime = Date.now();
       
-      const response = await this.client!.models.generateContent({
+      if (!this.client) {
+        throw new Error('LLM client not initialized');
+      }
+      
+      const response = await this.client.models.generateContent({
         model: this.modelName,
         contents: [
           {
