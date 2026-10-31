@@ -1,7 +1,7 @@
-import React from "react";
-import { Printer, X } from "lucide-react";
-import type { FullEventPlan } from "../types";
-import { formatExactINR, formatDate } from "../lib/formatters";
+import React from 'react';
+import { Printer, X } from 'lucide-react';
+import type { FullEventPlan } from '../types';
+import { formatExactINR, formatDate } from '../lib/formatters';
 
 interface PrintablePlanModalProps {
   plan: FullEventPlan;
@@ -21,8 +21,12 @@ export const PrintablePlanModal: React.FC<PrintablePlanModalProps> = ({ plan, on
         {/* Modal Top Actions (Hidden in Print) */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-200 print:hidden mb-6">
           <div>
-            <h3 className="text-lg font-bold text-slate-900">Printable Event Master Dossier (PDF Ready)</h3>
-            <p className="text-xs text-slate-500">Comprehensive plan for suppliers, hosts & coordinators</p>
+            <h3 className="text-lg font-bold text-slate-900">
+              Printable Event Master Dossier (PDF Ready)
+            </h3>
+            <p className="text-xs text-slate-500">
+              Comprehensive plan for suppliers, hosts & coordinators
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -32,7 +36,10 @@ export const PrintablePlanModal: React.FC<PrintablePlanModalProps> = ({ plan, on
               <Printer className="w-4 h-4" />
               <span>Print to PDF</span>
             </button>
-            <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 cursor-pointer">
+            <button
+              onClick={onClose}
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 cursor-pointer"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -56,8 +63,12 @@ export const PrintablePlanModal: React.FC<PrintablePlanModalProps> = ({ plan, on
               </div>
               <div className="text-right">
                 <div className="text-xs text-slate-500 font-bold uppercase">Event Date</div>
-                <div className="text-lg font-extrabold text-slate-900">{formatDate(profile.date)}</div>
-                <div className="text-xs text-slate-500">{profile.city} • {profile.guest_count} Guests</div>
+                <div className="text-lg font-extrabold text-slate-900">
+                  {formatDate(profile.date)}
+                </div>
+                <div className="text-xs text-slate-500">
+                  {profile.city} • {profile.guest_count} Guests
+                </div>
               </div>
             </div>
           </div>
@@ -140,10 +151,16 @@ export const PrintablePlanModal: React.FC<PrintablePlanModalProps> = ({ plan, on
                       <div className="text-[10px] text-slate-500 font-normal">{v.contact}</div>
                     </td>
                     <td className="p-2 border">{v.category}</td>
-                    <td className="p-2 border capitalize font-semibold">{v.status.replace("_", " ")}</td>
+                    <td className="p-2 border capitalize font-semibold">
+                      {v.status.replace('_', ' ')}
+                    </td>
                     <td className="p-2 border font-mono">{formatExactINR(v.quote)}</td>
-                    <td className="p-2 border font-mono text-emerald-700">{formatExactINR(v.advance_paid)}</td>
-                    <td className="p-2 border font-mono text-rose-700">{formatExactINR(v.balance)}</td>
+                    <td className="p-2 border font-mono text-emerald-700">
+                      {formatExactINR(v.advance_paid)}
+                    </td>
+                    <td className="p-2 border font-mono text-rose-700">
+                      {formatExactINR(v.balance)}
+                    </td>
                     <td className="p-2 border font-mono">{formatDate(v.due_date)}</td>
                   </tr>
                 ))}
@@ -160,11 +177,17 @@ export const PrintablePlanModal: React.FC<PrintablePlanModalProps> = ({ plan, on
               {risks.map((r) => (
                 <div key={r.id} className="p-3 bg-slate-50 border rounded-lg space-y-1">
                   <div className="flex items-center justify-between font-bold">
-                    <span>{r.title} ({r.severity.toUpperCase()} SEVERITY)</span>
+                    <span>
+                      {r.title} ({r.severity.toUpperCase()} SEVERITY)
+                    </span>
                     <span className="text-slate-500">{r.category}</span>
                   </div>
-                  <p className="text-slate-700 font-light"><strong>Mitigation:</strong> {r.mitigation}</p>
-                  <p className="text-rose-700 font-medium"><strong>Backup Plan:</strong> {r.backup_plan}</p>
+                  <p className="text-slate-700 font-light">
+                    <strong>Mitigation:</strong> {r.mitigation}
+                  </p>
+                  <p className="text-rose-700 font-medium">
+                    <strong>Backup Plan:</strong> {r.backup_plan}
+                  </p>
                 </div>
               ))}
             </div>

@@ -24,17 +24,19 @@ export async function createApp(): Promise<Express> {
   app.set('trust proxy', 1);
 
   // Enable gzip compression for all responses
-  app.use(compression({
-    level: 6, // Balance between speed and compression ratio
-    threshold: 1024, // Only compress responses > 1KB
-    filter: (req, res) => {
-      // Don't compress if client doesn't accept encoding
-      if (req.headers['x-no-compression']) {
-        return false;
-      }
-      return compression.filter(req, res);
-    }
-  }));
+  app.use(
+    compression({
+      level: 6, // Balance between speed and compression ratio
+      threshold: 1024, // Only compress responses > 1KB
+      filter: (req, res) => {
+        // Don't compress if client doesn't accept encoding
+        if (req.headers['x-no-compression']) {
+          return false;
+        }
+        return compression.filter(req, res);
+      },
+    })
+  );
 
   // Security middleware (helmet, CORS, CSP, etc.)
   app.use(helmetMiddleware);
@@ -59,7 +61,7 @@ export async function createApp(): Promise<Express> {
   if (env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
-      appType: 'spa'
+      appType: 'spa',
     });
     app.use(vite.middlewares);
   }

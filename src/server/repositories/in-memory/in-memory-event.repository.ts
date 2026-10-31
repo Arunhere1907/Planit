@@ -1,7 +1,7 @@
-import type { IEventRepository } from "../interfaces/event.repository.interface.js";
-import type { FullEventPlan } from "../../../shared/types/index.js";
-import { InMemoryStore } from "./store.js";
-import { NotFoundError } from "../../errors/app-error.js";
+import type { IEventRepository } from '../interfaces/event.repository.interface.js';
+import type { FullEventPlan } from '../../../shared/types/index.js';
+import { InMemoryStore } from './store.js';
+import { NotFoundError } from '../../errors/app-error.js';
 
 interface EventPlanEntity {
   id: string;
@@ -31,7 +31,7 @@ export class InMemoryEventRepository implements IEventRepository {
   public async update(id: string, updates: Partial<FullEventPlan>): Promise<FullEventPlan> {
     const existing = await this.findById(id);
     if (!existing) {
-      throw new NotFoundError("Event", id);
+      throw new NotFoundError('Event', id);
     }
 
     // Cap activity log to prevent unbounded growth (keep last 100 entries)
@@ -44,7 +44,9 @@ export class InMemoryEventRepository implements IEventRepository {
       ...updates,
       profile: updates.profile ? { ...existing.profile, ...updates.profile } : existing.profile,
       budget: updates.budget ? { ...existing.budget, ...updates.budget } : existing.budget,
-      timeline: updates.timeline ? { ...existing.timeline, ...updates.timeline } : existing.timeline,
+      timeline: updates.timeline
+        ? { ...existing.timeline, ...updates.timeline }
+        : existing.timeline,
       vendors: updates.vendors || existing.vendors,
       ideas: updates.ideas || existing.ideas,
       risks: updates.risks || existing.risks,

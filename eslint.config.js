@@ -10,7 +10,14 @@ import unusedImports from 'eslint-plugin-unused-imports';
 
 export default [
   {
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**', '*.config.ts', '*.config.js', 'src/__tests__/**'],
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'coverage/**',
+      '*.config.ts',
+      '*.config.js',
+      'src/__tests__/**',
+    ],
   },
   js.configs.recommended,
   {
@@ -46,15 +53,15 @@ export default [
       ...prettierConfig.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
-      
+
       // Code Quality - Complexity and Size Limits
       'max-lines': ['error', { max: 300, skipBlankLines: true, skipComments: true }],
       'max-lines-per-function': ['error', { max: 80, skipBlankLines: true, skipComments: true }],
-      'complexity': ['error', 10],
+      complexity: ['error', 10],
       'max-depth': ['error', 3],
       'max-params': ['error', 4],
       'no-nested-ternary': 'error',
-      
+
       // TypeScript Strict Rules
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
@@ -65,23 +72,23 @@ export default [
       // '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
-      
+
       // Variable and Import Management
       'no-unused-vars': 'off', // Disabled in favor of unused-imports
       '@typescript-eslint/no-unused-vars': 'off', // Disabled in favor of unused-imports
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
         'error',
-        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' }
+        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
       ],
-      
+
       // Code Style and Best Practices
       'no-console': ['error', { allow: ['warn', 'error'] }],
       'prefer-const': 'error',
-      'eqeqeq': ['error', 'always'],
+      eqeqeq: ['error', 'always'],
       'no-var': 'error',
       'no-undef': 'off', // TypeScript handles this
-      
+
       // Accessibility rules - all set to error for WCAG 2.1 AA compliance
       'jsx-a11y/alt-text': 'error',
       'jsx-a11y/anchor-has-content': 'error',

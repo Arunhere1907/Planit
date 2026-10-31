@@ -2,7 +2,7 @@ import crypto from 'crypto';
 
 /**
  * Share Token Service - Generates cryptographically secure read-only share links
- * 
+ *
  * Security Requirements:
  * - Tokens must be crypto-random with >= 128 bits of entropy
  * - Share links are read-only (no mutations allowed)
@@ -30,18 +30,14 @@ function generateSecureToken(): string {
   // Generate 32 bytes (256 bits) of crypto-random data
   // This exceeds the 128-bit minimum requirement
   const buffer = crypto.randomBytes(32);
-  
+
   // Convert to URL-safe base64 (replace +/= with -_~)
-  return buffer
-    .toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '~');
+  return buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '~');
 }
 
 /**
  * Create a new share token for an event
- * 
+ *
  * @param eventId - The event to share
  * @param createdBy - User ID who created the share link
  * @param expiresInDays - Optional expiration in days (null = never expires)
@@ -53,7 +49,7 @@ export function createShareToken(
   expiresInDays: number | null = null
 ): ShareToken {
   const token = generateSecureToken();
-  
+
   const expiresAt = expiresInDays
     ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
     : null;
@@ -73,13 +69,13 @@ export function createShareToken(
 
 /**
  * Validate a share token and return the associated event ID
- * 
+ *
  * @param token - The share token to validate
  * @returns Event ID if valid, null if invalid/expired/revoked
  */
 export function validateShareToken(token: string): string | null {
   const shareToken = tokenStore.get(token);
-  
+
   if (!shareToken) {
     return null; // Token not found
   }
@@ -97,13 +93,13 @@ export function validateShareToken(token: string): string | null {
 
 /**
  * Revoke a share token (make it invalid)
- * 
+ *
  * @param token - The token to revoke
  * @returns true if revoked, false if token not found
  */
 export function revokeShareToken(token: string): boolean {
   const shareToken = tokenStore.get(token);
-  
+
   if (!shareToken) {
     return false;
   }
@@ -114,7 +110,7 @@ export function revokeShareToken(token: string): boolean {
 
 /**
  * List all active share tokens for an event
- * 
+ *
  * @param eventId - The event ID
  * @returns Array of active (non-revoked, non-expired) share tokens
  */
@@ -139,9 +135,9 @@ export function listShareTokensForEvent(eventId: string): ShareToken[] {
  * Middleware helper to extract token from request
  * Supports both query param (?token=xxx) and Authorization header
  */
-export function extractTokenFromRequest(req: { 
-  query: { token?: string }; 
-  headers: { authorization?: string } 
+export function extractTokenFromRequest(req: {
+  query: { token?: string };
+  headers: { authorization?: string };
 }): string | null {
   // Check query parameter first
   if (req.query.token) {

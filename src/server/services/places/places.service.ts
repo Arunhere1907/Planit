@@ -49,7 +49,10 @@ export class PlacesService {
           return liveVendors;
         }
       } catch (err) {
-        logger.warn('Google Places API search failed, falling back to curated local vendor repository', { err });
+        logger.warn(
+          'Google Places API search failed, falling back to curated local vendor repository',
+          { err }
+        );
       }
     }
 
@@ -60,7 +63,7 @@ export class PlacesService {
       query,
       limit: maxResults,
     });
-    
+
     // Cache fallback results too (shorter TTL since they're static)
     cacheService.set(cacheKey, fallbackVendors, 30 * 60 * 1000); // 30 minutes
     return fallbackVendors;
@@ -72,7 +75,9 @@ export class PlacesService {
     query?: string;
     maxResults: number;
   }): Promise<VendorPlace[]> {
-    const textQuery = [params.query, params.category, params.city, 'events wedding'].filter(Boolean).join(' ');
+    const textQuery = [params.query, params.category, params.city, 'events wedding']
+      .filter(Boolean)
+      .join(' ');
 
     const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
       method: 'POST',
@@ -127,8 +132,15 @@ export class PlacesService {
         phone: place.internationalPhoneNumber || '+91 98250 12345',
         website: place.websiteUri || 'https://maps.google.com',
         google_maps_url: place.websiteUri || 'https://maps.google.com',
-        image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&auto=format&fit=crop&q=80',
-        reviews: [{ author: 'Verified Client', rating: place.rating || 5, text: 'Great service and highly reliable execution.' }],
+        image:
+          'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&auto=format&fit=crop&q=80',
+        reviews: [
+          {
+            author: 'Verified Client',
+            rating: place.rating || 5,
+            text: 'Great service and highly reliable execution.',
+          },
+        ],
         highlights: ['Verified Listing', 'Professional Team'],
         red_flags: [],
       };

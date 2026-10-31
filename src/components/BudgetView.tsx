@@ -1,16 +1,8 @@
-import React, { useState } from "react";
-import {
-  Lock,
-  Unlock,
-  AlertTriangle,
-  Plus,
-  FileDown,
-  Sliders,
-  Trash2,
-} from "lucide-react";
-import type { BudgetCategory, Expense, EventProfile } from "../types";
-import { formatExactINR, formatDate } from "../lib/formatters";
-import { rebalanceBudgetCategories } from "../lib/deterministicMath";
+import React, { useState } from 'react';
+import { Lock, Unlock, AlertTriangle, Plus, FileDown, Sliders, Trash2 } from 'lucide-react';
+import type { BudgetCategory, Expense, EventProfile } from '../types';
+import { formatExactINR, formatDate } from '../lib/formatters';
+import { rebalanceBudgetCategories } from '../lib/deterministicMath';
 
 interface BudgetViewProps {
   categories: BudgetCategory[];
@@ -33,16 +25,16 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
   onOpenOptimizerModal,
   onExportCSV,
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<"allocation" | "expenses">("allocation");
+  const [activeSubTab, setActiveSubTab] = useState<'allocation' | 'expenses'>('allocation');
 
   // New Expense modal state
   const [showAddExpense, setShowAddExpense] = useState(false);
-  const [newExpCategory, setNewExpCategory] = useState(categories[0]?.id || "");
-  const [newExpVendor, setNewExpVendor] = useState("");
+  const [newExpCategory, setNewExpCategory] = useState(categories[0]?.id || '');
+  const [newExpVendor, setNewExpVendor] = useState('');
   const [newExpAmount, setNewExpAmount] = useState<number>(10000);
-  const [newExpDate, setNewExpDate] = useState(new Date().toISOString().split("T")[0]);
-  const [newExpStatus, setNewExpStatus] = useState<"paid" | "pending">("paid");
-  const [newExpNotes, setNewExpNotes] = useState("");
+  const [newExpDate, setNewExpDate] = useState(new Date().toISOString().split('T')[0]);
+  const [newExpStatus, setNewExpStatus] = useState<'paid' | 'pending'>('paid');
+  const [newExpNotes, setNewExpNotes] = useState('');
 
   const totalBudget = profile.total_budget;
   const totalAllocated = categories.reduce((sum, c) => sum + c.amount, 0);
@@ -53,7 +45,7 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
     if (!expensesByCategory[exp.category_name]) {
       expensesByCategory[exp.category_name] = { totalSpent: 0, totalPending: 0 };
     }
-    if (exp.status === "paid") {
+    if (exp.status === 'paid') {
       expensesByCategory[exp.category_name].totalSpent += exp.amount;
     } else {
       expensesByCategory[exp.category_name].totalPending += exp.amount;
@@ -61,7 +53,7 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
   }
 
   const totalSpent = expenses
-    .filter((e) => e.status === "paid")
+    .filter((e) => e.status === 'paid')
     .reduce((sum, e) => sum + e.amount, 0);
 
   const budgetUtilization = (totalSpent / totalBudget) * 100;
@@ -101,9 +93,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
 
     onAddExpense(newExpenseItem);
     setShowAddExpense(false);
-    setNewExpVendor("");
+    setNewExpVendor('');
     setNewExpAmount(10000);
-    setNewExpNotes("");
+    setNewExpNotes('');
   };
 
   return (
@@ -112,7 +104,7 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
       <h1 className="sr-only" tabIndex={-1}>
         Budget and Expenses - {profile.title}
       </h1>
-      
+
       {/* Global Overspend Warning Banner */}
       {isOverBudget && (
         <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded-xl">
@@ -121,8 +113,10 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
             <div className="flex-1">
               <h3 className="text-sm font-bold text-red-900">Budget Exceeded!</h3>
               <p className="text-xs text-red-700 mt-1">
-                Total expenses ({formatExactINR(totalSpent)}) have exceeded your budget of {formatExactINR(totalBudget)} by{" "}
-                <span className="font-bold">{formatExactINR(totalSpent - totalBudget)}</span>. Consider using the AI Budget Optimizer to rebalance.
+                Total expenses ({formatExactINR(totalSpent)}) have exceeded your budget of{' '}
+                {formatExactINR(totalBudget)} by{' '}
+                <span className="font-bold">{formatExactINR(totalSpent - totalBudget)}</span>.
+                Consider using the AI Budget Optimizer to rebalance.
               </p>
             </div>
           </div>
@@ -136,7 +130,8 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
             <div className="flex-1">
               <h3 className="text-sm font-bold text-amber-900">Approaching Budget Limit</h3>
               <p className="text-xs text-amber-700 mt-1">
-                You've spent {budgetUtilization.toFixed(1)}% of your total budget. Only {formatExactINR(totalBudget - totalSpent)} remaining.
+                You've spent {budgetUtilization.toFixed(1)}% of your total budget. Only{' '}
+                {formatExactINR(totalBudget - totalSpent)} remaining.
               </p>
             </div>
           </div>
@@ -147,13 +142,16 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">AI Budget Planner</h2>
+            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+              AI Budget Planner
+            </h2>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
               Deterministic Math Guaranteed
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Sum of all categories strictly equals total budget ({formatExactINR(totalBudget)}). Editing unlocked items rebalances the rest proportionally.
+            Sum of all categories strictly equals total budget ({formatExactINR(totalBudget)}).
+            Editing unlocked items rebalances the rest proportionally.
           </p>
         </div>
 
@@ -179,21 +177,21 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
       {/* Sub Tabs: Category Allocation vs Expense Ledger (Strict Indigo Active Tab) */}
       <div className="flex border-b border-slate-200">
         <button
-          onClick={() => setActiveSubTab("allocation")}
+          onClick={() => setActiveSubTab('allocation')}
           className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all cursor-pointer ${
-            activeSubTab === "allocation"
-              ? "border-indigo-600 text-indigo-600"
-              : "border-transparent text-slate-500 hover:text-slate-800"
+            activeSubTab === 'allocation'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           Category Allocations ({categories.length})
         </button>
         <button
-          onClick={() => setActiveSubTab("expenses")}
+          onClick={() => setActiveSubTab('expenses')}
           className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
-            activeSubTab === "expenses"
-              ? "border-indigo-600 text-indigo-600"
-              : "border-transparent text-slate-500 hover:text-slate-800"
+            activeSubTab === 'expenses'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <span>Expense Tracker & Ledger</span>
@@ -204,7 +202,7 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
       </div>
 
       {/* Tab 1: Category Allocation Table & Rebalancing */}
-      {activeSubTab === "allocation" && (
+      {activeSubTab === 'allocation' && (
         <div className="space-y-4">
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
             <div className="overflow-x-auto">
@@ -221,7 +219,10 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {categories.map((cat) => {
-                    const spentInfo = expensesByCategory[cat.name] || { totalSpent: 0, totalPending: 0 };
+                    const spentInfo = expensesByCategory[cat.name] || {
+                      totalSpent: 0,
+                      totalPending: 0,
+                    };
                     const actualSpent = spentInfo.totalSpent;
                     const spendRatio = cat.amount > 0 ? (actualSpent / cat.amount) * 100 : 0;
                     const isOverspent = actualSpent > cat.amount;
@@ -231,7 +232,7 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
                       <tr
                         key={cat.id}
                         className={`hover:bg-slate-50/70 transition-colors ${
-                          cat.is_locked ? "bg-slate-50/40" : ""
+                          cat.is_locked ? 'bg-slate-50/40' : ''
                         }`}
                       >
                         {/* Lock / Unlock Toggle */}
@@ -240,12 +241,20 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
                             onClick={() => toggleLock(cat.id)}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                               cat.is_locked
-                                ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
-                                : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                                ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                             }`}
-                            title={cat.is_locked ? "Category locked against rebalance" : "Click to lock this category"}
+                            title={
+                              cat.is_locked
+                                ? 'Category locked against rebalance'
+                                : 'Click to lock this category'
+                            }
                           >
-                            {cat.is_locked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                            {cat.is_locked ? (
+                              <Lock className="w-4 h-4" />
+                            ) : (
+                              <Unlock className="w-4 h-4" />
+                            )}
                           </button>
                         </td>
 
@@ -254,7 +263,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
                           <div className="font-bold text-slate-900">{cat.name}</div>
                           <div className="text-[10px] text-slate-400 flex items-center gap-1">
                             <span>Source: {cat.source}</span>
-                            {cat.source === "user" && <span className="text-indigo-600 font-semibold">• Edited</span>}
+                            {cat.source === 'user' && (
+                              <span className="text-indigo-600 font-semibold">• Edited</span>
+                            )}
                           </div>
                         </td>
 
@@ -266,7 +277,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
                         {/* Amount Input with Inline Rebalance */}
                         <td className="py-3 px-4">
                           <div className="relative">
-                            <span className="absolute left-2.5 top-2 text-slate-400 font-bold text-xs">₹</span>
+                            <span className="absolute left-2.5 top-2 text-slate-400 font-bold text-xs">
+                              ₹
+                            </span>
                             <input
                               type="number"
                               step="1000"
@@ -290,10 +303,10 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
                               <span
                                 className={`font-bold ${
                                   isOverspent
-                                    ? "text-red-600"
+                                    ? 'text-red-600'
                                     : isNearLimit
-                                    ? "text-amber-600"
-                                    : "text-slate-500"
+                                      ? 'text-amber-600'
+                                      : 'text-slate-500'
                                 }`}
                               >
                                 {spendRatio.toFixed(0)}%
@@ -303,10 +316,10 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
                               <div
                                 className={`h-full transition-all ${
                                   isOverspent
-                                    ? "bg-red-600"
+                                    ? 'bg-red-600'
                                     : isNearLimit
-                                    ? "bg-amber-500"
-                                    : "bg-emerald-500"
+                                      ? 'bg-amber-500'
+                                      : 'bg-emerald-500'
                                 }`}
                                 style={{ width: `${Math.min(100, spendRatio)}%` }}
                               />
@@ -347,12 +360,14 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
       )}
 
       {/* Tab 2: Expense Tracker Ledger */}
-      {activeSubTab === "expenses" && (
+      {activeSubTab === 'expenses' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold text-slate-900">Recorded Expenses & Invoices</h3>
-              <p className="text-xs text-slate-500">Track actual vendor payments, deposits, and pending balances</p>
+              <p className="text-xs text-slate-500">
+                Track actual vendor payments, deposits, and pending balances
+              </p>
             </div>
             <button
               onClick={() => setShowAddExpense(true)}
@@ -398,16 +413,16 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
                       <td className="py-3 px-4">
                         <span
                           className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
-                            exp.status === "paid"
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : "bg-amber-50 text-amber-700 border border-amber-200"
+                            exp.status === 'paid'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-amber-50 text-amber-700 border border-amber-200'
                           }`}
                         >
                           {exp.status.toUpperCase()}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-xs text-slate-500 max-w-xs truncate">
-                        {exp.notes || "—"}
+                        {exp.notes || '—'}
                       </td>
                       <td className="py-3 px-4 text-right">
                         <button
@@ -432,11 +447,15 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md p-6">
             <h3 className="text-lg font-bold text-slate-900 mb-1">Record New Expense</h3>
-            <p className="text-xs text-slate-500 mb-4">Log invoice, advance deposit or vendor payment</p>
+            <p className="text-xs text-slate-500 mb-4">
+              Log invoice, advance deposit or vendor payment
+            </p>
 
             <form onSubmit={handleSaveExpense} className="space-y-3.5 text-xs">
               <div>
-                <label htmlFor="expense-category" className="block font-bold text-slate-700 mb-1">Category</label>
+                <label htmlFor="expense-category" className="block font-bold text-slate-700 mb-1">
+                  Category
+                </label>
                 <select
                   id="expense-category"
                   value={newExpCategory}
@@ -452,7 +471,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
               </div>
 
               <div>
-                <label htmlFor="expense-vendor" className="block font-bold text-slate-700 mb-1">Vendor / Payee Name</label>
+                <label htmlFor="expense-vendor" className="block font-bold text-slate-700 mb-1">
+                  Vendor / Payee Name
+                </label>
                 <input
                   id="expense-vendor"
                   type="text"
@@ -466,7 +487,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="expense-amount" className="block font-bold text-slate-700 mb-1">Amount (INR)</label>
+                  <label htmlFor="expense-amount" className="block font-bold text-slate-700 mb-1">
+                    Amount (INR)
+                  </label>
                   <input
                     id="expense-amount"
                     type="number"
@@ -478,11 +501,13 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
                   />
                 </div>
                 <div>
-                  <label htmlFor="expense-status" className="block font-bold text-slate-700 mb-1">Payment Status</label>
+                  <label htmlFor="expense-status" className="block font-bold text-slate-700 mb-1">
+                    Payment Status
+                  </label>
                   <select
                     id="expense-status"
                     value={newExpStatus}
-                    onChange={(e) => setNewExpStatus(e.target.value as "paid" | "pending")}
+                    onChange={(e) => setNewExpStatus(e.target.value as 'paid' | 'pending')}
                     className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 font-medium"
                   >
                     <option value="paid">Paid (Cleared)</option>
@@ -492,7 +517,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
               </div>
 
               <div>
-                <label htmlFor="expense-date" className="block font-bold text-slate-700 mb-1">Date</label>
+                <label htmlFor="expense-date" className="block font-bold text-slate-700 mb-1">
+                  Date
+                </label>
                 <input
                   id="expense-date"
                   type="date"
@@ -503,7 +530,9 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
               </div>
 
               <div>
-                <label htmlFor="expense-notes" className="block font-bold text-slate-700 mb-1">Notes / Invoice #</label>
+                <label htmlFor="expense-notes" className="block font-bold text-slate-700 mb-1">
+                  Notes / Invoice #
+                </label>
                 <textarea
                   id="expense-notes"
                   rows={2}

@@ -11,12 +11,7 @@ import { LiveRegion } from '../../client/components/ui/LiveRegion';
 describe('Accessibility Tests - UI Components', () => {
   it('Modal should have no accessibility violations', async () => {
     const { container } = render(
-      <Modal
-        isOpen={true}
-        onClose={() => {}}
-        title="Test Modal"
-        subtitle="Test subtitle"
-      >
+      <Modal isOpen={true} onClose={() => {}} title="Test Modal" subtitle="Test subtitle">
         <p>Modal content goes here</p>
         <button>Action</button>
       </Modal>
@@ -28,12 +23,7 @@ describe('Accessibility Tests - UI Components', () => {
 
   it('Input component should have no accessibility violations', async () => {
     const { container } = render(
-      <Input
-        label="Email Address"
-        type="email"
-        placeholder="Enter your email"
-        required
-      />
+      <Input label="Email Address" type="email" placeholder="Enter your email" required />
     );
 
     const results = await axe(container);
@@ -42,12 +32,7 @@ describe('Accessibility Tests - UI Components', () => {
 
   it('Input with error should have no accessibility violations', async () => {
     const { container } = render(
-      <Input
-        label="Email Address"
-        type="email"
-        error="Please enter a valid email"
-        required
-      />
+      <Input label="Email Address" type="email" error="Please enter a valid email" required />
     );
 
     const results = await axe(container);
@@ -55,12 +40,7 @@ describe('Accessibility Tests - UI Components', () => {
   });
 
   it('Input with helper text should have no accessibility violations', async () => {
-    const { container } = render(
-      <Input
-        label="Username"
-        helperText="Choose a unique username"
-      />
-    );
+    const { container } = render(<Input label="Username" helperText="Choose a unique username" />);
 
     const results = await axe(container);
     expect(results).toHaveNoViolations();
@@ -106,9 +86,7 @@ describe('Accessibility Tests - UI Components', () => {
   });
 
   it('LiveRegion should have no accessibility violations', async () => {
-    const { container } = render(
-      <LiveRegion message="Status update" politeness="polite" />
-    );
+    const { container } = render(<LiveRegion message="Status update" politeness="polite" />);
 
     const results = await axe(container);
     expect(results).toHaveNoViolations();
@@ -117,22 +95,9 @@ describe('Accessibility Tests - UI Components', () => {
   it('Form with multiple inputs should have no accessibility violations', async () => {
     const { container } = render(
       <form>
-        <Input
-          label="Full Name"
-          type="text"
-          required
-        />
-        <Input
-          label="Email"
-          type="email"
-          required
-          error="Email is required"
-        />
-        <Input
-          label="Phone"
-          type="tel"
-          helperText="Format: +91 98765 43210"
-        />
+        <Input label="Full Name" type="text" required />
+        <Input label="Email" type="email" required error="Email is required" />
+        <Input label="Phone" type="tel" helperText="Format: +91 98765 43210" />
         <Button type="submit">Submit</Button>
       </form>
     );
@@ -145,7 +110,9 @@ describe('Accessibility Tests - UI Components', () => {
     const { container } = render(
       <div>
         <button aria-label="Close">×</button>
-        <a href="#content" aria-label="Skip to content">Skip</a>
+        <a href="#content" aria-label="Skip to content">
+          Skip
+        </a>
         <input type="checkbox" id="agree" />
         <label htmlFor="agree">I agree to terms</label>
         <select aria-label="Select country">
@@ -210,17 +177,15 @@ describe('Accessibility Tests - UI Components', () => {
     const { container } = render(
       <div>
         <p className="text-slate-900 bg-white">High contrast text</p>
-        <button className="bg-indigo-600 text-white px-4 py-2">
-          Primary Button
-        </button>
+        <button className="bg-indigo-600 text-white px-4 py-2">Primary Button</button>
         <Badge variant="success">Success Badge</Badge>
       </div>
     );
 
     const results = await axe(container, {
       rules: {
-        'color-contrast': { enabled: true }
-      }
+        'color-contrast': { enabled: true },
+      },
     });
     expect(results).toHaveNoViolations();
   });
@@ -262,12 +227,7 @@ describe('Accessibility Tests - ARIA Attributes', () => {
     const { container } = render(
       <form>
         <label htmlFor="email">Email (required)</label>
-        <input
-          id="email"
-          type="email"
-          aria-required="true"
-          aria-invalid="false"
-        />
+        <input id="email" type="email" aria-required="true" aria-invalid="false" />
         <label htmlFor="password">Password</label>
         <input
           id="password"
@@ -306,7 +266,9 @@ describe('Accessibility Tests - ARIA Attributes', () => {
     const { container } = render(
       <nav aria-label="Main">
         <a href="/home">Home</a>
-        <a href="/about" aria-current="page">About</a>
+        <a href="/about" aria-current="page">
+          About
+        </a>
         <a href="/contact">Contact</a>
       </nav>
     );
@@ -323,7 +285,9 @@ describe('Accessibility Tests - Keyboard Navigation', () => {
         <button>Button</button>
         <a href="#link">Link</a>
         <input type="text" aria-label="Input field" />
-        <select aria-label="Select option"><option>Option</option></select>
+        <select aria-label="Select option">
+          <option>Option</option>
+        </select>
         <textarea aria-label="Text area"></textarea>
       </div>
     );

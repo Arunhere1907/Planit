@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Sliders, ArrowRight, X, Loader2 } from "lucide-react";
-import type { BudgetCategory, EventProfile } from "../types";
-import { formatExactINR } from "../lib/formatters";
+import React, { useState } from 'react';
+import { Sliders, ArrowRight, X, Loader2 } from 'lucide-react';
+import type { BudgetCategory, EventProfile } from '../types';
+import { formatExactINR } from '../lib/formatters';
 
 interface BudgetOptimizerModalProps {
   categories: BudgetCategory[];
@@ -34,34 +34,67 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [scenarios, setScenarios] = useState<OptimizerScenario[]>([
     {
-      name: "Minimal Impact (Surgical Polish)",
-      description: "Trims non-essential print stationery and exotic out-of-season blooms while keeping gourmet catering and candid photography 100% untouched.",
+      name: 'Minimal Impact (Surgical Polish)',
+      description:
+        'Trims non-essential print stationery and exotic out-of-season blooms while keeping gourmet catering and candid photography 100% untouched.',
       total_savings: Math.round(profile.total_budget * 0.1),
-      experience_impact: "Low",
+      experience_impact: 'Low',
       proposed_cuts: [
-        { category_name: "Decor & Floral Design", cut_percent: 15, specific_action: "Opt for indigenous fresh marigolds and brass diyas instead of imported orchids." },
-        { category_name: "Invitations & Stationery", cut_percent: 50, specific_action: "Shift 80% of guest list to interactive digital WhatsApp cards." },
+        {
+          category_name: 'Decor & Floral Design',
+          cut_percent: 15,
+          specific_action:
+            'Opt for indigenous fresh marigolds and brass diyas instead of imported orchids.',
+        },
+        {
+          category_name: 'Invitations & Stationery',
+          cut_percent: 50,
+          specific_action: 'Shift 80% of guest list to interactive digital WhatsApp cards.',
+        },
       ],
     },
     {
-      name: "Balanced Value (Recommended)",
-      description: "Saves the target 15% through smart menu course restructuring and combined sound packages.",
+      name: 'Balanced Value (Recommended)',
+      description:
+        'Saves the target 15% through smart menu course restructuring and combined sound packages.',
       total_savings: Math.round(profile.total_budget * 0.15),
-      experience_impact: "Medium",
+      experience_impact: 'Medium',
       proposed_cuts: [
-        { category_name: "Catering & Beverages", cut_percent: 10, specific_action: "Consolidate duplicate live dessert counters and standardize mocktail bar." },
-        { category_name: "Venue & Facilities", cut_percent: 10, specific_action: "Negotiate inclusive green rooms and power generator diesel waiver." },
-        { category_name: "Photography & Video", cut_percent: 8, specific_action: "Keep 2 lead candid cameras with drone, streamline standard prints." },
+        {
+          category_name: 'Catering & Beverages',
+          cut_percent: 10,
+          specific_action:
+            'Consolidate duplicate live dessert counters and standardize mocktail bar.',
+        },
+        {
+          category_name: 'Venue & Facilities',
+          cut_percent: 10,
+          specific_action: 'Negotiate inclusive green rooms and power generator diesel waiver.',
+        },
+        {
+          category_name: 'Photography & Video',
+          cut_percent: 8,
+          specific_action: 'Keep 2 lead candid cameras with drone, streamline standard prints.',
+        },
       ],
     },
     {
-      name: "Aggressive Optimization (Maximum Buffer)",
-      description: "Bold structural streamlining creating major financial breathing room.",
+      name: 'Aggressive Optimization (Maximum Buffer)',
+      description: 'Bold structural streamlining creating major financial breathing room.',
       total_savings: Math.round(profile.total_budget * 0.22),
-      experience_impact: "High",
+      experience_impact: 'High',
       proposed_cuts: [
-        { category_name: "Music, DJ & Entertainment", cut_percent: 30, specific_action: "Switch to acoustic folk performers and curated playlist." },
-        { category_name: "Transport & Logistics", cut_percent: 40, specific_action: "Designate centralized shuttle pickup points instead of individual cabs." },
+        {
+          category_name: 'Music, DJ & Entertainment',
+          cut_percent: 30,
+          specific_action: 'Switch to acoustic folk performers and curated playlist.',
+        },
+        {
+          category_name: 'Transport & Logistics',
+          cut_percent: 40,
+          specific_action:
+            'Designate centralized shuttle pickup points instead of individual cabs.',
+        },
       ],
     },
   ]);
@@ -70,9 +103,9 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
     setSelectedCutPercent(pct);
     setIsLoading(true);
     try {
-      const res = await fetch("/api/optimizer/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/optimizer/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           goal: `Cut ${pct}% from total event budget`,
           targetPercent: pct,
@@ -87,7 +120,7 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
         }
       }
     } catch (e) {
-      console.warn("Failed to fetch fresh optimizer scenarios, keeping deterministic baseline:", e);
+      console.warn('Failed to fetch fresh optimizer scenarios, keeping deterministic baseline:', e);
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +139,7 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
           amount: newAmt,
           percent: Number(((newAmt / profile.total_budget) * 100).toFixed(1)),
           reasoning: `${cat.reasoning} [Optimizer: ${cutRule.specific_action}]`,
-          source: "ai" as const,
+          source: 'ai' as const,
           edited_at: new Date().toISOString(),
         };
       }
@@ -127,7 +160,9 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-bold text-slate-900">AI Budget Optimizer</h3>
-              <p className="text-xs text-slate-500">Intelligent value engineering & targeted scenario trims</p>
+              <p className="text-xs text-slate-500">
+                Intelligent value engineering & targeted scenario trims
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
@@ -137,7 +172,13 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
 
         {/* Goal Selector */}
         <div className="my-5">
-          <div className="block text-xs font-bold text-slate-700 mb-2" role="group" aria-label="Select optimization goal">Select Optimization Goal:</div>
+          <div
+            className="block text-xs font-bold text-slate-700 mb-2"
+            role="group"
+            aria-label="Select optimization goal"
+          >
+            Select Optimization Goal:
+          </div>
           <div className="grid grid-cols-3 gap-2.5">
             {[10, 15, 20].map((pct) => (
               <button
@@ -145,12 +186,18 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
                 onClick={() => handleFetchScenarios(pct)}
                 className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex flex-col items-center gap-1 ${
                   selectedCutPercent === pct
-                    ? "bg-amber-500 text-white border-amber-600 shadow-xs"
-                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                    ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                 }`}
               >
                 <span>Cut {pct}%</span>
-                <span className={selectedCutPercent === pct ? "text-amber-100 text-[11px]" : "text-slate-500 text-[11px]"}>
+                <span
+                  className={
+                    selectedCutPercent === pct
+                      ? 'text-amber-100 text-[11px]'
+                      : 'text-slate-500 text-[11px]'
+                  }
+                >
                   Save ~{formatExactINR((pct / 100) * profile.total_budget)}
                 </span>
               </button>
@@ -177,11 +224,11 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
                       <h4 className="text-sm font-bold text-slate-900">{sc.name}</h4>
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          sc.experience_impact === "Low"
-                            ? "bg-emerald-100 text-emerald-800"
-                            : sc.experience_impact === "Medium"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-red-100 text-red-800"
+                          sc.experience_impact === 'Low'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : sc.experience_impact === 'Medium'
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-red-100 text-red-800'
                         }`}
                       >
                         {sc.experience_impact} Guest Impact
@@ -205,7 +252,10 @@ export const BudgetOptimizerModal: React.FC<BudgetOptimizerModalProps> = ({
                       <li key={cIdx} className="flex items-start gap-1.5">
                         <span className="text-amber-500 font-bold">•</span>
                         <span>
-                          <strong>{cut.category_name} (-{cut.cut_percent}%):</strong> {cut.specific_action}
+                          <strong>
+                            {cut.category_name} (-{cut.cut_percent}%):
+                          </strong>{' '}
+                          {cut.specific_action}
                         </span>
                       </li>
                     ))}

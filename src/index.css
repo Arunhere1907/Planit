@@ -1,11 +1,11 @@
-@import "tailwindcss";
-@import "./shared/styles/tokens.css";
+@import 'tailwindcss';
+@import './shared/styles/tokens.css';
 
 /* Base Body Styles */
 body {
   background-color: var(--neutral-bg);
   color: var(--neutral-text-body);
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
 /* Tabular numerals for prices, dates, percentages */
@@ -55,8 +55,8 @@ body {
 @media (pointer: coarse) {
   button,
   a,
-  input[type="checkbox"],
-  input[type="radio"],
+  input[type='checkbox'],
+  input[type='radio'],
   select {
     min-height: 44px;
     min-width: 44px;

@@ -1,6 +1,14 @@
 import { eventRepository } from '../repositories/index.js';
-import type { FullEventPlan, Expense, BudgetCategory, ActivityLogItem } from '../../shared/types/index.js';
-import { rebalanceBudgetWithLocks, validateBudgetTotals } from '../../shared/utils/deterministic-math.js';
+import type {
+  FullEventPlan,
+  Expense,
+  BudgetCategory,
+  ActivityLogItem,
+} from '../../shared/types/index.js';
+import {
+  rebalanceBudgetWithLocks,
+  validateBudgetTotals,
+} from '../../shared/utils/deterministic-math.js';
 import { NotFoundError, ValidationError } from '../errors/app-error.js';
 
 export class BudgetService {
@@ -24,10 +32,13 @@ export class BudgetService {
     };
 
     const targetCategory = event.budget.categories.find(
-      (c: BudgetCategory) => c.name === expenseData.category_name || c.id === expenseData.category_id
+      (c: BudgetCategory) =>
+        c.name === expenseData.category_name || c.id === expenseData.category_id
     );
     if (!targetCategory) {
-      throw new ValidationError(`Category "${expenseData.category_name}" does not exist in event budget`);
+      throw new ValidationError(
+        `Category "${expenseData.category_name}" does not exist in event budget`
+      );
     }
 
     event.budget.expenses = [newExpense, ...event.budget.expenses];

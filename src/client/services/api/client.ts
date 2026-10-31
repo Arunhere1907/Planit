@@ -1,6 +1,6 @@
 /**
  * Standard fetch wrapper sending demo-user header and parsing errors
- * 
+ *
  * SECURITY NOTE:
  * - localStorage only stores user ID (no secrets, tokens, or passwords)
  * - The client-side user ID and role are NOT trusted by the server
@@ -19,7 +19,7 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
 
   const response = await fetch(endpoint, {
     ...options,
-    headers
+    headers,
   });
 
   const data = await response.json().catch(() => ({}));

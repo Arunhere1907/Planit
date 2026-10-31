@@ -18,7 +18,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label htmlFor={inputId} className="block text-xs font-semibold text-slate-700 mb-1.5">
             {label}
-            {required && <span className="text-red-600 ml-1" aria-label="required">*</span>}
+            {required && (
+              <span className="text-red-600 ml-1" aria-label="required">
+                *
+              </span>
+            )}
           </label>
         )}
         <input
@@ -39,7 +43,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {error}
           </p>
         ) : helperText ? (
-          <p id={helperId} className="mt-1 text-xs text-slate-500">{helperText}</p>
+          <p id={helperId} className="mt-1 text-xs text-slate-500">
+            {helperText}
+          </p>
         ) : null}
       </div>
     );

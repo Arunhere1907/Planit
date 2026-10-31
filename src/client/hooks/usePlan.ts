@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { FullEventPlan, EventProfile, Expense, TaskStatus, Task } from '../../shared/types/index.js';
+import type {
+  FullEventPlan,
+  EventProfile,
+  Expense,
+  TaskStatus,
+  Task,
+} from '../../shared/types/index.js';
 import { eventApi } from '../services/api/event-api.js';
 
 export function usePlan() {
@@ -51,7 +57,9 @@ export function usePlan() {
     if (!activePlan) return;
     const updatedBudget = await eventApi.addExpense(activePlan.profile.id, expense);
     setPlans((prev) =>
-      prev.map((p) => (p.profile.id === activePlan.profile.id ? { ...p, budget: updatedBudget } : p))
+      prev.map((p) =>
+        p.profile.id === activePlan.profile.id ? { ...p, budget: updatedBudget } : p
+      )
     );
   };
 
@@ -64,7 +72,9 @@ export function usePlan() {
       isLocked
     );
     setPlans((prev) =>
-      prev.map((p) => (p.profile.id === activePlan.profile.id ? { ...p, budget: updatedBudget } : p))
+      prev.map((p) =>
+        p.profile.id === activePlan.profile.id ? { ...p, budget: updatedBudget } : p
+      )
     );
   };
 

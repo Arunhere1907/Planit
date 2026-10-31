@@ -1,13 +1,6 @@
-import React, { useState } from "react";
-import {
-  UserPlus,
-  Share2,
-  Copy,
-  Check,
-  Activity,
-  Trash2,
-} from "lucide-react";
-import type { Collaborator, ActivityLogItem, UserRole } from "../types";
+import React, { useState } from 'react';
+import { UserPlus, Share2, Copy, Check, Activity, Trash2 } from 'lucide-react';
+import type { Collaborator, ActivityLogItem, UserRole } from '../types';
 
 interface CollaborationViewProps {
   collaborators: Collaborator[];
@@ -23,9 +16,9 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
   onRemoveCollaborator,
 }) => {
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [newEmail, setNewEmail] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newRole, setNewRole] = useState<UserRole>("editor");
+  const [newEmail, setNewEmail] = useState('');
+  const [newName, setNewName] = useState('');
+  const [newRole, setNewRole] = useState<UserRole>('editor');
 
   const [shareLinkActive, setShareLinkActive] = useState(true);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -50,8 +43,8 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
     });
 
     setShowInviteModal(false);
-    setNewName("");
-    setNewEmail("");
+    setNewName('');
+    setNewEmail('');
   };
 
   return (
@@ -60,18 +53,21 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
       <h1 className="sr-only" tabIndex={-1}>
         Team and Activity Log
       </h1>
-      
+
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Team & Activity Feed</h2>
+            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+              Team & Activity Feed
+            </h2>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
               Role-Based Access
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Coordinate with family, bridal party, and event coordinators with Owner, Editor, and Viewer permissions.
+            Coordinate with family, bridal party, and event coordinators with Owner, Editor, and
+            Viewer permissions.
           </p>
         </div>
 
@@ -99,16 +95,17 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
                 onClick={() => setShareLinkActive(!shareLinkActive)}
                 className={`text-[11px] font-bold px-2 py-0.5 rounded-md transition-colors ${
                   shareLinkActive
-                    ? "bg-emerald-100 text-emerald-800"
-                    : "bg-slate-200 text-slate-600"
+                    ? 'bg-emerald-100 text-emerald-800'
+                    : 'bg-slate-200 text-slate-600'
                 }`}
               >
-                {shareLinkActive ? "Active (Link Enabled)" : "Revoked (Access Disabled)"}
+                {shareLinkActive ? 'Active (Link Enabled)' : 'Revoked (Access Disabled)'}
               </button>
             </div>
 
             <p className="text-xs text-slate-600 font-light">
-              Anyone with this link can view the live itinerary, budget status, and vendors in read-only mode without logging in.
+              Anyone with this link can view the live itinerary, budget status, and vendors in
+              read-only mode without logging in.
             </p>
 
             {shareLinkActive && (
@@ -123,8 +120,12 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
                   onClick={handleCopyShareLink}
                   className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1 shrink-0"
                 >
-                  {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedLink ? "Copied" : "Copy"}</span>
+                  {copiedLink ? (
+                    <Check className="w-3.5 h-3.5" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
+                  <span>{copiedLink ? 'Copied' : 'Copy'}</span>
                 </button>
               </div>
             )}
@@ -133,7 +134,9 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
           {/* Members Table */}
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
             <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900">Current Collaborators ({collaborators.length})</h3>
+              <h3 className="text-sm font-bold text-slate-900">
+                Current Collaborators ({collaborators.length})
+              </h3>
             </div>
 
             <div className="divide-y divide-slate-100 text-xs sm:text-sm">
@@ -152,17 +155,17 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
                   <div className="flex items-center gap-3">
                     <span
                       className={`text-[11px] font-bold px-2 py-0.5 rounded-full capitalize ${
-                        c.role === "owner"
-                          ? "bg-rose-100 text-rose-800"
-                          : c.role === "editor"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-slate-100 text-slate-700"
+                        c.role === 'owner'
+                          ? 'bg-rose-100 text-rose-800'
+                          : c.role === 'editor'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-slate-100 text-slate-700'
                       }`}
                     >
                       {c.role}
                     </span>
 
-                    {c.role !== "owner" && (
+                    {c.role !== 'owner' && (
                       <button
                         onClick={() => onRemoveCollaborator(c.id)}
                         className="text-slate-400 hover:text-rose-600 p-1"
@@ -190,12 +193,15 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
               <div key={log.id} className="relative group text-xs">
                 <div className="absolute -left-5 top-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white" />
                 <div className="text-slate-900 font-semibold">
-                  <span className="font-bold text-slate-900">{log.user}</span>{" "}
+                  <span className="font-bold text-slate-900">{log.user}</span>{' '}
                   <span className="text-rose-600 font-medium">{log.action}</span>
                 </div>
                 <div className="text-slate-600 text-[11px] mt-0.5">{log.detail}</div>
                 <div className="text-[10px] text-slate-400 mt-1">
-                  {new Date(log.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  {new Date(log.timestamp).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </div>
               </div>
             ))}
@@ -210,7 +216,12 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
             <h3 className="text-base font-bold text-slate-900 mb-4">Invite Team Member</h3>
             <form onSubmit={handleInvite} className="space-y-3.5 text-xs sm:text-sm">
               <div>
-                <label htmlFor="collab-name" className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+                <label
+                  htmlFor="collab-name"
+                  className="block text-xs font-bold text-slate-700 mb-1"
+                >
+                  Full Name
+                </label>
                 <input
                   id="collab-name"
                   type="text"
@@ -223,7 +234,12 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
               </div>
 
               <div>
-                <label htmlFor="collab-email" className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+                <label
+                  htmlFor="collab-email"
+                  className="block text-xs font-bold text-slate-700 mb-1"
+                >
+                  Email Address
+                </label>
                 <input
                   id="collab-email"
                   type="email"
@@ -236,7 +252,12 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
               </div>
 
               <div>
-                <label htmlFor="collab-role" className="block text-xs font-bold text-slate-700 mb-1">Access Role</label>
+                <label
+                  htmlFor="collab-role"
+                  className="block text-xs font-bold text-slate-700 mb-1"
+                >
+                  Access Role
+                </label>
                 <select
                   id="collab-role"
                   value={newRole}

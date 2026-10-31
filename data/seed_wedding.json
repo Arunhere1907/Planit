@@ -12,54 +12,347 @@
     "culture_tradition": "Gujarati Hindu & Jain fusion",
     "dietary_mix": "100% Pure Vegetarian, 35% Strict Jain (No Root Veg, Pre-sunset counter)",
     "indoor_outdoor": "Outdoor Evening Lawn with Covered Mandap",
-    "priorities": ["Uncompromising gourmet feast", "Aesthetic floral mandap", "Punctual ceremony schedule"],
+    "priorities": [
+      "Uncompromising gourmet feast",
+      "Aesthetic floral mandap",
+      "Punctual ceremony schedule"
+    ],
     "constraints": "Strict 10:00 PM sound curfew; ramp access for grandparents"
   },
   "budget": {
     "total_budget": 800000,
     "currency": "INR",
     "categories": [
-      { "id": "b-1", "name": "Venue & Facilities", "amount": 240000, "percent": 30.0, "reasoning": "SG Highway lush heritage lawn rental, green rooms & stage power.", "is_locked": false, "source": "ai", "edited_at": "2026-10-24T08:00:00Z" },
-      { "id": "b-2", "name": "Catering & Beverages", "amount": 256000, "percent": 32.0, "reasoning": "₹1,280/plate for 200 guests with live chaat, undhiyu, and dual Jain line.", "is_locked": true, "source": "user", "edited_at": "2026-10-24T08:15:00Z" },
-      { "id": "b-3", "name": "Decor & Floral Design", "amount": 96000, "percent": 12.0, "reasoning": "Carved brass mandap pillars, fresh marigold chandeliers & photo gallery.", "is_locked": false, "source": "ai", "edited_at": "2026-10-24T08:00:00Z" },
-      { "id": "b-4", "name": "Photography & Video", "amount": 72000, "percent": 9.0, "reasoning": "2 candid photographers, 1 cinematic drone pilot & 4K highlight reel.", "is_locked": false, "source": "ai", "edited_at": "2026-10-24T08:00:00Z" },
-      { "id": "b-5", "name": "Music, DJ & Entertainment", "amount": 40000, "percent": 5.0, "reasoning": "6-piece live Punjabi/Gujarati Dhol ensemble for baraat and Sangeet sound.", "is_locked": false, "source": "ai", "edited_at": "2026-10-24T08:00:00Z" },
-      { "id": "b-6", "name": "Attire, Hair & Makeup", "amount": 32000, "percent": 4.0, "reasoning": "Bridal HD airbrush styling, trial, and saree draping specialist.", "is_locked": false, "source": "ai", "edited_at": "2026-10-24T08:00:00Z" },
-      { "id": "b-7", "name": "Invitations & Stationery", "amount": 12000, "percent": 1.5, "reasoning": "Embossed traditional box cards for elders & animated WhatsApp invites.", "is_locked": false, "source": "ai", "edited_at": "2026-10-24T08:00:00Z" },
-      { "id": "b-8", "name": "Transport & Logistics", "amount": 12000, "percent": 1.5, "reasoning": "Vintage car for groom entry & tempo shuttle for senior relatives.", "is_locked": false, "source": "ai", "edited_at": "2026-10-24T08:00:00Z" },
-      { "id": "b-9", "name": "Rituals & Miscellaneous", "amount": 16000, "percent": 2.0, "reasoning": "Priest dakshina, wooden patla, hawan samagri, safas & garland sets.", "is_locked": false, "source": "ai", "edited_at": "2026-10-24T08:00:00Z" },
-      { "id": "b-10", "name": "Contingency Fund", "amount": 24000, "percent": 3.0, "reasoning": "Emergency buffer for overtime generator diesel or additional guests.", "is_locked": false, "source": "ai", "edited_at": "2026-10-24T08:00:00Z" }
+      {
+        "id": "b-1",
+        "name": "Venue & Facilities",
+        "amount": 240000,
+        "percent": 30.0,
+        "reasoning": "SG Highway lush heritage lawn rental, green rooms & stage power.",
+        "is_locked": false,
+        "source": "ai",
+        "edited_at": "2026-10-24T08:00:00Z"
+      },
+      {
+        "id": "b-2",
+        "name": "Catering & Beverages",
+        "amount": 256000,
+        "percent": 32.0,
+        "reasoning": "₹1,280/plate for 200 guests with live chaat, undhiyu, and dual Jain line.",
+        "is_locked": true,
+        "source": "user",
+        "edited_at": "2026-10-24T08:15:00Z"
+      },
+      {
+        "id": "b-3",
+        "name": "Decor & Floral Design",
+        "amount": 96000,
+        "percent": 12.0,
+        "reasoning": "Carved brass mandap pillars, fresh marigold chandeliers & photo gallery.",
+        "is_locked": false,
+        "source": "ai",
+        "edited_at": "2026-10-24T08:00:00Z"
+      },
+      {
+        "id": "b-4",
+        "name": "Photography & Video",
+        "amount": 72000,
+        "percent": 9.0,
+        "reasoning": "2 candid photographers, 1 cinematic drone pilot & 4K highlight reel.",
+        "is_locked": false,
+        "source": "ai",
+        "edited_at": "2026-10-24T08:00:00Z"
+      },
+      {
+        "id": "b-5",
+        "name": "Music, DJ & Entertainment",
+        "amount": 40000,
+        "percent": 5.0,
+        "reasoning": "6-piece live Punjabi/Gujarati Dhol ensemble for baraat and Sangeet sound.",
+        "is_locked": false,
+        "source": "ai",
+        "edited_at": "2026-10-24T08:00:00Z"
+      },
+      {
+        "id": "b-6",
+        "name": "Attire, Hair & Makeup",
+        "amount": 32000,
+        "percent": 4.0,
+        "reasoning": "Bridal HD airbrush styling, trial, and saree draping specialist.",
+        "is_locked": false,
+        "source": "ai",
+        "edited_at": "2026-10-24T08:00:00Z"
+      },
+      {
+        "id": "b-7",
+        "name": "Invitations & Stationery",
+        "amount": 12000,
+        "percent": 1.5,
+        "reasoning": "Embossed traditional box cards for elders & animated WhatsApp invites.",
+        "is_locked": false,
+        "source": "ai",
+        "edited_at": "2026-10-24T08:00:00Z"
+      },
+      {
+        "id": "b-8",
+        "name": "Transport & Logistics",
+        "amount": 12000,
+        "percent": 1.5,
+        "reasoning": "Vintage car for groom entry & tempo shuttle for senior relatives.",
+        "is_locked": false,
+        "source": "ai",
+        "edited_at": "2026-10-24T08:00:00Z"
+      },
+      {
+        "id": "b-9",
+        "name": "Rituals & Miscellaneous",
+        "amount": 16000,
+        "percent": 2.0,
+        "reasoning": "Priest dakshina, wooden patla, hawan samagri, safas & garland sets.",
+        "is_locked": false,
+        "source": "ai",
+        "edited_at": "2026-10-24T08:00:00Z"
+      },
+      {
+        "id": "b-10",
+        "name": "Contingency Fund",
+        "amount": 24000,
+        "percent": 3.0,
+        "reasoning": "Emergency buffer for overtime generator diesel or additional guests.",
+        "is_locked": false,
+        "source": "ai",
+        "edited_at": "2026-10-24T08:00:00Z"
+      }
     ],
     "expenses": [
-      { "id": "exp-1", "category_id": "b-1", "category_name": "Venue & Facilities", "vendor_name": "The Green Pearl Heritage Resort", "amount": 100000, "date": "2026-10-10", "status": "paid", "notes": "50% booking advance receipt #GP-889" },
-      { "id": "exp-2", "category_id": "b-2", "category_name": "Catering & Beverages", "vendor_name": "Rasraj Gourmet Royal Caterers", "amount": 75000, "date": "2026-10-14", "status": "paid", "notes": "Menu tasting approved, advance paid" },
-      { "id": "exp-3", "category_id": "b-4", "category_name": "Photography & Video", "vendor_name": "Drishti Weddings & Cinema", "amount": 25000, "date": "2026-10-20", "status": "paid", "notes": "Date lock token paid" },
-      { "id": "exp-4", "category_id": "b-3", "category_name": "Decor & Floral Design", "vendor_name": "Utsav Mandap Artistry", "amount": 30000, "date": "2026-11-01", "status": "pending", "notes": "First stage mockup advance due" }
+      {
+        "id": "exp-1",
+        "category_id": "b-1",
+        "category_name": "Venue & Facilities",
+        "vendor_name": "The Green Pearl Heritage Resort",
+        "amount": 100000,
+        "date": "2026-10-10",
+        "status": "paid",
+        "notes": "50% booking advance receipt #GP-889"
+      },
+      {
+        "id": "exp-2",
+        "category_id": "b-2",
+        "category_name": "Catering & Beverages",
+        "vendor_name": "Rasraj Gourmet Royal Caterers",
+        "amount": 75000,
+        "date": "2026-10-14",
+        "status": "paid",
+        "notes": "Menu tasting approved, advance paid"
+      },
+      {
+        "id": "exp-3",
+        "category_id": "b-4",
+        "category_name": "Photography & Video",
+        "vendor_name": "Drishti Weddings & Cinema",
+        "amount": 25000,
+        "date": "2026-10-20",
+        "status": "paid",
+        "notes": "Date lock token paid"
+      },
+      {
+        "id": "exp-4",
+        "category_id": "b-3",
+        "category_name": "Decor & Floral Design",
+        "vendor_name": "Utsav Mandap Artistry",
+        "amount": 30000,
+        "date": "2026-11-01",
+        "status": "pending",
+        "notes": "First stage mockup advance due"
+      }
     ]
   },
   "timeline": {
     "tasks": [
-      { "id": "t-1", "title": "Finalize Venue Contract & Pay Advance Deposit", "due_date": "2026-10-15", "phase": "6+ months", "status": "completed", "assignee": "Aarav (Groom)", "linked_vendor": "Venue & Facilities", "priority": "high", "notes": "Contract signed at Green Pearl." },
-      { "id": "t-2", "title": "Catering Tasting Session & Jain Menu Finalization", "due_date": "2026-10-20", "phase": "6+ months", "status": "completed", "assignee": "Diya (Bride)", "linked_vendor": "Catering & Beverages", "priority": "high", "notes": "Approved 4 appetizers, undhiyu, and jalebi rabdi." },
-      { "id": "t-3", "title": "Lock Candid Photography & Drone Videography Agreement", "due_date": "2026-10-28", "phase": "6+ months", "status": "completed", "assignee": "Aarav", "linked_vendor": "Photography & Video", "priority": "high", "notes": "Confirmed 3-person crew." },
-      { "id": "t-4", "title": "Finalize Mandap Floral Blueprint & Lighting Color Palette", "due_date": "2026-11-10", "phase": "1 month", "status": "in_progress", "assignee": "Rohan (Decor Lead)", "linked_vendor": "Decor & Floral Design", "priority": "medium", "notes": "Requested warm brass lanterns instead of neon." },
-      { "id": "t-5", "title": "Send Digital WhatsApp Invitations with RSVP Form", "due_date": "2026-11-18", "phase": "1 month", "status": "in_progress", "assignee": "Diya", "linked_vendor": "Invitations & Stationery", "priority": "high", "notes": "Track RSVPs in shared spreadsheet." },
-      { "id": "t-6", "title": "Bridal Makeup Airbrush Trial & Draping Rehearsal", "due_date": "2026-11-25", "phase": "1 month", "status": "pending", "assignee": "Diya", "linked_vendor": "Attire, Hair & Makeup", "priority": "medium", "notes": "Skin sensitivity test required." },
-      { "id": "t-7", "title": "Confirm Dhol Troupes & Baraat Route with Police Liaison", "due_date": "2026-12-05", "phase": "1 week", "status": "pending", "assignee": "Aarav's Uncle", "linked_vendor": "Music, DJ & Entertainment", "priority": "high", "notes": "Ensure procession clears main gate by 6:30 PM." },
-      { "id": "t-8", "title": "Re-confirm Guaranteed Plate Count with Caterer", "due_date": "2026-12-10", "phase": "1 week", "status": "pending", "assignee": "Host Family", "linked_vendor": "Catering & Beverages", "priority": "high", "notes": "Lock 195 plates + 15 buffer plates." },
-      { "id": "t-9", "title": "Venue Power Backup & Outdoor Patio Heaters Check", "due_date": "2026-12-17", "phase": "Day before", "status": "pending", "assignee": "Logistics Lead", "linked_vendor": "Venue & Facilities", "priority": "high", "notes": "Winter evening dew mitigation." },
-      { "id": "t-10", "title": "Mandap Fire Ritual Protocol & Hawan Samagri Verification", "due_date": "2026-12-18", "phase": "Day-of", "status": "pending", "assignee": "Priest Liaison", "linked_vendor": "Rituals & Miscellaneous", "priority": "high", "notes": "Verify ghee, wood, patla, and water extinguisher." }
+      {
+        "id": "t-1",
+        "title": "Finalize Venue Contract & Pay Advance Deposit",
+        "due_date": "2026-10-15",
+        "phase": "6+ months",
+        "status": "completed",
+        "assignee": "Aarav (Groom)",
+        "linked_vendor": "Venue & Facilities",
+        "priority": "high",
+        "notes": "Contract signed at Green Pearl."
+      },
+      {
+        "id": "t-2",
+        "title": "Catering Tasting Session & Jain Menu Finalization",
+        "due_date": "2026-10-20",
+        "phase": "6+ months",
+        "status": "completed",
+        "assignee": "Diya (Bride)",
+        "linked_vendor": "Catering & Beverages",
+        "priority": "high",
+        "notes": "Approved 4 appetizers, undhiyu, and jalebi rabdi."
+      },
+      {
+        "id": "t-3",
+        "title": "Lock Candid Photography & Drone Videography Agreement",
+        "due_date": "2026-10-28",
+        "phase": "6+ months",
+        "status": "completed",
+        "assignee": "Aarav",
+        "linked_vendor": "Photography & Video",
+        "priority": "high",
+        "notes": "Confirmed 3-person crew."
+      },
+      {
+        "id": "t-4",
+        "title": "Finalize Mandap Floral Blueprint & Lighting Color Palette",
+        "due_date": "2026-11-10",
+        "phase": "1 month",
+        "status": "in_progress",
+        "assignee": "Rohan (Decor Lead)",
+        "linked_vendor": "Decor & Floral Design",
+        "priority": "medium",
+        "notes": "Requested warm brass lanterns instead of neon."
+      },
+      {
+        "id": "t-5",
+        "title": "Send Digital WhatsApp Invitations with RSVP Form",
+        "due_date": "2026-11-18",
+        "phase": "1 month",
+        "status": "in_progress",
+        "assignee": "Diya",
+        "linked_vendor": "Invitations & Stationery",
+        "priority": "high",
+        "notes": "Track RSVPs in shared spreadsheet."
+      },
+      {
+        "id": "t-6",
+        "title": "Bridal Makeup Airbrush Trial & Draping Rehearsal",
+        "due_date": "2026-11-25",
+        "phase": "1 month",
+        "status": "pending",
+        "assignee": "Diya",
+        "linked_vendor": "Attire, Hair & Makeup",
+        "priority": "medium",
+        "notes": "Skin sensitivity test required."
+      },
+      {
+        "id": "t-7",
+        "title": "Confirm Dhol Troupes & Baraat Route with Police Liaison",
+        "due_date": "2026-12-05",
+        "phase": "1 week",
+        "status": "pending",
+        "assignee": "Aarav's Uncle",
+        "linked_vendor": "Music, DJ & Entertainment",
+        "priority": "high",
+        "notes": "Ensure procession clears main gate by 6:30 PM."
+      },
+      {
+        "id": "t-8",
+        "title": "Re-confirm Guaranteed Plate Count with Caterer",
+        "due_date": "2026-12-10",
+        "phase": "1 week",
+        "status": "pending",
+        "assignee": "Host Family",
+        "linked_vendor": "Catering & Beverages",
+        "priority": "high",
+        "notes": "Lock 195 plates + 15 buffer plates."
+      },
+      {
+        "id": "t-9",
+        "title": "Venue Power Backup & Outdoor Patio Heaters Check",
+        "due_date": "2026-12-17",
+        "phase": "Day before",
+        "status": "pending",
+        "assignee": "Logistics Lead",
+        "linked_vendor": "Venue & Facilities",
+        "priority": "high",
+        "notes": "Winter evening dew mitigation."
+      },
+      {
+        "id": "t-10",
+        "title": "Mandap Fire Ritual Protocol & Hawan Samagri Verification",
+        "due_date": "2026-12-18",
+        "phase": "Day-of",
+        "status": "pending",
+        "assignee": "Priest Liaison",
+        "linked_vendor": "Rituals & Miscellaneous",
+        "priority": "high",
+        "notes": "Verify ghee, wood, patla, and water extinguisher."
+      }
     ],
     "run_of_show": [
-      { "id": "ros-1", "time": "03:30 PM", "title": "Bridal Green Room Makeup & Styling Begins", "owner": "Riva Bridal Studio", "location": "Green Room 1", "notes": "Diya & sisters in makeup chair." },
-      { "id": "ros-2", "time": "04:30 PM", "title": "Venue Mandap Handover & Sound Check", "owner": "Decor & Sound Lead", "location": "Main Lawn", "notes": "Microphones tested for priest & flutist." },
-      { "id": "ros-3", "time": "05:15 PM", "title": "Baraat Assembly & Dhol Procession Starts", "owner": "Groom's Entourage & Dhol Beats", "location": "Resort Main Gate", "notes": "Baraat moves toward central porch." },
-      { "id": "ros-4", "time": "06:00 PM", "title": "Ponkhana & Welcoming of Groom", "owner": "Bride's Mother & Family", "location": "Welcome Arch", "notes": "Traditional brass shagun & toran touch." },
-      { "id": "ros-5", "time": "06:30 PM", "title": "Jaimala Ceremony & Cold Pyrotechnics", "owner": "Host & Drishti Cinema", "location": "Elevated Stage", "notes": "Drone captures rose petal shower." },
-      { "id": "ros-6", "time": "07:00 PM", "title": "Dinner Buffet & Chouviar Counter Opens", "owner": "Rasraj Gourmet", "location": "Dining Pavilion", "notes": "Pre-sunset Jain meal strictly ready by 6:45 PM." },
-      { "id": "ros-7", "time": "08:00 PM", "title": "Lagna Vidhi & Mangal Pheras in Mandap", "owner": "Panditji & Close Family", "location": "Sacred Mandap", "notes": "4 pheras, saptapadi, and sindoor daan." },
-      { "id": "ros-8", "time": "10:00 PM", "title": "Blessings, Photo Sessions & Sound System Power-off", "owner": "Host Coordinator", "location": "Main Stage", "notes": "Strict acoustic compliance with 10 PM curfew." },
-      { "id": "ros-9", "time": "10:30 PM", "title": "Heartfelt Bidaai & Departure in Decorated Vintage Car", "owner": "Family Elders", "location": "Porte-cochère", "notes": "Car keys and luggage already pre-loaded." }
+      {
+        "id": "ros-1",
+        "time": "03:30 PM",
+        "title": "Bridal Green Room Makeup & Styling Begins",
+        "owner": "Riva Bridal Studio",
+        "location": "Green Room 1",
+        "notes": "Diya & sisters in makeup chair."
+      },
+      {
+        "id": "ros-2",
+        "time": "04:30 PM",
+        "title": "Venue Mandap Handover & Sound Check",
+        "owner": "Decor & Sound Lead",
+        "location": "Main Lawn",
+        "notes": "Microphones tested for priest & flutist."
+      },
+      {
+        "id": "ros-3",
+        "time": "05:15 PM",
+        "title": "Baraat Assembly & Dhol Procession Starts",
+        "owner": "Groom's Entourage & Dhol Beats",
+        "location": "Resort Main Gate",
+        "notes": "Baraat moves toward central porch."
+      },
+      {
+        "id": "ros-4",
+        "time": "06:00 PM",
+        "title": "Ponkhana & Welcoming of Groom",
+        "owner": "Bride's Mother & Family",
+        "location": "Welcome Arch",
+        "notes": "Traditional brass shagun & toran touch."
+      },
+      {
+        "id": "ros-5",
+        "time": "06:30 PM",
+        "title": "Jaimala Ceremony & Cold Pyrotechnics",
+        "owner": "Host & Drishti Cinema",
+        "location": "Elevated Stage",
+        "notes": "Drone captures rose petal shower."
+      },
+      {
+        "id": "ros-6",
+        "time": "07:00 PM",
+        "title": "Dinner Buffet & Chouviar Counter Opens",
+        "owner": "Rasraj Gourmet",
+        "location": "Dining Pavilion",
+        "notes": "Pre-sunset Jain meal strictly ready by 6:45 PM."
+      },
+      {
+        "id": "ros-7",
+        "time": "08:00 PM",
+        "title": "Lagna Vidhi & Mangal Pheras in Mandap",
+        "owner": "Panditji & Close Family",
+        "location": "Sacred Mandap",
+        "notes": "4 pheras, saptapadi, and sindoor daan."
+      },
+      {
+        "id": "ros-8",
+        "time": "10:00 PM",
+        "title": "Blessings, Photo Sessions & Sound System Power-off",
+        "owner": "Host Coordinator",
+        "location": "Main Stage",
+        "notes": "Strict acoustic compliance with 10 PM curfew."
+      },
+      {
+        "id": "ros-9",
+        "time": "10:30 PM",
+        "title": "Heartfelt Bidaai & Departure in Decorated Vintage Car",
+        "owner": "Family Elders",
+        "location": "Porte-cochère",
+        "notes": "Car keys and luggage already pre-loaded."
+      }
     ]
   },
   "vendors": [
@@ -206,12 +499,35 @@
   "collaborators": [
     { "id": "user-1", "name": "Aarav Patel", "email": "aarav.patel@example.com", "role": "owner" },
     { "id": "user-2", "name": "Diya Shah", "email": "diya.shah@example.com", "role": "editor" },
-    { "id": "user-3", "name": "Rohan (Decor Lead)", "email": "rohan.decor@example.com", "role": "editor" },
+    {
+      "id": "user-3",
+      "name": "Rohan (Decor Lead)",
+      "email": "rohan.decor@example.com",
+      "role": "editor"
+    },
     { "id": "user-4", "name": "Uncle Kirit", "email": "kiritbhai@example.com", "role": "viewer" }
   ],
   "activity_log": [
-    { "id": "act-1", "user": "Aarav Patel", "action": "booked", "detail": "The Green Pearl Heritage Resort & Lawn", "timestamp": "2026-10-10T11:20:00Z" },
-    { "id": "act-2", "user": "Diya Shah", "action": "locked", "detail": "Catering budget at ₹2,56,000 (32%)", "timestamp": "2026-10-14T14:45:00Z" },
-    { "id": "act-3", "user": "Aarav Patel", "action": "added expense", "detail": "₹25,000 for Drishti Weddings Photography token", "timestamp": "2026-10-20T17:10:00Z" }
+    {
+      "id": "act-1",
+      "user": "Aarav Patel",
+      "action": "booked",
+      "detail": "The Green Pearl Heritage Resort & Lawn",
+      "timestamp": "2026-10-10T11:20:00Z"
+    },
+    {
+      "id": "act-2",
+      "user": "Diya Shah",
+      "action": "locked",
+      "detail": "Catering budget at ₹2,56,000 (32%)",
+      "timestamp": "2026-10-14T14:45:00Z"
+    },
+    {
+      "id": "act-3",
+      "user": "Aarav Patel",
+      "action": "added expense",
+      "detail": "₹25,000 for Drishti Weddings Photography token",
+      "timestamp": "2026-10-20T17:10:00Z"
+    }
   ]
 }

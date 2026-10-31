@@ -44,56 +44,57 @@ export class AIService {
   }> {
     if (llmClient.isAvailable()) {
       try {
-        const rawJson = await llmClient.generateContent(
-          INTAKE_EXTRACTION_SYSTEM_PROMPT,
-          userInput
-        );
-        
+        const rawJson = await llmClient.generateContent(INTAKE_EXTRACTION_SYSTEM_PROMPT, userInput);
+
         // Validate LLM output against expected structure
         const validated = validateLLMOutput(rawJson, (parsed: unknown) => {
           if (typeof parsed !== 'object' || parsed === null) {
             return null;
           }
-          
+
           const obj = parsed as Record<string, unknown>;
-          
+
           // Validate required fields exist
           const profile = obj.profile || obj;
           if (typeof profile !== 'object' || profile === null) {
             return null;
           }
-          
+
           return parsed;
         });
-        
+
         if (validated) {
           const parsed = validated as Record<string, unknown>;
-          
+
           // Additional validation: check for injection attempts in profile
           const profileObj = (parsed.profile || parsed) as Record<string, unknown>;
           const securityCheck = validateProfileBeforeLLM(profileObj);
-          
+
           if (!securityCheck.safe) {
             logger.warn('LLM output contained suspicious patterns, using fallback', {
               warnings: securityCheck.warnings,
             });
             return fallbackDataService.extractProfileFromText(userInput);
           }
-          
+
           return {
-            profile: this.sanitizeExtractedProfile((parsed.profile || parsed) as Record<string, unknown>),
+            profile: this.sanitizeExtractedProfile(
+              (parsed.profile || parsed) as Record<string, unknown>
+            ),
             followUpQuestions: Array.isArray(parsed.follow_up_questions)
               ? parsed.follow_up_questions
               : Array.isArray(parsed.followUpQuestions)
-              ? parsed.followUpQuestions
-              : [],
+                ? parsed.followUpQuestions
+                : [],
             confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.85,
           };
         } else {
           logger.warn('LLM output failed validation, using fallback');
         }
       } catch (err: unknown) {
-        logger.warn('LLM extraction failed or timed out, using deterministic fallback parser', { err });
+        logger.warn('LLM extraction failed or timed out, using deterministic fallback parser', {
+          err,
+        });
       }
     }
 
@@ -117,7 +118,9 @@ export class AIService {
       culture_tradition: String(raw.culture_tradition || raw.culturalTradition || 'Contemporary'),
       dietary_mix: String(raw.dietary_mix || raw.dietaryMix || 'Standard Vegetarian Feast'),
       indoor_outdoor: (raw.indoor_outdoor as 'indoor' | 'outdoor' | 'hybrid') || 'outdoor',
-      priorities: Array.isArray(raw.priorities) ? raw.priorities.map(String) : ['Food', 'Decor', 'Experience'],
+      priorities: Array.isArray(raw.priorities)
+        ? raw.priorities.map(String)
+        : ['Food', 'Decor', 'Experience'],
       constraints: String(raw.constraints || ''),
     };
   }
@@ -125,7 +128,9 @@ export class AIService {
   /**
    * Generates budget breakdown using LLM for reasoning, code for math
    */
-  public async generateBudgetWithReasoning(profile: EventProfile): Promise<{ categories: BudgetCategory[]; strategic_notes?: string }> {
+  public async generateBudgetWithReasoning(
+    profile: EventProfile
+  ): Promise<{ categories: BudgetCategory[]; strategic_notes?: string }> {
     if (llmClient.isAvailable()) {
       try {
         // Sanitize profile data before sending to LLM
@@ -138,35 +143,37 @@ export class AIService {
           vibe_theme: profile.vibe_theme,
           priorities: profile.priorities,
         });
-        
+
         const raw = await llmClient.generateContent(
           BUDGET_REASONING_SYSTEM_PROMPT,
           JSON.stringify(sanitizedProfile)
         );
-        
+
         // Parse and validate response
         const parseResult = aiResponseValidator.safeParseJSON(raw);
         if (!parseResult.success) {
           logger.warn('Budget response JSON parse failed', { error: parseResult.error });
           throw new Error('Invalid JSON response');
         }
-        
+
         const validation = aiResponseValidator.validateBudgetCategories(parseResult.data);
         if (!validation.isValid) {
           logger.warn('Budget response validation failed', { errors: validation.errors });
           throw new Error('Invalid budget structure');
         }
-        
+
         // Use validated data
         const validatedData = validation.data!;
         const categories = calculateBudgetSplitFromPercents(
           profile.total_budget,
           validatedData.categories
         );
-        
+
         return {
           categories,
-          strategic_notes: validatedData.strategic_notes || `Budget allocated using AI-powered analysis for ${profile.type} event in ${profile.city}.`,
+          strategic_notes:
+            validatedData.strategic_notes ||
+            `Budget allocated using AI-powered analysis for ${profile.type} event in ${profile.city}.`,
         };
       } catch (err: unknown) {
         logger.warn('LLM budget reasoning failed, using deterministic fallback', { err });
@@ -185,7 +192,9 @@ export class AIService {
   /**
    * Generates timeline tasks using LLM for context-aware planning, code for dates
    */
-  public async generateTimelineWithTasks(profile: EventProfile): Promise<{ tasks: Task[]; run_of_show: RunOfShowItem[] }> {
+  public async generateTimelineWithTasks(
+    profile: EventProfile
+  ): Promise<{ tasks: Task[]; run_of_show: RunOfShowItem[] }> {
     if (llmClient.isAvailable()) {
       try {
         const promptData = {
@@ -197,30 +206,30 @@ export class AIService {
           vibe_theme: profile.vibe_theme,
           indoor_outdoor: profile.indoor_outdoor,
         };
-        
+
         const raw = await llmClient.generateContent(
           TIMELINE_GENERATION_SYSTEM_PROMPT,
           JSON.stringify(promptData)
         );
-        
+
         // Parse and validate response
         const parseResult = aiResponseValidator.safeParseJSON(raw);
         if (!parseResult.success) {
           logger.warn('Timeline response JSON parse failed', { error: parseResult.error });
           throw new Error('Invalid JSON response');
         }
-        
+
         const validation = aiResponseValidator.validateTimelineTasks(parseResult.data);
         if (!validation.isValid) {
           logger.warn('Timeline response validation failed', { errors: validation.errors });
           throw new Error('Invalid timeline structure');
         }
-        
+
         // Use validated data - LLM provides task descriptions and offsets, code calculates exact dates
         const validatedData = validation.data!;
         const tasks = calculateBackwardsDueDates(profile.date, validatedData.tasks);
         const runOfShow = this.generateRunOfShowForType(profile.type, profile.date);
-        
+
         return { tasks, run_of_show: runOfShow };
       } catch (err: unknown) {
         logger.warn('LLM timeline generation failed, using deterministic fallback', { err });
@@ -239,35 +248,189 @@ export class AIService {
   private generateRunOfShowForType(eventType: EventType, _eventDate: string): RunOfShowItem[] {
     if (eventType === 'wedding') {
       return [
-        { id: 'ros_1', time: '03:30 PM', title: 'Bridal Makeup & Styling Begins', owner: 'Bridal Stylist', location: 'Green Room', notes: 'HD airbrush and draping' },
-        { id: 'ros_2', time: '05:15 PM', title: 'Baraat Procession & Dhol Beats', owner: 'Groom\'s Family', location: 'Main Gate', notes: 'Traditional welcome' },
-        { id: 'ros_3', time: '06:00 PM', title: 'Bride\'s Family Welcome & Aarti', owner: 'Host Family', location: 'Welcome Arch', notes: 'Tilak and garland exchange' },
-        { id: 'ros_4', time: '06:30 PM', title: 'Jaimala Ceremony on Stage', owner: 'Emcee & Photography', location: 'Main Stage', notes: 'Varmala exchange with photo op' },
-        { id: 'ros_5', time: '07:00 PM', title: 'Cocktail Hour & Dinner Service Begins', owner: 'Catering Team', location: 'Dining Pavilion', notes: 'Appetizers and welcome drinks' },
-        { id: 'ros_6', time: '08:00 PM', title: 'Sacred Mandap Ceremony & Pheras', owner: 'Priest & Family', location: 'Mandap', notes: 'Traditional vows and saptapadi' },
-        { id: 'ros_7', time: '10:00 PM', title: 'Blessings & Group Photos', owner: 'Photography Team', location: 'Photo Corner', notes: 'Family portraits' },
-        { id: 'ros_8', time: '10:30 PM', title: 'Vidaai & Departure', owner: 'Both Families', location: 'Main Porch', notes: 'Emotional farewell' },
+        {
+          id: 'ros_1',
+          time: '03:30 PM',
+          title: 'Bridal Makeup & Styling Begins',
+          owner: 'Bridal Stylist',
+          location: 'Green Room',
+          notes: 'HD airbrush and draping',
+        },
+        {
+          id: 'ros_2',
+          time: '05:15 PM',
+          title: 'Baraat Procession & Dhol Beats',
+          owner: "Groom's Family",
+          location: 'Main Gate',
+          notes: 'Traditional welcome',
+        },
+        {
+          id: 'ros_3',
+          time: '06:00 PM',
+          title: "Bride's Family Welcome & Aarti",
+          owner: 'Host Family',
+          location: 'Welcome Arch',
+          notes: 'Tilak and garland exchange',
+        },
+        {
+          id: 'ros_4',
+          time: '06:30 PM',
+          title: 'Jaimala Ceremony on Stage',
+          owner: 'Emcee & Photography',
+          location: 'Main Stage',
+          notes: 'Varmala exchange with photo op',
+        },
+        {
+          id: 'ros_5',
+          time: '07:00 PM',
+          title: 'Cocktail Hour & Dinner Service Begins',
+          owner: 'Catering Team',
+          location: 'Dining Pavilion',
+          notes: 'Appetizers and welcome drinks',
+        },
+        {
+          id: 'ros_6',
+          time: '08:00 PM',
+          title: 'Sacred Mandap Ceremony & Pheras',
+          owner: 'Priest & Family',
+          location: 'Mandap',
+          notes: 'Traditional vows and saptapadi',
+        },
+        {
+          id: 'ros_7',
+          time: '10:00 PM',
+          title: 'Blessings & Group Photos',
+          owner: 'Photography Team',
+          location: 'Photo Corner',
+          notes: 'Family portraits',
+        },
+        {
+          id: 'ros_8',
+          time: '10:30 PM',
+          title: 'Vidaai & Departure',
+          owner: 'Both Families',
+          location: 'Main Porch',
+          notes: 'Emotional farewell',
+        },
       ];
     } else if (eventType === 'birthday') {
       return [
-        { id: 'ros_1', time: '07:00 PM', title: 'Venue Setup & Soundcheck Complete', owner: 'Event Coordinator', location: 'Main Hall', notes: 'Decor and lighting final check' },
-        { id: 'ros_2', time: '07:30 PM', title: 'Guests Arrival & Welcome Drinks', owner: 'Hospitality Team', location: 'Entry Lounge', notes: 'Signature cocktails and mocktails' },
-        { id: 'ros_3', time: '08:00 PM', title: 'Music & Dance Floor Opens', owner: 'DJ', location: 'Main Floor', notes: 'Playlist begins with upbeat tracks' },
-        { id: 'ros_4', time: '09:00 PM', title: 'Dinner Service Begins', owner: 'Catering', location: 'Buffet Area', notes: 'Multi-cuisine spread' },
-        { id: 'ros_5', time: '09:30 PM', title: 'Cake Cutting & Birthday Toast', owner: 'Birthday Host', location: 'Center Stage', notes: 'Group singing and champagne toast' },
-        { id: 'ros_6', time: '10:00 PM', title: 'Games & Interactive Activities', owner: 'Emcee', location: 'Activity Zone', notes: 'Trivia and photo booth' },
-        { id: 'ros_7', time: '11:30 PM', title: 'Thank You & Party Winds Down', owner: 'Host', location: 'Exit Area', notes: 'Return gifts distribution' },
+        {
+          id: 'ros_1',
+          time: '07:00 PM',
+          title: 'Venue Setup & Soundcheck Complete',
+          owner: 'Event Coordinator',
+          location: 'Main Hall',
+          notes: 'Decor and lighting final check',
+        },
+        {
+          id: 'ros_2',
+          time: '07:30 PM',
+          title: 'Guests Arrival & Welcome Drinks',
+          owner: 'Hospitality Team',
+          location: 'Entry Lounge',
+          notes: 'Signature cocktails and mocktails',
+        },
+        {
+          id: 'ros_3',
+          time: '08:00 PM',
+          title: 'Music & Dance Floor Opens',
+          owner: 'DJ',
+          location: 'Main Floor',
+          notes: 'Playlist begins with upbeat tracks',
+        },
+        {
+          id: 'ros_4',
+          time: '09:00 PM',
+          title: 'Dinner Service Begins',
+          owner: 'Catering',
+          location: 'Buffet Area',
+          notes: 'Multi-cuisine spread',
+        },
+        {
+          id: 'ros_5',
+          time: '09:30 PM',
+          title: 'Cake Cutting & Birthday Toast',
+          owner: 'Birthday Host',
+          location: 'Center Stage',
+          notes: 'Group singing and champagne toast',
+        },
+        {
+          id: 'ros_6',
+          time: '10:00 PM',
+          title: 'Games & Interactive Activities',
+          owner: 'Emcee',
+          location: 'Activity Zone',
+          notes: 'Trivia and photo booth',
+        },
+        {
+          id: 'ros_7',
+          time: '11:30 PM',
+          title: 'Thank You & Party Winds Down',
+          owner: 'Host',
+          location: 'Exit Area',
+          notes: 'Return gifts distribution',
+        },
       ];
     } else {
       // Community event
       return [
-        { id: 'ros_1', time: '05:00 PM', title: 'Venue Gates Open & Security Check', owner: 'Security Team', location: 'Main Entrance', notes: 'Bag screening and entry badges' },
-        { id: 'ros_2', time: '06:00 PM', title: 'Welcome Aarti & Opening Ceremony', owner: 'Cultural Committee', location: 'Main Stage', notes: 'Traditional lamp lighting' },
-        { id: 'ros_3', time: '06:30 PM', title: 'Cultural Performances Begin', owner: 'Folk Performers', location: 'Central Ground', notes: 'Garba, bhajan, or folk dance' },
-        { id: 'ros_4', time: '07:30 PM', title: 'Community Dinner Service', owner: 'Food Committee', location: 'Dining Marquee', notes: 'Prasad and refreshments' },
-        { id: 'ros_5', time: '08:30 PM', title: 'Main Event Program', owner: 'Event Lead', location: 'Main Stage', notes: 'Speeches and announcements' },
-        { id: 'ros_6', time: '09:30 PM', title: 'Closing Prayer & Thanks', owner: 'Religious Leader', location: 'Main Stage', notes: 'Community blessing' },
-        { id: 'ros_7', time: '10:00 PM', title: 'Venue Clearance Begins', owner: 'Logistics Team', location: 'All Areas', notes: 'Sound curfew compliance' },
+        {
+          id: 'ros_1',
+          time: '05:00 PM',
+          title: 'Venue Gates Open & Security Check',
+          owner: 'Security Team',
+          location: 'Main Entrance',
+          notes: 'Bag screening and entry badges',
+        },
+        {
+          id: 'ros_2',
+          time: '06:00 PM',
+          title: 'Welcome Aarti & Opening Ceremony',
+          owner: 'Cultural Committee',
+          location: 'Main Stage',
+          notes: 'Traditional lamp lighting',
+        },
+        {
+          id: 'ros_3',
+          time: '06:30 PM',
+          title: 'Cultural Performances Begin',
+          owner: 'Folk Performers',
+          location: 'Central Ground',
+          notes: 'Garba, bhajan, or folk dance',
+        },
+        {
+          id: 'ros_4',
+          time: '07:30 PM',
+          title: 'Community Dinner Service',
+          owner: 'Food Committee',
+          location: 'Dining Marquee',
+          notes: 'Prasad and refreshments',
+        },
+        {
+          id: 'ros_5',
+          time: '08:30 PM',
+          title: 'Main Event Program',
+          owner: 'Event Lead',
+          location: 'Main Stage',
+          notes: 'Speeches and announcements',
+        },
+        {
+          id: 'ros_6',
+          time: '09:30 PM',
+          title: 'Closing Prayer & Thanks',
+          owner: 'Religious Leader',
+          location: 'Main Stage',
+          notes: 'Community blessing',
+        },
+        {
+          id: 'ros_7',
+          time: '10:00 PM',
+          title: 'Venue Clearance Begins',
+          owner: 'Logistics Team',
+          location: 'All Areas',
+          notes: 'Sound curfew compliance',
+        },
       ];
     }
   }
@@ -277,44 +440,219 @@ export class AIService {
    */
   private generateDefaultTimelineForType(eventType: EventType, eventDate: string): Task[] {
     let taskTemplates;
-    
+
     if (eventType === 'wedding') {
       taskTemplates = [
-        { title: 'Finalize and secure main venue contract with advance', role: 'Organizer', priority: 'high' as const, phase: '6+ months' as const, offset_days: 180, linked_vendor: 'Venue' },
-        { title: 'Finalize catering menu tasting and guest count tiers', role: 'Food Lead', priority: 'high' as const, phase: '3 months' as const, offset_days: 90, linked_vendor: 'Catering' },
-        { title: 'Book candid photography and cinematic videographer', role: 'Organizer', priority: 'medium' as const, phase: '3 months' as const, offset_days: 75, linked_vendor: 'Photography' },
-        { title: 'Approve mandap backdrop and floral decor theme', role: 'Decor Lead', priority: 'medium' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'Decor' },
-        { title: 'Send digital invitations with RSVP tracking', role: 'Communication Lead', priority: 'high' as const, phase: '1 month' as const, offset_days: 28, linked_vendor: 'Invitations' },
-        { title: 'Confirm baraat dhol troupe and route permissions', role: 'Entertainment Lead', priority: 'medium' as const, phase: '1 week' as const, offset_days: 7, linked_vendor: 'Music' },
-        { title: 'Reconfirm final guest headcount with caterer', role: 'Food Lead', priority: 'high' as const, phase: '1 week' as const, offset_days: 5, linked_vendor: 'Catering' },
-        { title: 'Venue walkthrough and backup power check', role: 'Logistics Lead', priority: 'high' as const, phase: 'Day before' as const, offset_days: 1, linked_vendor: 'Venue' },
-        { title: 'Mandap setup and priest arrival coordination', role: 'Lead Coordinator', priority: 'high' as const, phase: 'Day-of' as const, offset_days: 0, linked_vendor: 'Rituals' },
+        {
+          title: 'Finalize and secure main venue contract with advance',
+          role: 'Organizer',
+          priority: 'high' as const,
+          phase: '6+ months' as const,
+          offset_days: 180,
+          linked_vendor: 'Venue',
+        },
+        {
+          title: 'Finalize catering menu tasting and guest count tiers',
+          role: 'Food Lead',
+          priority: 'high' as const,
+          phase: '3 months' as const,
+          offset_days: 90,
+          linked_vendor: 'Catering',
+        },
+        {
+          title: 'Book candid photography and cinematic videographer',
+          role: 'Organizer',
+          priority: 'medium' as const,
+          phase: '3 months' as const,
+          offset_days: 75,
+          linked_vendor: 'Photography',
+        },
+        {
+          title: 'Approve mandap backdrop and floral decor theme',
+          role: 'Decor Lead',
+          priority: 'medium' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'Decor',
+        },
+        {
+          title: 'Send digital invitations with RSVP tracking',
+          role: 'Communication Lead',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 28,
+          linked_vendor: 'Invitations',
+        },
+        {
+          title: 'Confirm baraat dhol troupe and route permissions',
+          role: 'Entertainment Lead',
+          priority: 'medium' as const,
+          phase: '1 week' as const,
+          offset_days: 7,
+          linked_vendor: 'Music',
+        },
+        {
+          title: 'Reconfirm final guest headcount with caterer',
+          role: 'Food Lead',
+          priority: 'high' as const,
+          phase: '1 week' as const,
+          offset_days: 5,
+          linked_vendor: 'Catering',
+        },
+        {
+          title: 'Venue walkthrough and backup power check',
+          role: 'Logistics Lead',
+          priority: 'high' as const,
+          phase: 'Day before' as const,
+          offset_days: 1,
+          linked_vendor: 'Venue',
+        },
+        {
+          title: 'Mandap setup and priest arrival coordination',
+          role: 'Lead Coordinator',
+          priority: 'high' as const,
+          phase: 'Day-of' as const,
+          offset_days: 0,
+          linked_vendor: 'Rituals',
+        },
       ];
     } else if (eventType === 'birthday') {
       taskTemplates = [
-        { title: 'Reserve party venue or lounge space', role: 'Organizer', priority: 'high' as const, phase: '3 months' as const, offset_days: 60, linked_vendor: 'Venue' },
-        { title: 'Order custom birthday cake with design', role: 'Host', priority: 'high' as const, phase: '1 month' as const, offset_days: 14, linked_vendor: 'Bakery' },
-        { title: 'Book DJ or entertainment package', role: 'Entertainment Lead', priority: 'medium' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'Entertainment' },
-        { title: 'Send digital invitations with RSVP', role: 'Host', priority: 'high' as const, phase: '1 month' as const, offset_days: 21, linked_vendor: 'Invitations' },
-        { title: 'Finalize decor theme and balloon arrangements', role: 'Decor Lead', priority: 'medium' as const, phase: '1 week' as const, offset_days: 3, linked_vendor: 'Decor' },
-        { title: 'Confirm final headcount and meal preferences', role: 'Catering Lead', priority: 'high' as const, phase: '1 week' as const, offset_days: 5, linked_vendor: 'Catering' },
-        { title: 'Setup party favors and return gifts', role: 'Host', priority: 'low' as const, phase: 'Day before' as const, offset_days: 1, linked_vendor: 'Favors' },
-        { title: 'Venue decoration and soundcheck', role: 'Event Coordinator', priority: 'high' as const, phase: 'Day-of' as const, offset_days: 0, linked_vendor: 'Venue' },
+        {
+          title: 'Reserve party venue or lounge space',
+          role: 'Organizer',
+          priority: 'high' as const,
+          phase: '3 months' as const,
+          offset_days: 60,
+          linked_vendor: 'Venue',
+        },
+        {
+          title: 'Order custom birthday cake with design',
+          role: 'Host',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 14,
+          linked_vendor: 'Bakery',
+        },
+        {
+          title: 'Book DJ or entertainment package',
+          role: 'Entertainment Lead',
+          priority: 'medium' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'Entertainment',
+        },
+        {
+          title: 'Send digital invitations with RSVP',
+          role: 'Host',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 21,
+          linked_vendor: 'Invitations',
+        },
+        {
+          title: 'Finalize decor theme and balloon arrangements',
+          role: 'Decor Lead',
+          priority: 'medium' as const,
+          phase: '1 week' as const,
+          offset_days: 3,
+          linked_vendor: 'Decor',
+        },
+        {
+          title: 'Confirm final headcount and meal preferences',
+          role: 'Catering Lead',
+          priority: 'high' as const,
+          phase: '1 week' as const,
+          offset_days: 5,
+          linked_vendor: 'Catering',
+        },
+        {
+          title: 'Setup party favors and return gifts',
+          role: 'Host',
+          priority: 'low' as const,
+          phase: 'Day before' as const,
+          offset_days: 1,
+          linked_vendor: 'Favors',
+        },
+        {
+          title: 'Venue decoration and soundcheck',
+          role: 'Event Coordinator',
+          priority: 'high' as const,
+          phase: 'Day-of' as const,
+          offset_days: 0,
+          linked_vendor: 'Venue',
+        },
       ];
     } else {
       // Community event
       taskTemplates = [
-        { title: 'Apply for municipal permits and sound NOC', role: 'Admin Lead', priority: 'high' as const, phase: '6+ months' as const, offset_days: 90, linked_vendor: 'Permits' },
-        { title: 'Book community grounds and stage platform', role: 'Venue Coordinator', priority: 'high' as const, phase: '3 months' as const, offset_days: 60, linked_vendor: 'Venue' },
-        { title: 'Arrange sound system and lighting equipment', role: 'Technical Lead', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'Sound & Lighting' },
-        { title: 'Organize volunteer team and role assignments', role: 'Volunteer Coordinator', priority: 'medium' as const, phase: '1 month' as const, offset_days: 20, linked_vendor: 'Volunteers' },
-        { title: 'Confirm catering for community meal service', role: 'Food Committee', priority: 'high' as const, phase: '1 week' as const, offset_days: 7, linked_vendor: 'Catering' },
-        { title: 'Setup seating, signage, and sanitation facilities', role: 'Logistics Team', priority: 'medium' as const, phase: '1 week' as const, offset_days: 3, linked_vendor: 'Facilities' },
-        { title: 'Conduct volunteer briefing and dry run', role: 'Coordinator', priority: 'high' as const, phase: 'Day before' as const, offset_days: 1, linked_vendor: 'Volunteers' },
-        { title: 'Day-of security deployment and gate management', role: 'Security Lead', priority: 'high' as const, phase: 'Day-of' as const, offset_days: 0, linked_vendor: 'Security' },
+        {
+          title: 'Apply for municipal permits and sound NOC',
+          role: 'Admin Lead',
+          priority: 'high' as const,
+          phase: '6+ months' as const,
+          offset_days: 90,
+          linked_vendor: 'Permits',
+        },
+        {
+          title: 'Book community grounds and stage platform',
+          role: 'Venue Coordinator',
+          priority: 'high' as const,
+          phase: '3 months' as const,
+          offset_days: 60,
+          linked_vendor: 'Venue',
+        },
+        {
+          title: 'Arrange sound system and lighting equipment',
+          role: 'Technical Lead',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'Sound & Lighting',
+        },
+        {
+          title: 'Organize volunteer team and role assignments',
+          role: 'Volunteer Coordinator',
+          priority: 'medium' as const,
+          phase: '1 month' as const,
+          offset_days: 20,
+          linked_vendor: 'Volunteers',
+        },
+        {
+          title: 'Confirm catering for community meal service',
+          role: 'Food Committee',
+          priority: 'high' as const,
+          phase: '1 week' as const,
+          offset_days: 7,
+          linked_vendor: 'Catering',
+        },
+        {
+          title: 'Setup seating, signage, and sanitation facilities',
+          role: 'Logistics Team',
+          priority: 'medium' as const,
+          phase: '1 week' as const,
+          offset_days: 3,
+          linked_vendor: 'Facilities',
+        },
+        {
+          title: 'Conduct volunteer briefing and dry run',
+          role: 'Coordinator',
+          priority: 'high' as const,
+          phase: 'Day before' as const,
+          offset_days: 1,
+          linked_vendor: 'Volunteers',
+        },
+        {
+          title: 'Day-of security deployment and gate management',
+          role: 'Security Lead',
+          priority: 'high' as const,
+          phase: 'Day-of' as const,
+          offset_days: 0,
+          linked_vendor: 'Security',
+        },
       ];
     }
-    
+
     return calculateBackwardsDueDates(eventDate, taskTemplates);
   }
 
@@ -332,7 +670,10 @@ export class AIService {
     };
   }
 
-  public generateDeterministicTimeline(profile: EventProfile): { tasks: Task[]; run_of_show: RunOfShowItem[] } {
+  public generateDeterministicTimeline(profile: EventProfile): {
+    tasks: Task[];
+    run_of_show: RunOfShowItem[];
+  } {
     const tasks = this.generateDefaultTimelineForType(profile.type, profile.date);
     const runOfShow = this.generateRunOfShowForType(profile.type, profile.date);
     return { tasks, run_of_show: runOfShow };
@@ -354,7 +695,7 @@ export class AIService {
     implementation_tips: string[];
   }> {
     const target = targetBudget || profile.total_budget;
-    
+
     if (llmClient.isAvailable()) {
       try {
         const promptData = {
@@ -363,14 +704,14 @@ export class AIService {
           original_budget: profile.total_budget,
           target_budget: target,
         };
-        
+
         const raw = await llmClient.generateContent(
           BUDGET_OPTIMIZER_SYSTEM_PROMPT,
           JSON.stringify(promptData)
         );
-        
+
         const parsed = JSON.parse(raw);
-        
+
         if (Array.isArray(parsed.categories) && parsed.categories.length > 0) {
           const categories = calculateBudgetSplitFromPercents(
             target,
@@ -380,14 +721,16 @@ export class AIService {
               reasoning: String(c.new_reasoning || c.reasoning || c.savings_strategy || ''),
             }))
           );
-          
+
           return {
             scenario: parsed.scenario_name || scenario,
             original_budget: profile.total_budget,
             target_budget: target,
             projected_savings_percent: Number(parsed.projected_savings_percent || 0),
             categories,
-            implementation_tips: Array.isArray(parsed.implementation_tips) ? parsed.implementation_tips : [],
+            implementation_tips: Array.isArray(parsed.implementation_tips)
+              ? parsed.implementation_tips
+              : [],
           };
         }
       } catch (err: unknown) {
@@ -396,10 +739,11 @@ export class AIService {
     }
 
     // Fallback: apply simple percentage reduction
-    const savingsPercent = scenario === 'maintain_quality' ? 10 : scenario === 'moderate_cuts' ? 20 : 35;
+    const savingsPercent =
+      scenario === 'maintain_quality' ? 10 : scenario === 'moderate_cuts' ? 20 : 35;
     const splits = DEFAULT_BUDGET_SPLITS[profile.type] || DEFAULT_BUDGET_SPLITS.wedding;
     const categories = calculateBudgetSplitFromPercents(target, splits);
-    
+
     return {
       scenario,
       original_budget: profile.total_budget,
@@ -424,20 +768,20 @@ export class AIService {
           IDEA_GENERATION_SYSTEM_PROMPT,
           JSON.stringify(profile)
         );
-        
+
         // Parse and validate response
         const parseResult = aiResponseValidator.safeParseJSON(raw);
         if (!parseResult.success) {
           logger.warn('Ideas response JSON parse failed', { error: parseResult.error });
           throw new Error('Invalid JSON response');
         }
-        
+
         const validation = aiResponseValidator.validateIdeas(parseResult.data);
         if (!validation.isValid) {
           logger.warn('Ideas response validation failed', { errors: validation.errors });
           throw new Error('Invalid ideas structure');
         }
-        
+
         // Map validated data to IdeaItem format
         const validatedData = validation.data!;
         return validatedData.ideas.map((item, idx) => ({
@@ -498,20 +842,20 @@ export class AIService {
           RISK_ANALYSIS_SYSTEM_PROMPT,
           JSON.stringify(profile)
         );
-        
+
         // Parse and validate response
         const parseResult = aiResponseValidator.safeParseJSON(raw);
         if (!parseResult.success) {
           logger.warn('Risks response JSON parse failed', { error: parseResult.error });
           throw new Error('Invalid JSON response');
         }
-        
+
         const validation = aiResponseValidator.validateRisks(parseResult.data);
         if (!validation.isValid) {
           logger.warn('Risks response validation failed', { errors: validation.errors });
           throw new Error('Invalid risks structure');
         }
-        
+
         // Map validated data to RiskItem format
         const validatedData = validation.data!;
         return validatedData.risks.map((r, idx) => ({

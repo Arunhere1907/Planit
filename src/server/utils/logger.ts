@@ -1,4 +1,4 @@
-type LogLevel = "debug" | "info" | "warn" | "error";
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 /**
  * Security-enhanced Logger
@@ -9,7 +9,10 @@ type LogLevel = "debug" | "info" | "warn" | "error";
 
 // Patterns to scrub from logs
 const SENSITIVE_PATTERNS = [
-  { pattern: /api[_-]?key[:\s]*['"]*([a-zA-Z0-9_-]{20,})['"]*?/gi, replacement: 'api_key: [REDACTED]' },
+  {
+    pattern: /api[_-]?key[:\s]*['"]*([a-zA-Z0-9_-]{20,})['"]*?/gi,
+    replacement: 'api_key: [REDACTED]',
+  },
   { pattern: /bearer\s+([a-zA-Z0-9_-]{20,})/gi, replacement: 'bearer [REDACTED]' },
   { pattern: /token[:\s]*['"]*([a-zA-Z0-9_-]{20,})['"]*?/gi, replacement: 'token: [REDACTED]' },
   { pattern: /password[:\s]*['"]*([^'"]+)['"]*?/gi, replacement: 'password: [REDACTED]' },
@@ -65,7 +68,7 @@ class Logger {
     const scrubbed: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(obj)) {
       const lowerKey = key.toLowerCase();
-      
+
       // Redact sensitive fields completely
       if (SENSITIVE_FIELDS.some((field) => lowerKey.includes(field.toLowerCase()))) {
         scrubbed[key] = '[REDACTED]';
@@ -81,58 +84,58 @@ class Logger {
 
   private format(level: LogLevel, message: string, meta?: unknown): string {
     const timestamp = new Date().toISOString();
-    
+
     // Scrub sensitive data from message
     const scrubbedMessage = this.scrubSensitive(message);
-    
+
     // Scrub sensitive data from metadata
     let metaString = '';
     if (meta) {
       const scrubbedMeta = this.scrubObject(meta);
       metaString = ` | ${JSON.stringify(scrubbedMeta)}`;
     }
-    
+
     return `[${timestamp}] [${level.toUpperCase()}] [PlanIt]: ${scrubbedMessage}${metaString}`;
   }
 
   public debug(message: string, meta?: unknown): void {
     if (!this.isProduction) {
-      process.stdout.write(`${this.format("debug", message, meta)}\n`);
+      process.stdout.write(`${this.format('debug', message, meta)}\n`);
     }
   }
 
   public info(message: string, meta?: unknown): void {
-    process.stdout.write(`${this.format("info", message, meta)}\n`);
+    process.stdout.write(`${this.format('info', message, meta)}\n`);
   }
 
   public warn(message: string, meta?: unknown): void {
-    process.stderr.write(`${this.format("warn", message, meta)}\n`);
+    process.stderr.write(`${this.format('warn', message, meta)}\n`);
   }
 
   public error(message: string, error?: unknown): void {
     let errDetails: unknown;
-    
+
     if (error instanceof Error) {
       // In production, DO NOT log stack traces (security risk)
       if (this.isProduction) {
-        errDetails = { 
-          name: error.name, 
+        errDetails = {
+          name: error.name,
           message: this.scrubSensitive(error.message),
           // stack omitted in production
         };
       } else {
         // In development, include stack for debugging
-        errDetails = { 
-          name: error.name, 
-          message: this.scrubSensitive(error.message), 
-          stack: error.stack 
+        errDetails = {
+          name: error.name,
+          message: this.scrubSensitive(error.message),
+          stack: error.stack,
         };
       }
     } else {
       errDetails = this.scrubObject(error);
     }
-    
-    process.stderr.write(`${this.format("error", message, errDetails)}\n`);
+
+    process.stderr.write(`${this.format('error', message, errDetails)}\n`);
   }
 }
 

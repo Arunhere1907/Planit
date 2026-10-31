@@ -81,7 +81,10 @@ export class InProcessScheduler {
       }
 
       // Check budget overspending
-      const totalSpent = event.budget.expenses.reduce((acc: number, exp: Expense) => acc + exp.amount, 0);
+      const totalSpent = event.budget.expenses.reduce(
+        (acc: number, exp: Expense) => acc + exp.amount,
+        0
+      );
       if (totalSpent > event.budget.total_budget) {
         const notifId = `notif_budget_overspend_${event.profile.id}`;
         if (!notifications.some((n: AppNotification) => n.id === notifId)) {

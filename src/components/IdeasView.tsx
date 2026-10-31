@@ -1,13 +1,6 @@
-import React, { useState } from "react";
-import {
-  Sparkles,
-  Bookmark,
-  BookmarkCheck,
-  Trash2,
-  Tag,
-  Loader2,
-} from "lucide-react";
-import type { IdeaItem, EventProfile } from "../types";
+import React, { useState } from 'react';
+import { Sparkles, Bookmark, BookmarkCheck, Trash2, Tag, Loader2 } from 'lucide-react';
+import type { IdeaItem, EventProfile } from '../types';
 
 interface IdeasViewProps {
   ideas: IdeaItem[];
@@ -16,16 +9,16 @@ interface IdeasViewProps {
 }
 
 export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateIdeas }) => {
-  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [showSavedOnly, setShowSavedOnly] = useState<boolean>(false);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
   const categories = [
-    "Decor & Ambiance",
-    "Catering & Menu",
-    "Entertainment & Music",
-    "Guest Experience",
-    "Return Gifts & Favors",
+    'Decor & Ambiance',
+    'Catering & Menu',
+    'Entertainment & Music',
+    'Guest Experience',
+    'Return Gifts & Favors',
   ];
 
   const handleToggleSave = (ideaId: string) => {
@@ -42,12 +35,12 @@ export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateId
   const handleGenerateFreshIdeas = async (focusCategory?: string) => {
     setIsGenerating(true);
     try {
-      const res = await fetch("/api/ideas/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/ideas/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           profile,
-          focusCategory: focusCategory === "all" ? undefined : focusCategory,
+          focusCategory: focusCategory === 'all' ? undefined : focusCategory,
         }),
       });
       if (res.ok) {
@@ -57,7 +50,7 @@ export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateId
         }
       }
     } catch (e) {
-      console.warn("Failed to generate ideas:", e);
+      console.warn('Failed to generate ideas:', e);
     } finally {
       setIsGenerating(false);
     }
@@ -65,7 +58,7 @@ export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateId
 
   const filteredIdeas = ideas.filter((item) => {
     if (showSavedOnly && !item.saved) return false;
-    if (activeCategory !== "all" && item.category !== activeCategory) return false;
+    if (activeCategory !== 'all' && item.category !== activeCategory) return false;
     return true;
   });
 
@@ -75,18 +68,21 @@ export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateId
       <h1 className="sr-only" tabIndex={-1}>
         Curated Ideas - {profile.title}
       </h1>
-      
+
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Personalized Ideas & Concepts</h2>
+            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+              Personalized Ideas & Concepts
+            </h2>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
               Culturally Tailored for {profile.city}
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Unique decor concepts, authentic regional food counters, guest experiential moments, and keepsake favors.
+            Unique decor concepts, authentic regional food counters, guest experiential moments, and
+            keepsake favors.
           </p>
         </div>
 
@@ -110,11 +106,11 @@ export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateId
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
           <button
-            onClick={() => setActiveCategory("all")}
+            onClick={() => setActiveCategory('all')}
             className={`px-3 py-1 rounded-full text-xs font-bold transition-colors whitespace-nowrap ${
-              activeCategory === "all"
-                ? "bg-slate-900 text-white"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              activeCategory === 'all'
+                ? 'bg-slate-900 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             All Themes ({ideas.length})
@@ -125,8 +121,8 @@ export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateId
               onClick={() => setActiveCategory(cat)}
               className={`px-3 py-1 rounded-full text-xs font-bold transition-colors whitespace-nowrap ${
                 activeCategory === cat
-                  ? "bg-rose-50 text-rose-700 border border-rose-200"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
               {cat}
@@ -138,8 +134,8 @@ export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateId
           onClick={() => setShowSavedOnly(!showSavedOnly)}
           className={`px-3 py-1 rounded-xl text-xs font-bold border transition-colors flex items-center gap-1.5 ${
             showSavedOnly
-              ? "bg-amber-100 text-amber-900 border-amber-300"
-              : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+              ? 'bg-amber-100 text-amber-900 border-amber-300'
+              : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
           }`}
         >
           <Bookmark className="w-3.5 h-3.5" />
@@ -153,7 +149,7 @@ export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateId
           <div
             key={idea.id}
             className={`bg-white rounded-2xl border p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-3 ${
-              idea.saved ? "border-amber-400 bg-amber-50/20" : "border-slate-200"
+              idea.saved ? 'border-amber-400 bg-amber-50/20' : 'border-slate-200'
             }`}
           >
             <div className="space-y-2.5">
@@ -164,11 +160,11 @@ export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateId
 
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                    idea.effort_level === "Low"
-                      ? "bg-emerald-100 text-emerald-800"
-                      : idea.effort_level === "Medium"
-                      ? "bg-amber-100 text-amber-800"
-                      : "bg-rose-100 text-rose-800"
+                    idea.effort_level === 'Low'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : idea.effort_level === 'Medium'
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-rose-100 text-rose-800'
                   }`}
                 >
                   {idea.effort_level} Effort
@@ -177,7 +173,9 @@ export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateId
 
               <h3 className="text-sm font-extrabold text-slate-900 leading-snug">{idea.title}</h3>
 
-              <p className="text-xs text-slate-600 leading-relaxed font-light">{idea.description}</p>
+              <p className="text-xs text-slate-600 leading-relaxed font-light">
+                {idea.description}
+              </p>
 
               {/* Tags */}
               <div className="flex flex-wrap gap-1 pt-1">
@@ -194,22 +192,24 @@ export const IdeasView: React.FC<IdeasViewProps> = ({ ideas, profile, onUpdateId
 
             {/* Bottom Actions */}
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-              <div className="text-xs font-bold text-slate-800 font-mono">
-                {idea.cost_range}
-              </div>
+              <div className="text-xs font-bold text-slate-800 font-mono">{idea.cost_range}</div>
 
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => handleToggleSave(idea.id)}
                   className={`p-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 ${
                     idea.saved
-                      ? "bg-amber-500 text-white"
-                      : "text-slate-500 hover:text-amber-700 hover:bg-amber-50"
+                      ? 'bg-amber-500 text-white'
+                      : 'text-slate-500 hover:text-amber-700 hover:bg-amber-50'
                   }`}
-                  title={idea.saved ? "Saved in your event blueprint" : "Save this idea"}
+                  title={idea.saved ? 'Saved in your event blueprint' : 'Save this idea'}
                 >
-                  {idea.saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-                  <span>{idea.saved ? "Saved" : "Save"}</span>
+                  {idea.saved ? (
+                    <BookmarkCheck className="w-4 h-4" />
+                  ) : (
+                    <Bookmark className="w-4 h-4" />
+                  )}
+                  <span>{idea.saved ? 'Saved' : 'Save'}</span>
                 </button>
 
                 <button

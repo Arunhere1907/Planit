@@ -201,9 +201,30 @@ describe('Timeline Response Schema', () => {
   it('should validate timeline with minimum tasks and run_of_show', () => {
     const valid = {
       tasks: [
-        { title: 'T1', role: 'Organizer', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
-        { title: 'T2', role: 'Host', priority: 'medium' as const, phase: '1 week' as const, offset_days: 7, linked_vendor: 'V' },
-        { title: 'T3', role: 'Lead', priority: 'low' as const, phase: 'Day-of' as const, offset_days: 0, linked_vendor: 'V' },
+        {
+          title: 'T1',
+          role: 'Organizer',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
+        {
+          title: 'T2',
+          role: 'Host',
+          priority: 'medium' as const,
+          phase: '1 week' as const,
+          offset_days: 7,
+          linked_vendor: 'V',
+        },
+        {
+          title: 'T3',
+          role: 'Lead',
+          priority: 'low' as const,
+          phase: 'Day-of' as const,
+          offset_days: 0,
+          linked_vendor: 'V',
+        },
       ],
       run_of_show: [
         { time: '10:00 AM', title: 'Event 1', owner: 'Host', location: 'Hall', notes: 'Notes' },
@@ -219,8 +240,22 @@ describe('Timeline Response Schema', () => {
   it('should reject less than 3 tasks', () => {
     const invalid = {
       tasks: [
-        { title: 'T1', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
-        { title: 'T2', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
+        {
+          title: 'T1',
+          role: 'O',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
+        {
+          title: 'T2',
+          role: 'O',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
       ],
       run_of_show: [
         { time: '10:00', title: 'E1', owner: 'H', location: 'L', notes: 'N' },
@@ -236,9 +271,30 @@ describe('Timeline Response Schema', () => {
   it('should reject less than 3 run_of_show items', () => {
     const invalid = {
       tasks: [
-        { title: 'T1', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
-        { title: 'T2', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
-        { title: 'T3', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
+        {
+          title: 'T1',
+          role: 'O',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
+        {
+          title: 'T2',
+          role: 'O',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
+        {
+          title: 'T3',
+          role: 'O',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
       ],
       run_of_show: [
         { time: '10:00', title: 'E1', owner: 'H', location: 'L', notes: 'N' },
@@ -253,9 +309,30 @@ describe('Timeline Response Schema', () => {
   it('should reject invalid priority', () => {
     const invalid = {
       tasks: [
-        { title: 'T1', role: 'O', priority: 'urgent' as any, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
-        { title: 'T2', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
-        { title: 'T3', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
+        {
+          title: 'T1',
+          role: 'O',
+          priority: 'urgent' as any,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
+        {
+          title: 'T2',
+          role: 'O',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
+        {
+          title: 'T3',
+          role: 'O',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
       ],
       run_of_show: [
         { time: '10:00', title: 'E', owner: 'H', location: 'L', notes: 'N' },
@@ -271,9 +348,30 @@ describe('Timeline Response Schema', () => {
   it('should reject invalid phase', () => {
     const invalid = {
       tasks: [
-        { title: 'T1', role: 'O', priority: 'high' as const, phase: 'next year' as any, offset_days: 30, linked_vendor: 'V' },
-        { title: 'T2', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
-        { title: 'T3', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
+        {
+          title: 'T1',
+          role: 'O',
+          priority: 'high' as const,
+          phase: 'next year' as any,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
+        {
+          title: 'T2',
+          role: 'O',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
+        {
+          title: 'T3',
+          role: 'O',
+          priority: 'high' as const,
+          phase: '1 month' as const,
+          offset_days: 30,
+          linked_vendor: 'V',
+        },
       ],
       run_of_show: [
         { time: '10:00', title: 'E', owner: 'H', location: 'L', notes: 'N' },
@@ -291,9 +389,30 @@ describe('Ideas Response Schema', () => {
   it('should validate with minimum 3 ideas', () => {
     const valid = {
       ideas: [
-        { category: 'Decor', title: 'Idea 1', description: 'Desc', cost_range: '₹10k-20k', effort_level: 'Low' as const, tags: ['tag1'] },
-        { category: 'Food', title: 'Idea 2', description: 'Desc', cost_range: '₹5k-10k', effort_level: 'Medium' as const, tags: ['tag2'] },
-        { category: 'Music', title: 'Idea 3', description: 'Desc', cost_range: '₹20k-30k', effort_level: 'High' as const, tags: ['tag3'] },
+        {
+          category: 'Decor',
+          title: 'Idea 1',
+          description: 'Desc',
+          cost_range: '₹10k-20k',
+          effort_level: 'Low' as const,
+          tags: ['tag1'],
+        },
+        {
+          category: 'Food',
+          title: 'Idea 2',
+          description: 'Desc',
+          cost_range: '₹5k-10k',
+          effort_level: 'Medium' as const,
+          tags: ['tag2'],
+        },
+        {
+          category: 'Music',
+          title: 'Idea 3',
+          description: 'Desc',
+          cost_range: '₹20k-30k',
+          effort_level: 'High' as const,
+          tags: ['tag3'],
+        },
       ],
     };
 
@@ -304,8 +423,22 @@ describe('Ideas Response Schema', () => {
   it('should reject less than 3 ideas', () => {
     const invalid = {
       ideas: [
-        { category: 'Decor', title: 'Idea 1', description: 'Desc', cost_range: '₹10k', effort_level: 'Low' as const, tags: [] },
-        { category: 'Food', title: 'Idea 2', description: 'Desc', cost_range: '₹10k', effort_level: 'Low' as const, tags: [] },
+        {
+          category: 'Decor',
+          title: 'Idea 1',
+          description: 'Desc',
+          cost_range: '₹10k',
+          effort_level: 'Low' as const,
+          tags: [],
+        },
+        {
+          category: 'Food',
+          title: 'Idea 2',
+          description: 'Desc',
+          cost_range: '₹10k',
+          effort_level: 'Low' as const,
+          tags: [],
+        },
       ],
     };
 
@@ -316,9 +449,30 @@ describe('Ideas Response Schema', () => {
   it('should reject invalid effort_level', () => {
     const invalid = {
       ideas: [
-        { category: 'Decor', title: 'I1', description: 'D', cost_range: 'C', effort_level: 'Very High' as any, tags: [] },
-        { category: 'Food', title: 'I2', description: 'D', cost_range: 'C', effort_level: 'Low' as const, tags: [] },
-        { category: 'Music', title: 'I3', description: 'D', cost_range: 'C', effort_level: 'Low' as const, tags: [] },
+        {
+          category: 'Decor',
+          title: 'I1',
+          description: 'D',
+          cost_range: 'C',
+          effort_level: 'Very High' as any,
+          tags: [],
+        },
+        {
+          category: 'Food',
+          title: 'I2',
+          description: 'D',
+          cost_range: 'C',
+          effort_level: 'Low' as const,
+          tags: [],
+        },
+        {
+          category: 'Music',
+          title: 'I3',
+          description: 'D',
+          cost_range: 'C',
+          effort_level: 'Low' as const,
+          tags: [],
+        },
       ],
     };
 
@@ -379,8 +533,24 @@ describe('Risks Response Schema', () => {
   it('should reject invalid category', () => {
     const invalid = {
       risks: [
-        { title: 'R1', severity: 'high' as const, likelihood: 'high' as const, category: 'Unknown' as any, why: 'W', mitigation: 'M', backup_plan: 'B' },
-        { title: 'R2', severity: 'low' as const, likelihood: 'low' as const, category: 'Weather' as const, why: 'W', mitigation: 'M', backup_plan: 'B' },
+        {
+          title: 'R1',
+          severity: 'high' as const,
+          likelihood: 'high' as const,
+          category: 'Unknown' as any,
+          why: 'W',
+          mitigation: 'M',
+          backup_plan: 'B',
+        },
+        {
+          title: 'R2',
+          severity: 'low' as const,
+          likelihood: 'low' as const,
+          category: 'Weather' as const,
+          why: 'W',
+          mitigation: 'M',
+          backup_plan: 'B',
+        },
       ],
     };
 
@@ -398,9 +568,7 @@ describe('Optimizer Response Schema', () => {
           description: 'Desc',
           total_savings: 50000,
           experience_impact: 'Low' as const,
-          proposed_cuts: [
-            { category_name: 'Decor', cut_percent: 20, specific_action: 'DIY' },
-          ],
+          proposed_cuts: [{ category_name: 'Decor', cut_percent: 20, specific_action: 'DIY' }],
         },
         {
           name: 'Scenario 2',

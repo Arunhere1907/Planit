@@ -1,12 +1,12 @@
 export enum ErrorCode {
-  BAD_REQUEST = "BAD_REQUEST",
-  VALIDATION_ERROR = "VALIDATION_ERROR",
-  NOT_FOUND = "NOT_FOUND",
-  UNAUTHORIZED = "UNAUTHORIZED",
-  FORBIDDEN = "FORBIDDEN",
-  RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED",
-  UPSTREAM_SERVICE_ERROR = "UPSTREAM_SERVICE_ERROR",
-  INTERNAL_ERROR = "INTERNAL_ERROR",
+  BAD_REQUEST = 'BAD_REQUEST',
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  NOT_FOUND = 'NOT_FOUND',
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  FORBIDDEN = 'FORBIDDEN',
+  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
+  UPSTREAM_SERVICE_ERROR = 'UPSTREAM_SERVICE_ERROR',
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
 }
 
 export class AppError extends Error {
@@ -14,7 +14,12 @@ export class AppError extends Error {
   public readonly code: ErrorCode;
   public readonly details?: unknown;
 
-  constructor(message: string, statusCode: number = 500, code: ErrorCode = ErrorCode.INTERNAL_ERROR, details?: unknown) {
+  constructor(
+    message: string,
+    statusCode: number = 500,
+    code: ErrorCode = ErrorCode.INTERNAL_ERROR,
+    details?: unknown
+  ) {
     super(message);
     this.name = this.constructor.name;
     this.statusCode = statusCode;
@@ -38,19 +43,23 @@ export class ValidationError extends AppError {
 }
 
 export class UnauthorizedError extends AppError {
-  constructor(message: string = "Authentication required") {
+  constructor(message: string = 'Authentication required') {
     super(message, 401, ErrorCode.UNAUTHORIZED);
   }
 }
 
 export class ForbiddenError extends AppError {
-  constructor(message: string = "Insufficient permissions for this action") {
+  constructor(message: string = 'Insufficient permissions for this action') {
     super(message, 403, ErrorCode.FORBIDDEN);
   }
 }
 
 export class UpstreamServiceError extends AppError {
   constructor(service: string, message: string) {
-    super(`Upstream service error from ${service}: ${message}`, 502, ErrorCode.UPSTREAM_SERVICE_ERROR);
+    super(
+      `Upstream service error from ${service}: ${message}`,
+      502,
+      ErrorCode.UPSTREAM_SERVICE_ERROR
+    );
   }
 }

@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Calendar,
-  Bell,
-  FileDown,
-  RefreshCw,
-  RotateCcw,
-  UserCheck
-} from 'lucide-react';
+import { Calendar, Bell, FileDown, RefreshCw, RotateCcw, UserCheck } from 'lucide-react';
 import type { EventProfile } from '../../../shared/types/index.js';
 import { useDemoUser, DEMO_USERS_LIST } from '../../context/DemoUserContext.js';
 import { Badge } from '../ui/Badge.js';
@@ -37,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
   onResetDatabase,
   unreadNotificationsCount,
   activeTab,
-  setActiveTab
+  setActiveTab,
 }) => {
   const { currentUser, switchUser } = useDemoUser();
 
@@ -49,14 +42,13 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'ideas', label: 'Creative Ideas' },
     { id: 'invitations', label: 'Invitations & Copy' },
     { id: 'risks', label: 'Risk Matrix' },
-    { id: 'collaborators', label: 'Team & Activity' }
+    { id: 'collaborators', label: 'Team & Activity' },
   ];
 
   // Calculate days left
   const daysLeft = currentProfile?.date
     ? Math.ceil(
-        (new Date(currentProfile.date).getTime() - new Date().getTime()) /
-          (1000 * 60 * 60 * 24)
+        (new Date(currentProfile.date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
       )
     : 0;
 
@@ -73,12 +65,16 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold text-slate-900 tracking-tight text-lg">PlanIt</span>
+                  <span className="font-extrabold text-slate-900 tracking-tight text-lg">
+                    PlanIt
+                  </span>
                   <Badge variant="primary" size="sm">
                     GenAI
                   </Badge>
                 </div>
-                <p className="text-[11px] text-slate-500 hidden sm:block font-medium">Event Planning Assistant</p>
+                <p className="text-[11px] text-slate-500 hidden sm:block font-medium">
+                  Event Planning Assistant
+                </p>
               </div>
             </div>
 
@@ -87,7 +83,11 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Event Dropdown Selector */}
             <div className="relative">
               <select
-                value={eventsList.find(e => e.title === currentProfile?.title)?.id || eventsList[0]?.id || ''}
+                value={
+                  eventsList.find((e) => e.title === currentProfile?.title)?.id ||
+                  eventsList[0]?.id ||
+                  ''
+                }
                 onChange={(e) => {
                   if (e.target.value === 'new') {
                     onOpenNewEventModal();
@@ -138,8 +138,8 @@ export const Header: React.FC<HeaderProps> = ({
                   currentUser.role === 'owner'
                     ? 'primary'
                     : currentUser.role === 'editor'
-                    ? 'warning'
-                    : 'default'
+                      ? 'warning'
+                      : 'default'
                 }
                 size="sm"
               >

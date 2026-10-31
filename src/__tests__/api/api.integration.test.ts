@@ -86,10 +86,7 @@ describe('API Integration Tests - Event Routes', () => {
         constraints: '',
       };
 
-      const response = await request(app)
-        .post('/api/events')
-        .send(newEvent)
-        .expect(201);
+      const response = await request(app).post('/api/events').send(newEvent).expect(201);
 
       expect(response.body).toHaveProperty('id');
       expect(response.body.profile.title).toBe('Test Wedding');
@@ -103,20 +100,14 @@ describe('API Integration Tests - Event Routes', () => {
         total_budget: -5000, // Negative budget
       };
 
-      const response = await request(app)
-        .post('/api/events')
-        .send(invalidEvent)
-        .expect(400);
+      const response = await request(app).post('/api/events').send(invalidEvent).expect(400);
 
       expect(response.body).toHaveProperty('error');
       expect(response.body.error.message).toMatch(/validation/i);
     });
 
     it('should return 400 for missing required fields', async () => {
-      const response = await request(app)
-        .post('/api/events')
-        .send({})
-        .expect(400);
+      const response = await request(app).post('/api/events').send({}).expect(400);
 
       expect(response.body.error).toBeDefined();
     });
@@ -139,9 +130,7 @@ describe('API Integration Tests - Event Routes', () => {
 
   describe('GET /api/events/:id', () => {
     it('should return 404 for non-existent event', async () => {
-      const response = await request(app)
-        .get('/api/events/nonexistent-id-12345')
-        .expect(404);
+      const response = await request(app).get('/api/events/nonexistent-id-12345').expect(404);
 
       expect(response.body.error.message).toMatch(/not found/i);
     });
@@ -231,10 +220,7 @@ describe('API Integration Tests - Budget Routes', () => {
       expect(response.body.categories).toBeInstanceOf(Array);
 
       // Verify sum still equals total
-      const sum = response.body.categories.reduce(
-        (acc: number, c: any) => acc + c.amount,
-        0
-      );
+      const sum = response.body.categories.reduce((acc: number, c: any) => acc + c.amount, 0);
       expect(Math.abs(sum - 800000)).toBeLessThan(10); // Allow small rounding
     });
 
@@ -283,9 +269,7 @@ describe('API Integration Tests - Timeline Routes', () => {
         .expect(200);
 
       expect(response.body.tasks).toBeInstanceOf(Array);
-      const addedTask = response.body.tasks.find(
-        (t: any) => t.title === 'Book DJ'
-      );
+      const addedTask = response.body.tasks.find((t: any) => t.title === 'Book DJ');
       expect(addedTask).toBeDefined();
       expect(addedTask.priority).toBe('high');
     });
@@ -304,9 +288,7 @@ describe('API Integration Tests - Timeline Routes', () => {
   describe('PATCH /api/events/:id/timeline/task/:taskId', () => {
     it('should update task status', async () => {
       // First get existing tasks
-      const getResponse = await request(app)
-        .get(`/api/events/${eventId}`)
-        .expect(200);
+      const getResponse = await request(app).get(`/api/events/${eventId}`).expect(200);
 
       const taskId = getResponse.body.timeline.tasks[0]?.id;
 
@@ -318,9 +300,7 @@ describe('API Integration Tests - Timeline Routes', () => {
           })
           .expect(200);
 
-        const updatedTask = response.body.tasks.find(
-          (t: any) => t.id === taskId
-        );
+        const updatedTask = response.body.tasks.find((t: any) => t.id === taskId);
         expect(updatedTask.status).toBe('completed');
       }
     });
@@ -370,9 +350,7 @@ describe('API Integration Tests - Vendor Routes', () => {
         .expect(200);
 
       expect(response.body).toBeInstanceOf(Array);
-      const addedVendor = response.body.find(
-        (v: any) => v.name === 'Royal Caterers'
-      );
+      const addedVendor = response.body.find((v: any) => v.name === 'Royal Caterers');
       expect(addedVendor).toBeDefined();
       expect(addedVendor.category).toBe('Catering');
     });
@@ -402,17 +380,13 @@ describe('API Integration Tests - Vendor Routes', () => {
   describe('PATCH /api/events/:id/vendors/:vendorId', () => {
     it('should update vendor status through pipeline', async () => {
       // First add a vendor
-      const addResponse = await request(app)
-        .post(`/api/events/${eventId}/vendors`)
-        .send({
-          name: 'Test Photographer',
-          category: 'Photography',
-          status: 'contacted',
-        });
+      const addResponse = await request(app).post(`/api/events/${eventId}/vendors`).send({
+        name: 'Test Photographer',
+        category: 'Photography',
+        status: 'contacted',
+      });
 
-      const vendorId = addResponse.body.find(
-        (v: any) => v.name === 'Test Photographer'
-      )?.id;
+      const vendorId = addResponse.body.find((v: any) => v.name === 'Test Photographer')?.id;
 
       if (vendorId) {
         const response = await request(app)
@@ -513,10 +487,7 @@ describe('API Integration Tests - AI Features Routes', () => {
         vibe_theme: 'Fun',
       };
 
-      const response = await request(app)
-        .post('/api/generate/ideas')
-        .send({ profile })
-        .expect(200);
+      const response = await request(app).post('/api/generate/ideas').send({ profile }).expect(200);
 
       expect(response.body).toBeInstanceOf(Array);
       expect(response.body.length).toBeGreaterThan(0);
@@ -557,10 +528,7 @@ describe('API Integration Tests - AI Features Routes', () => {
         guest_count: 500,
       };
 
-      const response = await request(app)
-        .post('/api/generate/risks')
-        .send({ profile })
-        .expect(200);
+      const response = await request(app).post('/api/generate/risks').send({ profile }).expect(200);
 
       expect(response.body).toBeInstanceOf(Array);
       expect(response.body.length).toBeGreaterThan(0);
@@ -581,9 +549,7 @@ describe('API Integration Tests - Rate Limiting', () => {
     // Make many rapid requests
     const requests = Array(15)
       .fill(null)
-      .map(() =>
-        request(app).post('/api/intake').send({ userInput: 'Test event' })
-      );
+      .map(() => request(app).post('/api/intake').send({ userInput: 'Test event' }));
 
     const responses = await Promise.all(requests);
 
@@ -601,9 +567,7 @@ describe('API Integration Tests - Error Response Shape', () => {
   });
 
   it('should return consistent error shape for 404', async () => {
-    const response = await request(app)
-      .get('/api/events/nonexistent-123')
-      .expect(404);
+    const response = await request(app).get('/api/events/nonexistent-123').expect(404);
 
     expect(response.body).toHaveProperty('error');
     expect(response.body.error).toHaveProperty('message');
@@ -612,10 +576,7 @@ describe('API Integration Tests - Error Response Shape', () => {
   });
 
   it('should return consistent error shape for 400', async () => {
-    const response = await request(app)
-      .post('/api/events')
-      .send({ invalid: 'data' })
-      .expect(400);
+    const response = await request(app).post('/api/events').send({ invalid: 'data' }).expect(400);
 
     expect(response.body).toHaveProperty('error');
     expect(response.body.error).toHaveProperty('message');

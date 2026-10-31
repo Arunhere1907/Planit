@@ -1,14 +1,18 @@
-import type { IVendorRepository } from "../interfaces/vendor.repository.interface.js";
-import type { VendorPlace } from "../../../shared/types/index.js";
-import { InMemoryStore } from "./store.js";
+import type { IVendorRepository } from '../interfaces/vendor.repository.interface.js';
+import type { VendorPlace } from '../../../shared/types/index.js';
+import { InMemoryStore } from './store.js';
 
 export class InMemoryVendorRepository implements IVendorRepository {
   private store = new InMemoryStore<VendorPlace>();
 
-  public async findPlaces(category?: string, city?: string, minRating: number = 0): Promise<VendorPlace[]> {
+  public async findPlaces(
+    category?: string,
+    city?: string,
+    minRating: number = 0
+  ): Promise<VendorPlace[]> {
     const all = this.store.getAll();
-    const cleanCity = city ? city.trim().toLowerCase() : "";
-    const cleanCat = category ? category.trim().toLowerCase() : "";
+    const cleanCity = city ? city.trim().toLowerCase() : '';
+    const cleanCat = category ? category.trim().toLowerCase() : '';
 
     return all.filter((v) => {
       const matchCity = !cleanCity || v.city.toLowerCase().includes(cleanCity);
@@ -29,9 +33,9 @@ export class InMemoryVendorRepository implements IVendorRepository {
   }): Promise<VendorPlace[]> {
     const { category, city, query, limit = 10 } = params;
     const all = this.store.getAll();
-    const cleanCity = city ? city.trim().toLowerCase() : "";
-    const cleanCat = category ? category.trim().toLowerCase() : "";
-    const cleanQuery = query ? query.trim().toLowerCase() : "";
+    const cleanCity = city ? city.trim().toLowerCase() : '';
+    const cleanCat = category ? category.trim().toLowerCase() : '';
+    const cleanQuery = query ? query.trim().toLowerCase() : '';
 
     const filtered = all.filter((v) => {
       const matchCity = !cleanCity || v.city.toLowerCase().includes(cleanCity);

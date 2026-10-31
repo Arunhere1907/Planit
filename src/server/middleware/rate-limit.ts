@@ -55,8 +55,8 @@ export function inMemoryRateLimiter(
         error: {
           code: 'RATE_LIMIT_EXCEEDED',
           message: `Too many requests. Please try again after ${retryAfterSeconds} seconds.`,
-          retryAfter: retryAfterSeconds
-        }
+          retryAfter: retryAfterSeconds,
+        },
       });
       return;
     }

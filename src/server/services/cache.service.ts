@@ -30,7 +30,7 @@ export class CacheService {
    */
   public get<T>(key: string): T | null {
     const entry = this.cache.get(key) as CacheEntry<T> | undefined;
-    
+
     if (!entry) {
       return null;
     }

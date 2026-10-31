@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { getBudget, addExpense, updateCategoryAllocation } from '../controllers/budget.controller.js';
+import {
+  getBudget,
+  addExpense,
+  updateCategoryAllocation,
+} from '../controllers/budget.controller.js';
 import { validateBody, validateParams } from '../middleware/validate.js';
 import { ExpenseItemSchema } from '../../shared/schemas/zod-schemas.js';
 import { EventIdParamSchema } from '../validation/request-schemas.js';
@@ -9,10 +13,12 @@ import { z } from 'zod';
 const router = Router();
 
 // Category ID param schema (for /category/:categoryId route)
-const CategoryIdParamSchema = z.object({
-  id: z.string().min(1),
-  categoryId: z.string().min(1),
-}).strict();
+const CategoryIdParamSchema = z
+  .object({
+    id: z.string().min(1),
+    categoryId: z.string().min(1),
+  })
+  .strict();
 
 router.get('/:id/budget', validateParams(EventIdParamSchema), requireEventAccess(), getBudget);
 

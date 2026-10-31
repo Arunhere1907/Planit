@@ -65,10 +65,13 @@ export const eventApi = {
     allocated: number,
     isLocked?: boolean
   ) =>
-    apiFetch<FullEventPlan['budget']>(`/api/events/${eventId}/budget/categories/${encodeURIComponent(categoryName)}`, {
-      method: 'PUT',
-      body: JSON.stringify({ allocated, isLocked }),
-    }),
+    apiFetch<FullEventPlan['budget']>(
+      `/api/events/${eventId}/budget/categories/${encodeURIComponent(categoryName)}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({ allocated, isLocked }),
+      }
+    ),
 
   // Timeline
   generateTimeline: (profile: EventProfile) =>
@@ -91,13 +94,20 @@ export const eventApi = {
     }),
 
   // Vendors
-  searchVendors: (params: { category?: VendorCategory; city?: string; query?: string; maxResults?: number }) => {
+  searchVendors: (params: {
+    category?: VendorCategory;
+    city?: string;
+    query?: string;
+    maxResults?: number;
+  }) => {
     const searchParams = new URLSearchParams();
     if (params.category) searchParams.set('category', params.category);
     if (params.city) searchParams.set('city', params.city);
     if (params.query) searchParams.set('query', params.query);
     if (params.maxResults) searchParams.set('maxResults', String(params.maxResults));
-    return apiFetch<{ data: VendorPlace[]; vendors: VendorPlace[] }>(`/api/vendors/search?${searchParams.toString()}`);
+    return apiFetch<{ data: VendorPlace[]; vendors: VendorPlace[] }>(
+      `/api/vendors/search?${searchParams.toString()}`
+    );
   },
 
   // AI Features
@@ -107,10 +117,13 @@ export const eventApi = {
       body: JSON.stringify({ profile }),
     }),
   generateInvitations: (profile: EventProfile) =>
-    apiFetch<{ variants: InvitationItem[]; invitations: InvitationItem[] }>('/api/invitations/generate', {
-      method: 'POST',
-      body: JSON.stringify({ profile }),
-    }),
+    apiFetch<{ variants: InvitationItem[]; invitations: InvitationItem[] }>(
+      '/api/invitations/generate',
+      {
+        method: 'POST',
+        body: JSON.stringify({ profile }),
+      }
+    ),
   analyzeRisks: (profile: EventProfile) =>
     apiFetch<{ risks: RiskItem[] }>('/api/risks/generate', {
       method: 'POST',

@@ -1,4 +1,4 @@
-import type { FullEventPlan } from "../types/index.js";
+import type { FullEventPlan } from '../types/index.js';
 
 /**
  * Security utilities for preventing injection attacks in exports
@@ -8,30 +8,30 @@ import type { FullEventPlan } from "../types/index.js";
  * CSV Formula Injection Prevention
  * Excel, Google Sheets, and other spreadsheet apps interpret cells starting with
  * =, +, -, @, tab, or carriage return as formulas, which can execute arbitrary commands
- * 
+ *
  * Solution: Prefix dangerous characters with a single quote (') to force text interpretation
  */
 function sanitizeCSVCell(value: string | number | undefined | null): string {
   if (value === null || value === undefined) {
     return '""';
   }
-  
+
   const strValue = String(value);
-  
+
   // Check if cell starts with dangerous characters
   const dangerousChars = ['=', '+', '-', '@', '\t', '\r'];
   const firstChar = strValue.charAt(0);
-  
+
   let sanitized = strValue;
-  
+
   // Prefix dangerous characters with single quote to neutralize formulas
   if (dangerousChars.includes(firstChar)) {
     sanitized = "'" + strValue;
   }
-  
+
   // Escape double quotes by doubling them (CSV standard)
   sanitized = sanitized.replace(/"/g, '""');
-  
+
   // Wrap in quotes
   return `"${sanitized}"`;
 }
@@ -55,11 +55,11 @@ function sanitizeFilename(filename: string): string {
 function sanitizeICSField(value: string): string {
   return value
     .replace(/\\/g, '\\\\') // Escape backslashes
-    .replace(/;/g, '\\;')   // Escape semicolons
-    .replace(/,/g, '\\,')   // Escape commas
-    .replace(/\n/g, '\\n')  // Escape newlines
-    .replace(/\r/g, '')     // Remove carriage returns
-    .substring(0, 1000);    // Limit length to prevent DoS
+    .replace(/;/g, '\\;') // Escape semicolons
+    .replace(/,/g, '\\,') // Escape commas
+    .replace(/\n/g, '\\n') // Escape newlines
+    .replace(/\r/g, '') // Remove carriage returns
+    .substring(0, 1000); // Limit length to prevent DoS
 }
 
 /**
@@ -69,7 +69,7 @@ function sanitizeICSField(value: string): string {
  */
 export function sanitizeURL(url: string | undefined): string {
   if (!url) return '';
-  
+
   try {
     const parsed = new URL(url);
     // Only allow http and https protocols
@@ -79,7 +79,7 @@ export function sanitizeURL(url: string | undefined): string {
   } catch {
     // Invalid URL
   }
-  
+
   return '';
 }
 
@@ -89,67 +89,63 @@ export function sanitizeURL(url: string | undefined): string {
  */
 export function exportToICS(plan: FullEventPlan): void {
   const { profile, timeline } = plan;
-  
+
   // Sanitize all text fields to prevent ICS injection
   const sanitizedTitle = sanitizeICSField(profile.title);
   const sanitizedCity = sanitizeICSField(profile.city);
   const sanitizedType = sanitizeICSField(profile.type);
-  
+
   const icsLines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//PlanIt Event Planning Assistant//EN",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//PlanIt Event Planning Assistant//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
     `X-WR-CALNAME:${sanitizedTitle}`,
   ];
 
-  const mainEventDate = profile.date.replace(/-/g, "");
+  const mainEventDate = profile.date.replace(/-/g, '');
   icsLines.push(
-    "BEGIN:VEVENT",
+    'BEGIN:VEVENT',
     `UID:main-${profile.id}@planit.ai`,
-    `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z`,
+    `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
     `DTSTART;VALUE=DATE:${mainEventDate}`,
     `DTEND;VALUE=DATE:${mainEventDate}`,
     `SUMMARY:${sanitizedTitle}`,
     `DESCRIPTION:Type: ${sanitizedType} | Guests: ${profile.guest_count} | Location: ${sanitizedCity}`,
     `LOCATION:${sanitizedCity}`,
-    "STATUS:CONFIRMED",
-    "END:VEVENT"
+    'STATUS:CONFIRMED',
+    'END:VEVENT'
   );
 
   for (const task of timeline.tasks) {
     if (!task.due_date) continue;
-    const taskDate = task.due_date.replace(/-/g, "");
-    
+    const taskDate = task.due_date.replace(/-/g, '');
+
     // Sanitize task fields
     const sanitizedTaskTitle = sanitizeICSField(task.title);
     const sanitizedAssignee = sanitizeICSField(task.assignee || 'Unassigned');
     const sanitizedPriority = sanitizeICSField(task.priority);
     const sanitizedNotes = sanitizeICSField(task.notes || 'None');
-    
+
     icsLines.push(
-      "BEGIN:VEVENT",
+      'BEGIN:VEVENT',
       `UID:${task.id}@planit.ai`,
-      `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z`,
+      `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
       `DTSTART;VALUE=DATE:${taskDate}`,
       `DTEND;VALUE=DATE:${taskDate}`,
       `SUMMARY:[PlanIt] ${sanitizedTaskTitle}`,
       `DESCRIPTION:Assignee: ${sanitizedAssignee} | Priority: ${sanitizedPriority} | Notes: ${sanitizedNotes}`,
       `LOCATION:${sanitizedCity}`,
-      task.status === "completed" ? "STATUS:COMPLETED" : "STATUS:CONFIRMED",
-      "END:VEVENT"
+      task.status === 'completed' ? 'STATUS:COMPLETED' : 'STATUS:CONFIRMED',
+      'END:VEVENT'
     );
   }
 
-  icsLines.push("END:VCALENDAR");
+  icsLines.push('END:VCALENDAR');
 
   const safeFilename = sanitizeFilename(`${profile.title}_schedule.ics`);
-  downloadBlob(
-    icsLines.join("\r\n"),
-    safeFilename,
-    "text/calendar;charset=utf-8"
-  );
+  downloadBlob(icsLines.join('\r\n'), safeFilename, 'text/calendar;charset=utf-8');
 }
 
 /**
@@ -157,25 +153,21 @@ export function exportToICS(plan: FullEventPlan): void {
  * NOW WITH: CSV formula injection prevention, proper escaping
  */
 export function exportBudgetCSV(plan: FullEventPlan): void {
-  const headers = ["Category Name", "Allocated Amount (INR)", "Percent (%)", "Locked", "Reasoning"];
-  
+  const headers = ['Category Name', 'Allocated Amount (INR)', 'Percent (%)', 'Locked', 'Reasoning'];
+
   // Sanitize all cells to prevent CSV formula injection
   const rows = plan.budget.categories.map((c) => [
     sanitizeCSVCell(c.name),
     sanitizeCSVCell(c.amount),
     sanitizeCSVCell(`${c.percent}%`),
-    sanitizeCSVCell(c.is_locked ? "Yes" : "No"),
+    sanitizeCSVCell(c.is_locked ? 'Yes' : 'No'),
     sanitizeCSVCell(c.reasoning),
   ]);
 
-  const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-  
+  const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+
   const safeFilename = sanitizeFilename(`${plan.profile.title}_budget.csv`);
-  downloadBlob(
-    csvContent,
-    safeFilename,
-    "text/csv;charset=utf-8;"
-  );
+  downloadBlob(csvContent, safeFilename, 'text/csv;charset=utf-8;');
 }
 
 /**
@@ -184,17 +176,17 @@ export function exportBudgetCSV(plan: FullEventPlan): void {
  */
 export function exportVendorsCSV(plan: FullEventPlan): void {
   const headers = [
-    "Vendor Name",
-    "Category",
-    "Status",
-    "Quote (INR)",
-    "Advance Paid",
-    "Balance Due",
-    "Payment Due Date",
-    "Contact",
-    "Notes",
+    'Vendor Name',
+    'Category',
+    'Status',
+    'Quote (INR)',
+    'Advance Paid',
+    'Balance Due',
+    'Payment Due Date',
+    'Contact',
+    'Notes',
   ];
-  
+
   // Sanitize all cells to prevent CSV formula injection
   const rows = plan.vendors.map((v) => [
     sanitizeCSVCell(v.name),
@@ -205,17 +197,13 @@ export function exportVendorsCSV(plan: FullEventPlan): void {
     sanitizeCSVCell(v.balance),
     sanitizeCSVCell(v.due_date),
     sanitizeCSVCell(v.contact),
-    sanitizeCSVCell(v.notes || ""),
+    sanitizeCSVCell(v.notes || ''),
   ]);
 
-  const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-  
+  const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+
   const safeFilename = sanitizeFilename(`${plan.profile.title}_vendors.csv`);
-  downloadBlob(
-    csvContent,
-    safeFilename,
-    "text/csv;charset=utf-8;"
-  );
+  downloadBlob(csvContent, safeFilename, 'text/csv;charset=utf-8;');
 }
 
 /**
@@ -225,11 +213,11 @@ export function exportVendorsCSV(plan: FullEventPlan): void {
 function downloadBlob(content: string, filename: string, mimeType: string): void {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
-  link.setAttribute("download", filename);
+  link.setAttribute('download', filename);
   // Use rel="noopener" for security (prevents window.opener access)
-  link.setAttribute("rel", "noopener");
+  link.setAttribute('rel', 'noopener');
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
