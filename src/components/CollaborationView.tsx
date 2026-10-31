@@ -30,7 +30,7 @@ export const CollaborationView: React.FC<CollaborationViewProps> = ({
   const [shareLinkActive, setShareLinkActive] = useState(true);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  const shareUrl = `${window.location.origin}/share/plan-preview-secret-key-99`;
+  const shareUrl = `${window.location.origin}/share/7f9a2c8e-4b3d-6f1a-9e8d-2c5b7a4f6e9a`;
 
   const handleCopyShareLink = () => {
     navigator.clipboard.writeText(shareUrl);
