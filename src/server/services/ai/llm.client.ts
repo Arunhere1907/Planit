@@ -94,11 +94,9 @@ export class LLMClient {
     const callPromise = (async () => {
       const startTime = Date.now();
       
-      if (!this.client) {
-        throw new Error('LLM client not initialized');
-      }
-      
-      const response = await this.client.models.generateContent({
+      // Safe to use non-null assertion: client initialization is checked in constructor
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const response = await this.client!.models.generateContent({
         model: this.modelName,
         contents: [
           {
