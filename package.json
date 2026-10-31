@@ -1,8 +1,14 @@
 {
-  "name": "react-example",
+  "name": "planit-genai-event-assistant",
+  "description": "GenAI-powered event planning assistant for weddings, birthdays, and community events with budgets, timelines, vendor checklists, and personalized ideas",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "keywords": ["event-planning", "genai", "gemini", "wedding-planner", "budget-management", "timeline-scheduling", "vendor-management", "react", "typescript", "express"],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "dev": "tsx src/server/server.ts",
     "build": "vite build",
@@ -15,6 +21,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build",
     "seed:reset": "curl -s -X POST http://localhost:3000/api/dev/reset"
   },
   "dependencies": {
