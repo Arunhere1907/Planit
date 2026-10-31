@@ -23,7 +23,7 @@ export class EventService {
     return event;
   }
 
-  public async createEventFromProfile(profile: EventProfile, _creatorUserId: string): Promise<FullEventPlan> {
+  public async createEventFromProfile(profile: EventProfile, creatorUserId: string): Promise<FullEventPlan> {
     const budget = aiService.generateDeterministicBudget(profile);
     const timeline = aiService.generateDeterministicTimeline(profile);
     const ideas = await aiService.suggestIdeas(profile);
@@ -31,7 +31,7 @@ export class EventService {
     const risks = await aiService.analyzeRisks(profile);
 
     const initialMember: Collaborator = {
-      id: `member_${Date.now()}`,
+      id: creatorUserId,
       name: 'Aarav Patel (Organizer)',
       email: 'aarav@planit.demo',
       role: 'owner',
