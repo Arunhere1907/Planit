@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Calendar,
   Users,
@@ -10,9 +10,9 @@ import {
   Volume2,
   ChevronRight,
   Plus,
-} from "lucide-react";
-import { FullEventPlan } from "../types";
-import { formatExactINR, formatDate, getDaysRemaining } from "../lib/formatters";
+} from 'lucide-react';
+import type { FullEventPlan } from '../types';
+import { formatExactINR, formatDate, getDaysRemaining } from '../lib/formatters';
 
 interface DashboardViewProps {
   plan: FullEventPlan;
@@ -33,38 +33,38 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   // Budget calculations
   const totalBudget = budget.total_budget;
   const spentAmount = budget.expenses
-    .filter((e) => e.status === "paid")
+    .filter((e) => e.status === 'paid')
     .reduce((acc, e) => acc + e.amount, 0);
   const pendingExpenseAmount = budget.expenses
-    .filter((e) => e.status === "pending")
+    .filter((e) => e.status === 'pending')
     .reduce((acc, e) => acc + e.amount, 0);
 
   const spentPercent = totalBudget > 0 ? (spentAmount / totalBudget) * 100 : 0;
 
   // Task metrics
-  const completedTasks = timeline.tasks.filter((t) => t.status === "completed").length;
+  const completedTasks = timeline.tasks.filter((t) => t.status === 'completed').length;
   const totalTasks = timeline.tasks.length;
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = new Date().toISOString().split('T')[0];
 
   const overdueTasks = timeline.tasks.filter(
-    (t) => t.status !== "completed" && t.due_date < todayStr
+    (t) => t.status !== 'completed' && t.due_date < todayStr
   );
   const upcomingTasks = timeline.tasks
-    .filter((t) => t.status !== "completed" && t.due_date >= todayStr)
+    .filter((t) => t.status !== 'completed' && t.due_date >= todayStr)
     .sort((a, b) => a.due_date.localeCompare(b.due_date))
     .slice(0, 5);
 
   // Vendor Pipeline counts
   const vendorCounts = {
-    not_started: vendors.filter((v) => v.status === "not_started").length,
-    contacted: vendors.filter((v) => v.status === "contacted").length,
-    quote_received: vendors.filter((v) => v.status === "quote_received").length,
-    booked: vendors.filter((v) => v.status === "booked").length,
-    paid: vendors.filter((v) => v.status === "paid").length,
+    not_started: vendors.filter((v) => v.status === 'not_started').length,
+    contacted: vendors.filter((v) => v.status === 'contacted').length,
+    quote_received: vendors.filter((v) => v.status === 'quote_received').length,
+    booked: vendors.filter((v) => v.status === 'booked').length,
+    paid: vendors.filter((v) => v.status === 'paid').length,
   };
 
   // High risks
-  const highRisks = risks.filter((r) => r.severity === "high");
+  const highRisks = risks.filter((r) => r.severity === 'high');
 
   // Daily digest state
   const [digest] = useState<string | null>(
@@ -74,7 +74,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   const handleSpeakDigest = () => {
     if (!digest) return;
-    if ("speechSynthesis" in window) {
+    if ('speechSynthesis' in window) {
       if (isSpeaking) {
         window.speechSynthesis.cancel();
         setIsSpeaking(false);
@@ -96,7 +96,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <h1 className="sr-only" tabIndex={-1}>
         Event Dashboard - {profile.title}
       </h1>
-      
+
       {/* Overdue alert banner if any (semantic warning/danger) */}
       {overdueTasks.length > 0 && (
         <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-xs flex items-center justify-between">
@@ -104,15 +104,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
             <div>
               <p className="text-sm font-bold text-amber-900">
-                {overdueTasks.length} task{overdueTasks.length > 1 ? "s are" : " is"} past due date!
+                {overdueTasks.length} task{overdueTasks.length > 1 ? 's are' : ' is'} past due date!
               </p>
               <p className="text-xs text-amber-700">
-                Action required: {overdueTasks[0].title} (due {formatDate(overdueTasks[0].due_date)})
+                Action required: {overdueTasks[0].title} (due {formatDate(overdueTasks[0].due_date)}
+                )
               </p>
             </div>
           </div>
           <button
-            onClick={() => onNavigateTab("timeline")}
+            onClick={() => onNavigateTab('timeline')}
             className="text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
           >
             Review Tasks <ChevronRight className="w-3.5 h-3.5" />
@@ -150,7 +151,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div className="text-3xl sm:text-4xl font-black text-amber-300 font-mono tracking-tight">
                 {daysLeft}
               </div>
-              <div className="text-[11px] uppercase tracking-wider text-slate-300 font-semibold">Days Left</div>
+              <div className="text-[11px] uppercase tracking-wider text-slate-300 font-semibold">
+                Days Left
+              </div>
             </div>
             <div className="h-10 w-px bg-white/20" />
             <div className="space-y-1 text-xs">
@@ -177,12 +180,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               onClick={handleSpeakDigest}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-colors cursor-pointer ${
                 isSpeaking
-                  ? "bg-indigo-600 text-white animate-pulse"
-                  : "bg-white/15 hover:bg-white/25 text-white"
+                  ? 'bg-indigo-600 text-white animate-pulse'
+                  : 'bg-white/15 hover:bg-white/25 text-white'
               }`}
             >
               <Volume2 className="w-3.5 h-3.5" />
-              <span>{isSpeaking ? "Stop Voice" : "Listen Briefing"}</span>
+              <span>{isSpeaking ? 'Stop Voice' : 'Listen Briefing'}</span>
             </button>
           </div>
         )}
@@ -202,17 +205,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <span className="text-2xl font-black text-slate-900 tracking-tight">
               {formatExactINR(spentAmount)}
             </span>
-            <span className="text-xs text-slate-500 font-medium">of {formatExactINR(totalBudget)}</span>
+            <span className="text-xs text-slate-500 font-medium">
+              of {formatExactINR(totalBudget)}
+            </span>
           </div>
           {/* Progress bar */}
           <div className="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden flex">
             <div
               className={`h-full transition-all ${
                 spentPercent >= 100
-                  ? "bg-red-600"
+                  ? 'bg-red-600'
                   : spentPercent >= 90
-                  ? "bg-amber-500"
-                  : "bg-emerald-500"
+                    ? 'bg-amber-500'
+                    : 'bg-emerald-500'
               }`}
               style={{ width: `${Math.min(100, spentPercent)}%` }}
             />
@@ -220,7 +225,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="mt-2 flex justify-between text-[11px] text-slate-500">
             <span>Committed: {formatExactINR(spentAmount + pendingExpenseAmount)}</span>
             <button
-              onClick={() => onNavigateTab("budget")}
+              onClick={() => onNavigateTab('budget')}
               className="font-bold text-indigo-600 hover:underline cursor-pointer"
             >
               Manage
@@ -251,7 +256,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="mt-2 flex justify-between text-[11px] text-slate-500">
             <span>{totalTasks - completedTasks} remaining</span>
             <button
-              onClick={() => onNavigateTab("timeline")}
+              onClick={() => onNavigateTab('timeline')}
               className="font-bold text-indigo-600 hover:underline cursor-pointer"
             >
               View Schedule
@@ -279,13 +284,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div
                 key={v.id || i}
                 className={`h-full flex-1 rounded-sm ${
-                  v.status === "paid"
-                    ? "bg-emerald-500"
-                    : v.status === "booked"
-                    ? "bg-indigo-600"
-                    : v.status === "quote_received"
-                    ? "bg-amber-400"
-                    : "bg-slate-200"
+                  v.status === 'paid'
+                    ? 'bg-emerald-500'
+                    : v.status === 'booked'
+                      ? 'bg-indigo-600'
+                      : v.status === 'quote_received'
+                        ? 'bg-amber-400'
+                        : 'bg-slate-200'
                 }`}
                 title={`${v.name}: ${v.status}`}
               />
@@ -294,7 +299,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="mt-2 flex justify-between text-[11px] text-slate-500">
             <span>{vendorCounts.not_started + vendorCounts.contacted} in negotiation</span>
             <button
-              onClick={() => onNavigateTab("vendors")}
+              onClick={() => onNavigateTab('vendors')}
               className="font-bold text-amber-700 hover:underline cursor-pointer"
             >
               Pipeline
@@ -306,9 +311,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs hover:shadow-xs transition-shadow">
           <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Critical Risks</span>
-            <span className={`p-1.5 rounded-lg font-bold ${
-              highRisks.length > 0 ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-600"
-            }`}>
+            <span
+              className={`p-1.5 rounded-lg font-bold ${
+                highRisks.length > 0 ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'
+              }`}
+            >
               {highRisks.length} High
             </span>
           </div>
@@ -331,7 +338,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="mt-2 flex justify-between text-[11px] text-slate-500">
             <span>Permit & weather alerts</span>
             <button
-              onClick={() => onNavigateTab("risks")}
+              onClick={() => onNavigateTab('risks')}
               className="font-bold text-indigo-600 hover:underline cursor-pointer"
             >
               Contingencies
@@ -349,10 +356,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-base font-bold text-slate-900">Immediate Action Items</h3>
-                <p className="text-xs text-slate-500">Next critical tasks computed from backwards timeline</p>
+                <p className="text-xs text-slate-500">
+                  Next critical tasks computed from backwards timeline
+                </p>
               </div>
               <button
-                onClick={() => onNavigateTab("timeline")}
+                onClick={() => onNavigateTab('timeline')}
                 className="text-xs font-bold text-slate-700 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
               >
                 View all ({timeline.tasks.length}) <ChevronRight className="w-3.5 h-3.5" />
@@ -386,7 +395,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           <span className="font-medium text-slate-700">Role: {task.assignee}</span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-slate-400" /> Due {formatDate(task.due_date)}
+                            <Clock className="w-3 h-3 text-slate-400" /> Due{' '}
+                            {formatDate(task.due_date)}
                           </span>
                           <span>•</span>
                           <span className="text-slate-500">{task.linked_vendor}</span>
@@ -396,11 +406,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                     <span
                       className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                        task.priority === "high"
-                          ? "bg-amber-50 text-amber-700 border border-amber-200"
-                          : task.priority === "medium"
-                          ? "bg-slate-100 text-slate-700 border border-slate-200"
-                          : "bg-slate-50 text-slate-500"
+                        task.priority === 'high'
+                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                          : task.priority === 'medium'
+                            ? 'bg-slate-100 text-slate-700 border border-slate-200'
+                            : 'bg-slate-50 text-slate-500'
                       }`}
                     >
                       {task.priority}
@@ -415,11 +425,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="bg-white rounded-xl border border-slate-200 shadow-2xs p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Day-of Run of Show (Schedule)</h3>
-                <p className="text-xs text-slate-500">Hour-by-hour ceremonial sequence & operational handoffs</p>
+                <h3 className="text-base font-bold text-slate-900">
+                  Day-of Run of Show (Schedule)
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Hour-by-hour ceremonial sequence & operational handoffs
+                </p>
               </div>
               <button
-                onClick={() => onNavigateTab("timeline")}
+                onClick={() => onNavigateTab('timeline')}
                 className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 cursor-pointer"
               >
                 Open Full Schedule <ChevronRight className="w-3.5 h-3.5" />
@@ -435,9 +449,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <span className="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
                         {item.time}
                       </span>
-                      <span className="text-xs sm:text-sm font-semibold text-slate-900">{item.title}</span>
+                      <span className="text-xs sm:text-sm font-semibold text-slate-900">
+                        {item.title}
+                      </span>
                     </div>
-                    <span className="text-[11px] text-slate-500 italic">{item.location} ({item.owner})</span>
+                    <span className="text-[11px] text-slate-500 italic">
+                      {item.location} ({item.owner})
+                    </span>
                   </div>
                   {item.notes && (
                     <p className="text-xs text-slate-500 mt-0.5 font-light">{item.notes}</p>
@@ -467,19 +485,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
             <div className="divide-y divide-slate-100">
               {budget.expenses.length === 0 ? (
-                <div className="py-4 text-center text-slate-400 text-xs">No expenses recorded yet.</div>
+                <div className="py-4 text-center text-slate-400 text-xs">
+                  No expenses recorded yet.
+                </div>
               ) : (
                 budget.expenses.slice(0, 4).map((exp) => (
                   <div key={exp.id} className="py-2.5 flex items-center justify-between">
                     <div>
                       <div className="text-xs font-bold text-slate-900">{exp.vendor_name}</div>
-                      <div className="text-[11px] text-slate-500">{exp.category_name} • {formatDate(exp.date)}</div>
+                      <div className="text-[11px] text-slate-500">
+                        {exp.category_name} • {formatDate(exp.date)}
+                      </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-xs font-black text-slate-900">{formatExactINR(exp.amount)}</div>
+                      <div className="text-xs font-black text-slate-900">
+                        {formatExactINR(exp.amount)}
+                      </div>
                       <span
                         className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                          exp.status === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+                          exp.status === 'paid'
+                            ? 'bg-emerald-50 text-emerald-700'
+                            : 'bg-amber-50 text-amber-700'
                         }`}
                       >
                         {exp.status.toUpperCase()}
@@ -491,7 +517,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             <button
-              onClick={() => onNavigateTab("budget")}
+              onClick={() => onNavigateTab('budget')}
               className="mt-3 w-full py-2 text-center text-xs font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
             >
               View Full Expense Ledger →
@@ -506,7 +532,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <p className="text-[11px] text-slate-500">Contract milestone payables</p>
               </div>
               <button
-                onClick={() => onNavigateTab("vendors")}
+                onClick={() => onNavigateTab('vendors')}
                 className="text-xs font-bold text-indigo-600 hover:underline cursor-pointer"
               >
                 Vendors
@@ -523,13 +549,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     className="p-2.5 rounded-lg border border-slate-100 bg-slate-50/50 flex items-center justify-between"
                   >
                     <div>
-                      <div className="text-xs font-bold text-slate-900 truncate max-w-[160px]">{v.name}</div>
+                      <div className="text-xs font-bold text-slate-900 truncate max-w-[160px]">
+                        {v.name}
+                      </div>
                       <div className="text-[10px] text-slate-500 flex items-center gap-1">
                         <Calendar className="w-2.5 h-2.5" /> Due {formatDate(v.due_date)}
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-xs font-bold text-amber-700">{formatExactINR(v.balance)}</div>
+                      <div className="text-xs font-bold text-amber-700">
+                        {formatExactINR(v.balance)}
+                      </div>
                       <div className="text-[10px] text-slate-500">of {formatExactINR(v.quote)}</div>
                     </div>
                   </div>

@@ -5,11 +5,7 @@
     "useDefineForClassFields": false,
     "module": "ESNext",
     "types": ["vite/client"],
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "isolatedModules": true,
@@ -17,20 +13,22 @@
     "allowJs": true,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./src/*"],
+      "@server/*": ["./src/server/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@client/*": ["./src/client/*"],
+      "@components/*": ["./src/components/*"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    
+
     /* Strict Type-Checking Options - Pragmatic subset */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    
+
     /* Disabled for now - too many changes needed */
     "noUncheckedIndexedAccess": false,
     "noImplicitOverride": false,

@@ -1,13 +1,13 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
-import {visualizer} from 'rollup-plugin-visualizer';
+import { defineConfig } from 'vite';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig(() => {
   return {
     plugins: [
-      react(), 
+      react(),
       tailwindcss(),
       visualizer({
         filename: './dist/stats.html',
@@ -18,7 +18,11 @@ export default defineConfig(() => {
     ],
     resolve: {
       alias: {
-        '@': path.resolve(import.meta.dirname || '.', '.'),
+        '@': path.resolve(import.meta.dirname || '.', './src'),
+        '@server': path.resolve(import.meta.dirname || '.', './src/server'),
+        '@shared': path.resolve(import.meta.dirname || '.', './src/shared'),
+        '@client': path.resolve(import.meta.dirname || '.', './src/client'),
+        '@components': path.resolve(import.meta.dirname || '.', './src/components'),
       },
     },
     server: {

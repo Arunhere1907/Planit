@@ -93,11 +93,7 @@ describe('Budget Split from Percentages', () => {
 });
 
 describe('Budget Rebalancing with Locks', () => {
-  const createCategory = (
-    name: string,
-    amount: number,
-    isLocked = false
-  ): BudgetCategory => ({
+  const createCategory = (name: string, amount: number, isLocked = false): BudgetCategory => ({
     id: `cat-${name}`,
     name,
     amount,
@@ -117,12 +113,7 @@ describe('Budget Rebalancing with Locks', () => {
     ];
 
     // Edit Venue to 50000
-    const result = rebalanceBudgetCategories(
-      totalBudget,
-      categories,
-      'cat-Venue',
-      50000
-    );
+    const result = rebalanceBudgetCategories(totalBudget, categories, 'cat-Venue', 50000);
 
     const sum = result.reduce((acc, c) => acc + c.amount, 0);
     expect(sum).toBe(totalBudget);
@@ -141,12 +132,7 @@ describe('Budget Rebalancing with Locks', () => {
     ];
 
     // Edit Food
-    const result = rebalanceBudgetCategories(
-      totalBudget,
-      categories,
-      'cat-Food',
-      60000
-    );
+    const result = rebalanceBudgetCategories(totalBudget, categories, 'cat-Food', 60000);
 
     const venue = result.find((c) => c.name === 'Venue');
     expect(venue?.amount).toBe(30000); // Unchanged
@@ -164,12 +150,7 @@ describe('Budget Rebalancing with Locks', () => {
     ];
 
     // Edit Decor - it should get whatever is left
-    const result = rebalanceBudgetCategories(
-      totalBudget,
-      categories,
-      'cat-Decor',
-      40000
-    );
+    const result = rebalanceBudgetCategories(totalBudget, categories, 'cat-Decor', 40000);
 
     const sum = result.reduce((acc, c) => acc + c.amount, 0);
     expect(sum).toBe(110000); // Will exceed because locked cats consume 70k
@@ -182,17 +163,9 @@ describe('Budget Rebalancing with Locks', () => {
 
   it('should handle zero new amount', () => {
     const totalBudget = 100000;
-    const categories = [
-      createCategory('Venue', 50000),
-      createCategory('Food', 50000),
-    ];
+    const categories = [createCategory('Venue', 50000), createCategory('Food', 50000)];
 
-    const result = rebalanceBudgetCategories(
-      totalBudget,
-      categories,
-      'cat-Venue',
-      0
-    );
+    const result = rebalanceBudgetCategories(totalBudget, categories, 'cat-Venue', 0);
 
     const sum = result.reduce((acc, c) => acc + c.amount, 0);
     expect(sum).toBe(totalBudget);
@@ -208,12 +181,7 @@ describe('Budget Rebalancing with Locks', () => {
     const totalBudget = 100000;
     const categories = [createCategory('Venue', 50000)];
 
-    const result = rebalanceBudgetCategories(
-      totalBudget,
-      categories,
-      'cat-Venue',
-      -1000
-    );
+    const result = rebalanceBudgetCategories(totalBudget, categories, 'cat-Venue', -1000);
 
     const venue = result.find((c) => c.name === 'Venue');
     expect(venue?.amount).toBe(0);
@@ -223,12 +191,7 @@ describe('Budget Rebalancing with Locks', () => {
     const totalBudget = 100000;
     const categories = [createCategory('Venue', 50000)];
 
-    const result = rebalanceBudgetCategories(
-      totalBudget,
-      categories,
-      'cat-Venue',
-      150000
-    );
+    const result = rebalanceBudgetCategories(totalBudget, categories, 'cat-Venue', 150000);
 
     const venue = result.find((c) => c.name === 'Venue');
     expect(venue?.amount).toBe(100000);
@@ -243,12 +206,7 @@ describe('Budget Rebalancing with Locks', () => {
     ];
 
     // Lock Venue at 30000, leaving 70000 for Food and Decor
-    const result = rebalanceBudgetCategories(
-      totalBudget,
-      categories,
-      'cat-Venue',
-      30000
-    );
+    const result = rebalanceBudgetCategories(totalBudget, categories, 'cat-Venue', 30000);
 
     const sum = result.reduce((acc, c) => acc + c.amount, 0);
     expect(sum).toBe(totalBudget);
@@ -265,29 +223,16 @@ describe('Budget Rebalancing with Locks', () => {
   it('should return unchanged if category not found', () => {
     const categories = [createCategory('Venue', 50000)];
 
-    const result = rebalanceBudgetCategories(
-      100000,
-      categories,
-      'cat-NonExistent',
-      10000
-    );
+    const result = rebalanceBudgetCategories(100000, categories, 'cat-NonExistent', 10000);
 
     expect(result).toEqual(categories);
   });
 
   it('should recalculate percentages based on totalBudget', () => {
     const totalBudget = 100000;
-    const categories = [
-      createCategory('Venue', 50000),
-      createCategory('Food', 50000),
-    ];
+    const categories = [createCategory('Venue', 50000), createCategory('Food', 50000)];
 
-    const result = rebalanceBudgetCategories(
-      totalBudget,
-      categories,
-      'cat-Venue',
-      60000
-    );
+    const result = rebalanceBudgetCategories(totalBudget, categories, 'cat-Venue', 60000);
 
     const venue = result.find((c) => c.name === 'Venue');
     expect(venue?.percent).toBe(60); // 60k / 100k * 100
@@ -397,9 +342,7 @@ describe('Budget Sanity Check', () => {
     const otherResult = checkBudgetSanity(800000, 200, 'wedding', 'Jaipur');
 
     // Mumbai should have higher benchmark
-    expect(mumbaiResult.benchmarkRange[0]).toBeGreaterThan(
-      otherResult.benchmarkRange[0]
-    );
+    expect(mumbaiResult.benchmarkRange[0]).toBeGreaterThan(otherResult.benchmarkRange[0]);
   });
 
   it('should handle zero guests gracefully', () => {

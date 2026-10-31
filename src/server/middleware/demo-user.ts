@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { UserRole } from '../../shared/types/index.js';
+import type { Request, Response, NextFunction } from 'express';
+import type { UserRole } from '../../shared/types/index.js';
 import { ForbiddenError, UnauthorizedError, NotFoundError } from '../errors/app-error.js';
 import { eventRepository } from '../repositories/index.js';
 
@@ -26,45 +26,50 @@ const DEMO_USERS: Record<string, AuthenticatedUser> = {
     name: 'Aarav Patel',
     email: 'aarav.patel@example.com',
     role: 'owner',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
   },
-  'user_owner_1': {
+  user_owner_1: {
     id: 'user-demo-1',
     name: 'Aarav Patel',
     email: 'aarav.patel@example.com',
     role: 'owner',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
   },
   'user-demo-2': {
     id: 'user-demo-2',
     name: 'Diya Shah',
     email: 'diya.shah@example.com',
     role: 'editor',
-    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
   },
-  'user_editor_1': {
+  user_editor_1: {
     id: 'user-demo-2',
     name: 'Diya Shah',
     email: 'diya.shah@example.com',
     role: 'editor',
-    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
   },
   'user-demo-3': {
     id: 'user-demo-3',
     name: 'Uncle Kirit',
     email: 'kiritbhai@example.com',
     role: 'viewer',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
   },
-  'user_viewer_1': {
+  user_viewer_1: {
     id: 'user-demo-3',
     name: 'Uncle Kirit',
     email: 'kiritbhai@example.com',
     role: 'viewer',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
   },
 };
-
 
 /**
  * Resolves the acting user from the x-demo-user-id header, default to owner
@@ -103,7 +108,7 @@ export function requireRole(...allowedRoles: UserRole[]) {
 /**
  * IDOR Protection: Verify user is a member/owner of the event before allowing access
  * This middleware prevents users from accessing events they don't belong to
- * 
+ *
  * @param requiredRoles - Optional roles required for the action (e.g., ['owner', 'editor'])
  */
 export function requireEventAccess(requiredRoles?: UserRole[]) {
@@ -127,11 +132,11 @@ export function requireEventAccess(requiredRoles?: UserRole[]) {
       }
 
       // Check if user is a collaborator/member of this event
+      // Safe to use non-null assertion: req.user existence is checked above (line 113)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const member = event.collaborators?.find((c) => c.id === req.user!.id);
       if (!member) {
-        return next(
-          new ForbiddenError(`You do not have access to event '${eventId}'`)
-        );
+        return next(new ForbiddenError(`You do not have access to event '${eventId}'`));
       }
 
       // If specific roles are required, verify the user's role within THIS event

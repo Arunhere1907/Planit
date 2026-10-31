@@ -35,8 +35,7 @@ export const RATE_LIMITS = {
   DEFAULT_WINDOW_MAX: 120,
 } as const;
 
-
-export const DEFAULT_DEMO_USER_ID = "user-demo-1";
+export const DEFAULT_DEMO_USER_ID = 'user-demo-1';
 
 export const CONSTANTS = {
   HTTP_STATUS,
@@ -45,4 +44,3 @@ export const CONSTANTS = {
   RATE_LIMITS,
   DEFAULT_DEMO_USER_ID,
 } as const;
-

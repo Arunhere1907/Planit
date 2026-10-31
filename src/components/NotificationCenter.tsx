@@ -1,10 +1,7 @@
-import React, { useState } from "react";
-import {
-  Bell,
-  X,
-} from "lucide-react";
-import { FullEventPlan } from "../types";
-import { formatDate, formatExactINR } from "../lib/formatters";
+import React, { useState } from 'react';
+import { Bell, X } from 'lucide-react';
+import type { FullEventPlan } from '../types';
+import { formatDate, formatExactINR } from '../lib/formatters';
 
 interface NotificationCenterProps {
   plan: FullEventPlan;
@@ -18,7 +15,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   onMarkTaskDone,
 }) => {
   const { profile: _profile, timeline, vendors, budget: _budget } = plan;
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = new Date().toISOString().split('T')[0];
 
   // Auto-generate notifications based on live data
   const [snoozedIds, setSnoozedIds] = useState<string[]>([]);
@@ -26,15 +23,15 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const notifications = [
     // 1. Overdue or upcoming tasks
     ...timeline.tasks
-      .filter((t) => t.status !== "completed" && !snoozedIds.includes(t.id))
+      .filter((t) => t.status !== 'completed' && !snoozedIds.includes(t.id))
       .slice(0, 4)
       .map((t) => ({
         id: t.id,
-        type: "task" as const,
+        type: 'task' as const,
         title: `Task Reminder: ${t.title}`,
         detail: `Assigned to ${t.assignee} • Due ${formatDate(t.due_date)}`,
         isOverdue: t.due_date < todayStr,
-        actionLabel: "Mark Done",
+        actionLabel: 'Mark Done',
         actionFn: () => onMarkTaskDone(t.id),
       })),
 
@@ -44,23 +41,23 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       .slice(0, 2)
       .map((v) => ({
         id: `v-${v.id}`,
-        type: "payment" as const,
+        type: 'payment' as const,
         title: `Balance Due: ${v.name}`,
         detail: `Amount: ${formatExactINR(v.balance)} • Due by ${formatDate(v.due_date)}`,
         isOverdue: false,
-        actionLabel: "Snooze 3d",
+        actionLabel: 'Snooze 3d',
         actionFn: () => setSnoozedIds((prev) => [...prev, `v-${v.id}`]),
       })),
 
     // 3. Risk notification
     {
-      id: "risk-notif-1",
-      type: "risk" as const,
-      title: "Logistics Alert: 10 PM Sound Curfew",
-      detail: "Police noise monitoring in effect. Ensure baraat finishes by 7:30 PM.",
+      id: 'risk-notif-1',
+      type: 'risk' as const,
+      title: 'Logistics Alert: 10 PM Sound Curfew',
+      detail: 'Police noise monitoring in effect. Ensure baraat finishes by 7:30 PM.',
       isOverdue: false,
-      actionLabel: "Acknowledged",
-      actionFn: () => setSnoozedIds((prev) => [...prev, "risk-notif-1"]),
+      actionLabel: 'Acknowledged',
+      actionFn: () => setSnoozedIds((prev) => [...prev, 'risk-notif-1']),
     },
   ];
 
@@ -82,7 +79,10 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 <p className="text-xs text-slate-500">Milestone dues, reminders & alerts</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+            <button
+              onClick={onClose}
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -99,10 +99,10 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                   key={notif.id}
                   className={`p-3.5 rounded-xl border text-xs space-y-2 transition-all ${
                     notif.isOverdue
-                      ? "bg-red-50/60 border-red-200"
-                      : notif.type === "payment"
-                      ? "bg-amber-50/60 border-amber-200"
-                      : "bg-slate-50 border-slate-200"
+                      ? 'bg-red-50/60 border-red-200'
+                      : notif.type === 'payment'
+                        ? 'bg-amber-50/60 border-amber-200'
+                        : 'bg-slate-50 border-slate-200'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">

@@ -1,14 +1,7 @@
-import React, { useState } from "react";
-import {
-  Calendar,
-  Bell,
-  FileDown,
-  RefreshCw,
-  RotateCcw,
-  UserCheck
-} from "lucide-react";
-import { EventProfile } from "../types";
-import { getDaysRemaining } from "../lib/formatters";
+import React, { useState } from 'react';
+import { Calendar, Bell, FileDown, RefreshCw, RotateCcw, UserCheck } from 'lucide-react';
+import type { EventProfile } from '../types';
+import { getDaysRemaining } from '../lib/formatters';
 
 interface HeaderProps {
   currentProfile: EventProfile;
@@ -40,29 +33,33 @@ export const Header: React.FC<HeaderProps> = ({
   const daysLeft = getDaysRemaining(currentProfile.date);
 
   const [activeUserRole, setActiveUserRole] = useState<string>(() => {
-    return localStorage.getItem("planit_user_role") || "owner";
+    return localStorage.getItem('planit_user_role') || 'owner';
   });
 
   const handleRoleChange = (role: string) => {
     setActiveUserRole(role);
-    localStorage.setItem("planit_user_role", role);
-    const userId = role === "owner" ? "user_owner_1" : role === "editor" ? "user_editor_1" : "user_viewer_1";
-    localStorage.setItem("planit_demo_user", userId);
+    localStorage.setItem('planit_user_role', role);
+    const userId =
+      role === 'owner' ? 'user_owner_1' : role === 'editor' ? 'user_editor_1' : 'user_viewer_1';
+    localStorage.setItem('planit_demo_user', userId);
   };
 
   const navItems = [
-    { id: "dashboard", label: "Dashboard" },
-    { id: "budget", label: "Budget & Expenses" },
-    { id: "timeline", label: "Timeline & Run-of-Show" },
-    { id: "vendors", label: "Vendors & Places" },
-    { id: "ideas", label: "Curated Ideas" },
-    { id: "invitations", label: "Invitations & Copy" },
-    { id: "risks", label: "Risk Advisor" },
-    { id: "collaborators", label: "Team & Log" },
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'budget', label: 'Budget & Expenses' },
+    { id: 'timeline', label: 'Timeline & Run-of-Show' },
+    { id: 'vendors', label: 'Vendors & Places' },
+    { id: 'ideas', label: 'Curated Ideas' },
+    { id: 'invitations', label: 'Invitations & Copy' },
+    { id: 'risks', label: 'Risk Advisor' },
+    { id: 'collaborators', label: 'Team & Log' },
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs" role="banner">
+    <header
+      className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs"
+      role="banner"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top bar */}
         <div className="flex items-center justify-between h-16 gap-3">
@@ -74,12 +71,16 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold text-slate-900 tracking-tight text-lg">PlanIt</span>
+                  <span className="font-extrabold text-slate-900 tracking-tight text-lg">
+                    PlanIt
+                  </span>
                   <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                     GenAI
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 hidden sm:block font-medium">Event Planning Intelligence</p>
+                <p className="text-[11px] text-slate-500 hidden sm:block font-medium">
+                  Event Planning Intelligence
+                </p>
               </div>
             </div>
 
@@ -90,7 +91,7 @@ export const Header: React.FC<HeaderProps> = ({
               <select
                 value={currentProfile.id}
                 onChange={(e) => {
-                  if (e.target.value === "new") {
+                  if (e.target.value === 'new') {
                     onOpenNewEventModal();
                   } else {
                     onSelectEvent(e.target.value);
@@ -127,11 +128,11 @@ export const Header: React.FC<HeaderProps> = ({
               </select>
               <span
                 className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase ${
-                  activeUserRole === "owner"
-                    ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
-                    : activeUserRole === "editor"
-                    ? "bg-amber-50 text-amber-700 border border-amber-200"
-                    : "bg-slate-100 text-slate-600 border border-slate-200"
+                  activeUserRole === 'owner'
+                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                    : activeUserRole === 'editor'
+                      ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                      : 'bg-slate-100 text-slate-600 border border-slate-200'
                 }`}
               >
                 {activeUserRole}
@@ -141,7 +142,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Countdown Badge */}
             <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-xs font-semibold text-amber-800">
               <Calendar className="w-3.5 h-3.5 text-amber-600" />
-              <span>{daysLeft > 0 ? `${daysLeft} days to go` : "Event is today!"}</span>
+              <span>{daysLeft > 0 ? `${daysLeft} days to go` : 'Event is today!'}</span>
             </div>
 
             {/* Replan Button */}
@@ -175,7 +176,10 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Bell className="w-5 h-5" aria-hidden="true" />
               {unreadNotificationsCount > 0 && (
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-indigo-600 rounded-full ring-2 ring-white animate-pulse" aria-hidden="true" />
+                <span
+                  className="absolute top-1 right-1 w-2.5 h-2.5 bg-indigo-600 rounded-full ring-2 ring-white animate-pulse"
+                  aria-hidden="true"
+                />
               )}
             </button>
 
@@ -194,7 +198,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Navigation Tabs (Strictly Indigo Active State, NO RED!) */}
-        <nav 
+        <nav
           className="flex space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar py-1.5 border-t border-slate-100 text-xs sm:text-sm font-medium"
           aria-label="Main navigation"
           role="navigation"
@@ -205,11 +209,11 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                aria-current={isActive ? "page" : undefined}
+                aria-current={isActive ? 'page' : undefined}
                 className={`relative whitespace-nowrap px-3 py-2 rounded-lg transition-all cursor-pointer font-medium ${
                   isActive
                     ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-200 shadow-2xs after:content-[''] after:absolute after:bottom-0.5 after:left-3 after:right-3 after:h-[3px] after:bg-indigo-600 after:rounded-full"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 {tab.label}

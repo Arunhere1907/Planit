@@ -1,12 +1,17 @@
-import { Router, Request, Response } from 'express';
+import type { Request, Response } from 'express';
+import { Router } from 'express';
 import { aiService } from '../services/ai/ai.service.js';
 import { placesService } from '../services/places/places.service.js';
 import { asyncHandler } from '../utils/async-handler.js';
 import { CONSTANTS } from '../config/constants.js';
-import { EventProfile, VendorCategory } from '../../shared/types/index.js';
+import type { EventProfile, VendorCategory } from '../../shared/types/index.js';
 import { strictRateLimiter, externalApiRateLimiter } from '../middleware/rate-limit.js';
 import { validateBody, validateQuery } from '../middleware/validate.js';
-import { EventProfileInputSchema, VendorSearchSchema, ReplanRequestSchema } from '../validation/request-schemas.js';
+import {
+  EventProfileInputSchema,
+  VendorSearchSchema,
+  ReplanRequestSchema,
+} from '../validation/request-schemas.js';
 
 const router = Router();
 
@@ -24,7 +29,8 @@ router.post(
     const result = await aiService.generateBudgetWithReasoning(profile);
     res.status(CONSTANTS.HTTP_STATUS.OK).json({
       categories: result.categories,
-      strategic_notes: result.strategic_notes || 'Budget allocated with event-specific considerations.',
+      strategic_notes:
+        result.strategic_notes || 'Budget allocated with event-specific considerations.',
     });
   })
 );
@@ -60,8 +66,18 @@ const handleVendorSearch = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-router.post('/vendors/search', placesRateLimiter, validateBody(VendorSearchSchema), handleVendorSearch);
-router.get('/vendors/search', placesRateLimiter, validateQuery(VendorSearchSchema), handleVendorSearch);
+router.post(
+  '/vendors/search',
+  placesRateLimiter,
+  validateBody(VendorSearchSchema),
+  handleVendorSearch
+);
+router.get(
+  '/vendors/search',
+  placesRateLimiter,
+  validateQuery(VendorSearchSchema),
+  handleVendorSearch
+);
 
 // 4. Ideas Generation
 router.post(
@@ -103,9 +119,10 @@ router.post(
   validateBody(EventProfileInputSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
-    const scenario: 'maintain_quality' | 'moderate_cuts' | 'aggressive_savings' = req.body.scenario || 'moderate_cuts';
+    const scenario: 'maintain_quality' | 'moderate_cuts' | 'aggressive_savings' =
+      req.body.scenario || 'moderate_cuts';
     const targetBudget = req.body.targetBudget || profile.total_budget;
-    
+
     const optimized = await aiService.optimizeBudget(profile, scenario, targetBudget);
     res.status(CONSTANTS.HTTP_STATUS.OK).json(optimized);
   })
@@ -119,7 +136,7 @@ router.post(
   asyncHandler(async (req: Request, res: Response) => {
     const profile: EventProfile = req.body.profile || req.body;
     const newDate = req.body.newDate || profile.date;
-    
+
     const timeline = await aiService.generateTimelineWithTasks({ ...profile, date: newDate });
     res.status(CONSTANTS.HTTP_STATUS.OK).json({
       tasks: timeline.tasks,

@@ -95,12 +95,54 @@ describe('Timeline Backwards Date Calculation', () => {
   it('should set correct phase based on offset_days', () => {
     const eventDate = '2027-06-01';
     const tasks = [
-      { title: 'T1', role: 'O', priority: 'high' as const, phase: '6+ months' as const, offset_days: 200, linked_vendor: 'V' },
-      { title: 'T2', role: 'O', priority: 'high' as const, phase: '3 months' as const, offset_days: 100, linked_vendor: 'V' },
-      { title: 'T3', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 40, linked_vendor: 'V' },
-      { title: 'T4', role: 'O', priority: 'high' as const, phase: '1 week' as const, offset_days: 10, linked_vendor: 'V' },
-      { title: 'T5', role: 'O', priority: 'high' as const, phase: 'Day before' as const, offset_days: 1, linked_vendor: 'V' },
-      { title: 'T6', role: 'O', priority: 'high' as const, phase: 'Day-of' as const, offset_days: 0, linked_vendor: 'V' },
+      {
+        title: 'T1',
+        role: 'O',
+        priority: 'high' as const,
+        phase: '6+ months' as const,
+        offset_days: 200,
+        linked_vendor: 'V',
+      },
+      {
+        title: 'T2',
+        role: 'O',
+        priority: 'high' as const,
+        phase: '3 months' as const,
+        offset_days: 100,
+        linked_vendor: 'V',
+      },
+      {
+        title: 'T3',
+        role: 'O',
+        priority: 'high' as const,
+        phase: '1 month' as const,
+        offset_days: 40,
+        linked_vendor: 'V',
+      },
+      {
+        title: 'T4',
+        role: 'O',
+        priority: 'high' as const,
+        phase: '1 week' as const,
+        offset_days: 10,
+        linked_vendor: 'V',
+      },
+      {
+        title: 'T5',
+        role: 'O',
+        priority: 'high' as const,
+        phase: 'Day before' as const,
+        offset_days: 1,
+        linked_vendor: 'V',
+      },
+      {
+        title: 'T6',
+        role: 'O',
+        priority: 'high' as const,
+        phase: 'Day-of' as const,
+        offset_days: 0,
+        linked_vendor: 'V',
+      },
     ];
 
     const result = calculateBackwardsDueDates(eventDate, tasks);
@@ -136,8 +178,22 @@ describe('Timeline Backwards Date Calculation', () => {
   it('should assign unique IDs to each task', () => {
     const eventDate = '2027-01-01';
     const tasks = [
-      { title: 'T1', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
-      { title: 'T2', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V' },
+      {
+        title: 'T1',
+        role: 'O',
+        priority: 'high' as const,
+        phase: '1 month' as const,
+        offset_days: 30,
+        linked_vendor: 'V',
+      },
+      {
+        title: 'T2',
+        role: 'O',
+        priority: 'high' as const,
+        phase: '1 month' as const,
+        offset_days: 30,
+        linked_vendor: 'V',
+      },
     ];
 
     const result = calculateBackwardsDueDates(eventDate, tasks);
@@ -399,9 +455,30 @@ describe('Timeline Edge Cases', () => {
   it('should handle multiple tasks with same offset', () => {
     const eventDate = '2027-06-01';
     const tasks = [
-      { title: 'T1', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V1' },
-      { title: 'T2', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V2' },
-      { title: 'T3', role: 'O', priority: 'high' as const, phase: '1 month' as const, offset_days: 30, linked_vendor: 'V3' },
+      {
+        title: 'T1',
+        role: 'O',
+        priority: 'high' as const,
+        phase: '1 month' as const,
+        offset_days: 30,
+        linked_vendor: 'V1',
+      },
+      {
+        title: 'T2',
+        role: 'O',
+        priority: 'high' as const,
+        phase: '1 month' as const,
+        offset_days: 30,
+        linked_vendor: 'V2',
+      },
+      {
+        title: 'T3',
+        role: 'O',
+        priority: 'high' as const,
+        phase: '1 month' as const,
+        offset_days: 30,
+        linked_vendor: 'V3',
+      },
     ];
 
     const result = calculateBackwardsDueDates(eventDate, tasks);

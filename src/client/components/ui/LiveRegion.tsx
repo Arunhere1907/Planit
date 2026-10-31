@@ -11,19 +11,19 @@ export interface LiveRegionProps {
 /**
  * LiveRegion component for announcing dynamic content changes to screen readers.
  * Use for: loading states, form validation, toast notifications, AI generation updates.
- * 
+ *
  * WCAG 4.1.3 Status Messages: Announcements must be communicated to assistive technologies
  */
-export const LiveRegion: React.FC<LiveRegionProps> = ({ 
-  message, 
+export const LiveRegion: React.FC<LiveRegionProps> = ({
+  message,
   politeness = 'polite',
-  clearAfter = 0
+  clearAfter = 0,
 }) => {
   const [displayMessage, setDisplayMessage] = React.useState(message);
 
   React.useEffect(() => {
     setDisplayMessage(message);
-    
+
     if (clearAfter > 0 && message) {
       const timer = setTimeout(() => {
         setDisplayMessage('');

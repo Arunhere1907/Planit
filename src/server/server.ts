@@ -10,11 +10,13 @@ async function bootstrap() {
 
   const app = await createApp();
   app.listen(env.PORT, () => {
-    logger.info(`PlanIt GenAI Event Planning Assistant server listening on http://localhost:${env.PORT}`);
+    logger.info(
+      `PlanIt GenAI Event Planning Assistant server listening on http://localhost:${env.PORT}`
+    );
   });
 }
 
-bootstrap().catch(err => {
+bootstrap().catch((err) => {
   logger.error('Fatal error during application startup', { err });
   process.exit(1);
 });

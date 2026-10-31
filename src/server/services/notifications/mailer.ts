@@ -14,7 +14,9 @@ export interface IMailer {
 export class ConsoleMailer implements IMailer {
   public async sendEmail(message: EmailMessage): Promise<{ success: boolean; id?: string }> {
     const id = `mail_${Date.now()}`;
-    logger.info(`[ConsoleMailer] Email simulated to: ${message.to} | Subject: "${message.subject}"`);
+    logger.info(
+      `[ConsoleMailer] Email simulated to: ${message.to} | Subject: "${message.subject}"`
+    );
     return { success: true, id };
   }
 }
@@ -31,22 +33,22 @@ export class ResendMailer implements IMailer {
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           from: 'PlanIt Event Assistant <notifications@planit.demo>',
           to: message.to,
           subject: message.subject,
-          html: message.htmlContent
-        })
+          html: message.htmlContent,
+        }),
       });
 
       if (!response.ok) {
         throw new Error(`Resend error: ${response.status}`);
       }
 
-      const data = await response.json() as { id?: string };
+      const data = (await response.json()) as { id?: string };
       return { success: true, id: data.id };
     } catch (err) {
       logger.warn('Failed sending email via Resend, falling back to console logger', { err });

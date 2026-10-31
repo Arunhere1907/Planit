@@ -1,14 +1,7 @@
-import React, { useState } from "react";
-import {
-  Copy,
-  Check,
-  Sparkles,
-  Share2,
-  ShieldCheck,
-  Loader2,
-} from "lucide-react";
-import { InvitationItem, EventProfile } from "../types";
-import { formatDate } from "../lib/formatters";
+import React, { useState } from 'react';
+import { Copy, Check, Sparkles, Share2, ShieldCheck, Loader2 } from 'lucide-react';
+import type { InvitationItem, EventProfile } from '../types';
+import { formatDate } from '../lib/formatters';
 
 interface InvitationsViewProps {
   invitations: InvitationItem[];
@@ -20,33 +13,38 @@ interface InvitationsViewProps {
 export const InvitationsView: React.FC<InvitationsViewProps> = ({
   invitations,
   profile,
-  venueName = "The Green Pearl Heritage Resort, SG Highway",
+  venueName = 'The Green Pearl Heritage Resort, SG Highway',
   onUpdateInvitations,
 }) => {
-  const [selectedType, setSelectedType] = useState<string>("WhatsApp Invite");
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("English");
-  const [selectedTone, setSelectedTone] = useState<string>("Warm & Traditional");
+  const [selectedType, setSelectedType] = useState<string>('WhatsApp Invite');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
+  const [selectedTone, setSelectedTone] = useState<string>('Warm & Traditional');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const inviteTypes = [
-    "WhatsApp Invite",
-    "Formal Digital Card",
-    "Save-the-Date Reminder",
-    "RSVP Follow-up",
-    "Post-Event Thank You Note",
-    "Host Welcome Speech",
+    'WhatsApp Invite',
+    'Formal Digital Card',
+    'Save-the-Date Reminder',
+    'RSVP Follow-up',
+    'Post-Event Thank You Note',
+    'Host Welcome Speech',
   ];
 
-  const languages = ["English", "Hindi", "Gujarati"];
-  const tones = ["Formal & Royal", "Warm & Traditional", "Lighthearted & Joyful", "Modern Minimalist"];
+  const languages = ['English', 'Hindi', 'Gujarati'];
+  const tones = [
+    'Formal & Royal',
+    'Warm & Traditional',
+    'Lighthearted & Joyful',
+    'Modern Minimalist',
+  ];
 
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const res = await fetch("/api/invitations/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/invitations/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: selectedType,
           language: selectedLanguage,
@@ -63,7 +61,7 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
         }
       }
     } catch (e) {
-      console.warn("Error generating invitations:", e);
+      console.warn('Error generating invitations:', e);
     } finally {
       setIsGenerating(false);
     }
@@ -95,18 +93,21 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
       <h1 className="sr-only" tabIndex={-1}>
         Invitations and Copy - {profile.title}
       </h1>
-      
+
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Invitations & Copy Generator</h2>
+            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+              Invitations & Copy Generator
+            </h2>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" /> Strict Fact Guardrails
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Dates, venues, and names are strictly locked to your verified event profile. Never hallucinated.
+            Dates, venues, and names are strictly locked to your verified event profile. Never
+            hallucinated.
           </p>
         </div>
 
@@ -115,7 +116,11 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
           disabled={isGenerating}
           className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 rounded-xl shadow-xs transition-colors"
         >
-          {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+          {isGenerating ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Sparkles className="w-4 h-4" />
+          )}
           <span>Generate 3 Variations</span>
         </button>
       </div>
@@ -123,7 +128,9 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
       {/* Control Bar: Type, Language & Tone */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
-          <label htmlFor="invite-type" className="block text-xs font-bold text-slate-700 mb-1">Message Type</label>
+          <label htmlFor="invite-type" className="block text-xs font-bold text-slate-700 mb-1">
+            Message Type
+          </label>
           <select
             id="invite-type"
             value={selectedType}
@@ -139,7 +146,9 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
         </div>
 
         <div>
-          <label htmlFor="invite-language" className="block text-xs font-bold text-slate-700 mb-1">Language</label>
+          <label htmlFor="invite-language" className="block text-xs font-bold text-slate-700 mb-1">
+            Language
+          </label>
           <select
             id="invite-language"
             value={selectedLanguage}
@@ -155,7 +164,9 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
         </div>
 
         <div>
-          <label htmlFor="invite-tone" className="block text-xs font-bold text-slate-700 mb-1">Tone & Voice</label>
+          <label htmlFor="invite-tone" className="block text-xs font-bold text-slate-700 mb-1">
+            Tone & Voice
+          </label>
           <select
             id="invite-tone"
             value={selectedTone}
@@ -211,7 +222,7 @@ export const InvitationsView: React.FC<InvitationsViewProps> = ({
                 rows={9}
                 value={inv.content}
                 onChange={(e) => handleContentEdit(inv.id, e.target.value)}
-                lang={inv.language === "Hindi" ? "hi" : inv.language === "Gujarati" ? "gu" : "en"}
+                lang={inv.language === 'Hindi' ? 'hi' : inv.language === 'Gujarati' ? 'gu' : 'en'}
                 className="w-full p-3 bg-slate-50/70 hover:bg-white focus:bg-white border border-slate-200 focus:border-rose-500 rounded-xl text-xs sm:text-sm font-sans leading-relaxed text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-rose-500 transition-colors resize-y"
               />
             </div>

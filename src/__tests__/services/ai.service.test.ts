@@ -101,9 +101,7 @@ describe('AI Service - Intake Extraction', () => {
   });
 
   it('should handle LLM timeout with fallback', async () => {
-    mockLLMClient.generateContent.mockRejectedValue(
-      new Error('LLM call timed out after 9000ms')
-    );
+    mockLLMClient.generateContent.mockRejectedValue(new Error('LLM call timed out after 9000ms'));
 
     const result = await aiService.extractEventProfile(
       'Birthday party in Mumbai for 50 guests with 2 lakh budget'
@@ -404,9 +402,7 @@ describe('AI Service - Timeline Generation with LLM', () => {
   });
 
   it('should use fallback when LLM times out', async () => {
-    mockLLMClient.generateContent.mockRejectedValue(
-      new Error('LLM call timed out')
-    );
+    mockLLMClient.generateContent.mockRejectedValue(new Error('LLM call timed out'));
 
     const result = await aiService.generateTimelineWithTasks(mockProfile);
 
@@ -459,11 +455,7 @@ describe('AI Service - Budget Optimizer', () => {
 
     mockLLMClient.generateContent.mockResolvedValue(mockResponse);
 
-    const result = await aiService.optimizeBudget(
-      mockProfile,
-      'moderate_cuts',
-      800000
-    );
+    const result = await aiService.optimizeBudget(mockProfile, 'moderate_cuts', 800000);
 
     expect(result.scenario).toBe('Moderate Cost Reduction');
     expect(result.original_budget).toBe(1000000);
@@ -480,21 +472,9 @@ describe('AI Service - Budget Optimizer', () => {
   it('should handle each scenario type', async () => {
     mockLLMClient.isAvailable.mockReturnValue(false);
 
-    const maintain = await aiService.optimizeBudget(
-      mockProfile,
-      'maintain_quality',
-      900000
-    );
-    const moderate = await aiService.optimizeBudget(
-      mockProfile,
-      'moderate_cuts',
-      800000
-    );
-    const aggressive = await aiService.optimizeBudget(
-      mockProfile,
-      'aggressive_savings',
-      650000
-    );
+    const maintain = await aiService.optimizeBudget(mockProfile, 'maintain_quality', 900000);
+    const moderate = await aiService.optimizeBudget(mockProfile, 'moderate_cuts', 800000);
+    const aggressive = await aiService.optimizeBudget(mockProfile, 'aggressive_savings', 650000);
 
     expect(maintain.projected_savings_percent).toBe(10);
     expect(moderate.projected_savings_percent).toBe(20);
@@ -616,10 +596,7 @@ describe('AI Service - Graceful Error Handling', () => {
 
   it('should handle network errors with timeout', async () => {
     mockLLMClient.generateContent.mockImplementation(
-      () =>
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Network timeout')), 100)
-        )
+      () => new Promise((_, reject) => setTimeout(() => reject(new Error('Network timeout')), 100))
     );
 
     const result = await aiService.extractEventProfile('Community event');
@@ -653,9 +630,7 @@ describe('AI Service - Deterministic Fallbacks', () => {
   });
 
   it('should work without API key', async () => {
-    const profile = await aiService.extractEventProfile(
-      'Wedding in Mumbai for 100 guests'
-    );
+    const profile = await aiService.extractEventProfile('Wedding in Mumbai for 100 guests');
     const budget = await aiService.generateBudgetWithReasoning(profile.profile);
     const timeline = await aiService.generateTimelineWithTasks(profile.profile);
     const ideas = await aiService.suggestIdeas(profile.profile);

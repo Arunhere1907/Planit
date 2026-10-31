@@ -2,8 +2,8 @@
  * Shared Domain Interfaces for PlanIt
  */
 
-export type EventType = "wedding" | "birthday" | "community" | "general";
-export type UserRole = "owner" | "editor" | "viewer";
+export type EventType = 'wedding' | 'birthday' | 'community' | 'general';
+export type UserRole = 'owner' | 'editor' | 'viewer';
 
 export interface DemoUser {
   id: string;
@@ -26,7 +26,7 @@ export interface EventProfile {
   vibe_theme: string;
   culture_tradition: string;
   dietary_mix: string;
-  indoor_outdoor: "indoor" | "outdoor" | "hybrid";
+  indoor_outdoor: 'indoor' | 'outdoor' | 'hybrid';
   priorities: string[];
   constraints: string;
 }
@@ -38,7 +38,7 @@ export interface BudgetCategory {
   percent: number;
   reasoning: string;
   is_locked?: boolean;
-  source: "ai" | "user";
+  source: 'ai' | 'user';
   edited_at: string;
 }
 
@@ -49,7 +49,7 @@ export interface Expense {
   vendor_name: string;
   amount: number;
   date: string;
-  status: "paid" | "pending";
+  status: 'paid' | 'pending';
   notes?: string;
 }
 
@@ -57,13 +57,13 @@ export interface Task {
   id: string;
   title: string;
   due_date: string;
-  phase: "6+ months" | "3 months" | "1 month" | "1 week" | "Day before" | "Day-of";
-  status: "pending" | "in_progress" | "completed";
+  phase: '6+ months' | '3 months' | '1 month' | '1 week' | 'Day before' | 'Day-of';
+  status: 'pending' | 'in_progress' | 'completed';
   assignee: string;
   linked_vendor: string;
-  priority: "high" | "medium" | "low";
+  priority: 'high' | 'medium' | 'low';
   notes?: string;
-  source?: "ai" | "user";
+  source?: 'ai' | 'user';
   edited_at?: string;
 }
 
@@ -76,7 +76,7 @@ export interface RunOfShowItem {
   notes: string;
 }
 
-export type VendorStatus = "not_started" | "contacted" | "quote_received" | "booked" | "paid";
+export type VendorStatus = 'not_started' | 'contacted' | 'quote_received' | 'booked' | 'paid';
 
 export interface VendorItem {
   id: string;
@@ -90,7 +90,7 @@ export interface VendorItem {
   status: VendorStatus;
   place_id?: string;
   notes?: string;
-  source?: "ai" | "user";
+  source?: 'ai' | 'user';
   edited_at?: string;
 }
 
@@ -121,7 +121,7 @@ export interface IdeaItem {
   title: string;
   description: string;
   cost_range: string;
-  effort_level: "Low" | "Medium" | "High";
+  effort_level: 'Low' | 'Medium' | 'High';
   tags: string[];
   saved: boolean;
 }
@@ -129,9 +129,9 @@ export interface IdeaItem {
 export interface RiskItem {
   id: string;
   title: string;
-  severity: "high" | "medium" | "low";
-  likelihood: "high" | "medium" | "low";
-  category: "Weather" | "Permits & Legal" | "Food & Safety" | "Timeline" | "Financial" | "General";
+  severity: 'high' | 'medium' | 'low';
+  likelihood: 'high' | 'medium' | 'low';
+  category: 'Weather' | 'Permits & Legal' | 'Food & Safety' | 'Timeline' | 'Financial' | 'General';
   why: string;
   mitigation: string;
   backup_plan: string;
@@ -166,7 +166,7 @@ export interface AppNotification {
   eventId: string;
   title: string;
   message: string;
-  type: "alert" | "reminder" | "info";
+  type: 'alert' | 'reminder' | 'info';
   read: boolean;
   createdAt: string;
 }
@@ -218,4 +218,3 @@ export type EventMessage = InvitationItem;
 export type ExpenseItem = Expense;
 export type EventMember = Collaborator;
 export type ActivityLogEntry = ActivityLogItem;
-

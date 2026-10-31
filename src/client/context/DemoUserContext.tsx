@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { UserRole } from '../../shared/types/index.js';
+import type { UserRole } from '../../shared/types/index.js';
 
 export interface DemoUser {
   id: string;
@@ -48,7 +48,7 @@ const DemoUserContext = createContext<DemoUserContextType | undefined>(undefined
 
 /**
  * Demo User Provider - Manages client-side user selection
- * 
+ *
  * SECURITY MODEL:
  * - localStorage stores ONLY user ID and role (no secrets, passwords, or tokens)
  * - Client-side role (canEdit, isOwner) is for UI convenience ONLY

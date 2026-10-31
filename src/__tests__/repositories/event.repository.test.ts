@@ -214,9 +214,9 @@ describe('In-Memory Event Repository - CRUD Operations', () => {
     });
 
     it('should throw NotFoundError for non-existent ID', async () => {
-      await expect(
-        repository.update('nonexistent-id', { profile: {} as any })
-      ).rejects.toThrow('Event');
+      await expect(repository.update('nonexistent-id', { profile: {} as any })).rejects.toThrow(
+        'Event'
+      );
     });
 
     it('should preserve fields not in update', async () => {

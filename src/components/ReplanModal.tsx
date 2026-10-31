@@ -1,11 +1,15 @@
-import React, { useState } from "react";
-import { RefreshCw, Check, ArrowRight, X, Loader2 } from "lucide-react";
-import { FullEventPlan, BudgetCategory, Task, EventProfile } from "../types";
-import { formatExactINR, formatDate } from "../lib/formatters";
+import React, { useState } from 'react';
+import { RefreshCw, Check, ArrowRight, X, Loader2 } from 'lucide-react';
+import type { FullEventPlan, BudgetCategory, Task, EventProfile } from '../types';
+import { formatExactINR, formatDate } from '../lib/formatters';
 
 interface ReplanModalProps {
   plan: FullEventPlan;
-  onApplyReplan: (updatedProfile: EventProfile, updatedCategories: BudgetCategory[], updatedTasks: Task[]) => void;
+  onApplyReplan: (
+    updatedProfile: EventProfile,
+    updatedCategories: BudgetCategory[],
+    updatedTasks: Task[]
+  ) => void;
   onClose: () => void;
 }
 
@@ -36,17 +40,17 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
 
     try {
       // 1. Recompute budget categories via API
-      const budgetRes = await fetch("/api/budget/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const budgetRes = await fetch('/api/budget/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile: updatedProfile }),
       });
       const budgetData = await budgetRes.json();
 
       // 2. Recompute timeline backwards tasks via API
-      const timelineRes = await fetch("/api/timeline/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const timelineRes = await fetch('/api/timeline/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile: updatedProfile }),
       });
       const timelineData = await timelineRes.json();
@@ -56,13 +60,15 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
 
       // Default accept all
       const initialAccepts: Record<string, boolean> = {};
-      (budgetData.categories || []).forEach((c: BudgetCategory) => (initialAccepts[`cat-${c.id}`] = true));
+      (budgetData.categories || []).forEach(
+        (c: BudgetCategory) => (initialAccepts[`cat-${c.id}`] = true)
+      );
       (timelineData.tasks || []).forEach((t: Task) => (initialAccepts[`task-${t.id}`] = true));
       setAcceptedItems(initialAccepts);
 
       setDiffGenerated(true);
     } catch (e) {
-      console.warn("Replan pipeline error:", e);
+      console.warn('Replan pipeline error:', e);
     } finally {
       setIsSimulating(false);
     }
@@ -90,7 +96,9 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
               <RefreshCw className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">Replanning Pipeline & Diff Review</h3>
+              <h3 className="text-base font-bold text-slate-900">
+                Replanning Pipeline & Diff Review
+              </h3>
               <p className="text-xs text-slate-500">
                 Propose and review ripple updates to budget and timeline
               </p>
@@ -104,12 +112,18 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
         {!diffGenerated ? (
           <div className="space-y-4 my-4 flex-1">
             <p className="text-xs text-slate-600 leading-relaxed font-light">
-              Adjust any key parameter below. PlanIt will run a deterministic re-computation of budget categories and backwards date milestones for your review.
+              Adjust any key parameter below. PlanIt will run a deterministic re-computation of
+              budget categories and backwards date milestones for your review.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label htmlFor="replan-date" className="block text-xs font-bold text-slate-700 mb-1">Event Date</label>
+                <label
+                  htmlFor="replan-date"
+                  className="block text-xs font-bold text-slate-700 mb-1"
+                >
+                  Event Date
+                </label>
                 <input
                   id="replan-date"
                   type="date"
@@ -121,7 +135,12 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
               </div>
 
               <div>
-                <label htmlFor="replan-budget" className="block text-xs font-bold text-slate-700 mb-1">Total Budget (INR)</label>
+                <label
+                  htmlFor="replan-budget"
+                  className="block text-xs font-bold text-slate-700 mb-1"
+                >
+                  Total Budget (INR)
+                </label>
                 <input
                   id="replan-budget"
                   type="number"
@@ -130,11 +149,18 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
                   onChange={(e) => setNewBudget(parseInt(e.target.value) || 0)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold font-mono"
                 />
-                <span className="text-[10px] text-slate-400">Current: {formatExactINR(profile.total_budget)}</span>
+                <span className="text-[10px] text-slate-400">
+                  Current: {formatExactINR(profile.total_budget)}
+                </span>
               </div>
 
               <div>
-                <label htmlFor="replan-guests" className="block text-xs font-bold text-slate-700 mb-1">Guest Count</label>
+                <label
+                  htmlFor="replan-guests"
+                  className="block text-xs font-bold text-slate-700 mb-1"
+                >
+                  Guest Count
+                </label>
                 <input
                   id="replan-guests"
                   type="number"
@@ -142,7 +168,9 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
                   onChange={(e) => setNewGuests(parseInt(e.target.value) || 0)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold"
                 />
-                <span className="text-[10px] text-slate-400">Current: {profile.guest_count} guests</span>
+                <span className="text-[10px] text-slate-400">
+                  Current: {profile.guest_count} guests
+                </span>
               </div>
             </div>
 
@@ -170,7 +198,9 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
           <div className="space-y-4 my-4 flex-1 overflow-y-auto pr-1">
             <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-xs text-emerald-900 flex items-center justify-between">
               <div>
-                <strong>Diff Ready:</strong> Budget updated from {formatExactINR(profile.total_budget)} → {formatExactINR(newBudget)}. Date shifted to {formatDate(newDate)}.
+                <strong>Diff Ready:</strong> Budget updated from{' '}
+                {formatExactINR(profile.total_budget)} → {formatExactINR(newBudget)}. Date shifted
+                to {formatDate(newDate)}.
               </div>
               <button
                 onClick={() => setDiffGenerated(false)}
@@ -189,14 +219,19 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
                 {proposedCategories.slice(0, 5).map((cat) => {
                   const oldCat = budget.categories.find((c) => c.name === cat.name);
                   return (
-                    <div key={cat.id} className="p-2.5 bg-slate-50 flex items-center justify-between">
+                    <div
+                      key={cat.id}
+                      className="p-2.5 bg-slate-50 flex items-center justify-between"
+                    >
                       <span className="font-semibold text-slate-900">{cat.name}</span>
                       <div className="flex items-center gap-3 font-mono">
                         <span className="text-slate-400 line-through">
-                          {oldCat ? formatExactINR(oldCat.amount) : "—"}
+                          {oldCat ? formatExactINR(oldCat.amount) : '—'}
                         </span>
                         <ArrowRight className="w-3 h-3 text-slate-400" />
-                        <span className="font-bold text-emerald-700">{formatExactINR(cat.amount)}</span>
+                        <span className="font-bold text-emerald-700">
+                          {formatExactINR(cat.amount)}
+                        </span>
                       </div>
                     </div>
                   );
@@ -211,9 +246,16 @@ export const ReplanModal: React.FC<ReplanModalProps> = ({ plan, onApplyReplan, o
               </h4>
               <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden text-xs">
                 {proposedTasks.slice(0, 4).map((task) => (
-                  <div key={task.id} className="p-2.5 bg-slate-50 flex items-center justify-between">
-                    <span className="font-semibold text-slate-900 truncate max-w-xs">{task.title}</span>
-                    <span className="font-mono font-bold text-indigo-700">{formatDate(task.due_date)}</span>
+                  <div
+                    key={task.id}
+                    className="p-2.5 bg-slate-50 flex items-center justify-between"
+                  >
+                    <span className="font-semibold text-slate-900 truncate max-w-xs">
+                      {task.title}
+                    </span>
+                    <span className="font-mono font-bold text-indigo-700">
+                      {formatDate(task.due_date)}
+                    </span>
                   </div>
                 ))}
               </div>

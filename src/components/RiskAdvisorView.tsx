@@ -1,14 +1,7 @@
-import React, { useState } from "react";
-import {
-  CloudRain,
-  AlertTriangle,
-  Scale,
-  RefreshCw,
-  CheckCircle2,
-  Loader2,
-} from "lucide-react";
-import { RiskItem, EventProfile } from "../types";
-import { checkBudgetSanity } from "../lib/deterministicMath";
+import React, { useState } from 'react';
+import { CloudRain, AlertTriangle, Scale, RefreshCw, CheckCircle2, Loader2 } from 'lucide-react';
+import type { RiskItem, EventProfile } from '../types';
+import { checkBudgetSanity } from '../lib/deterministicMath';
 
 interface RiskAdvisorViewProps {
   risks: RiskItem[];
@@ -31,9 +24,9 @@ export const RiskAdvisorView: React.FC<RiskAdvisorViewProps> = ({
   const handleReevaluate = async () => {
     setIsReevaluating(true);
     try {
-      const res = await fetch("/api/risks/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/risks/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           profile,
           budgetData: { total_budget: totalBudget },
@@ -47,7 +40,7 @@ export const RiskAdvisorView: React.FC<RiskAdvisorViewProps> = ({
         }
       }
     } catch (e) {
-      console.warn("Failed to reevaluate risks:", e);
+      console.warn('Failed to reevaluate risks:', e);
     } finally {
       setIsReevaluating(false);
     }
@@ -59,18 +52,21 @@ export const RiskAdvisorView: React.FC<RiskAdvisorViewProps> = ({
       <h1 className="sr-only" tabIndex={-1}>
         Risk Advisor - {profile.title}
       </h1>
-      
+
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Risk & Contingency Advisor</h2>
+            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+              Risk & Contingency Advisor
+            </h2>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
               Proactive Safeguards
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Monitors seasonal weather hazards, sound curfews, civic fire compliance, dietary segregation, and per-head budget sanity.
+            Monitors seasonal weather hazards, sound curfews, civic fire compliance, dietary
+            segregation, and per-head budget sanity.
           </p>
         </div>
 
@@ -100,19 +96,21 @@ export const RiskAdvisorView: React.FC<RiskAdvisorViewProps> = ({
             <span
               className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                 sanity.isSane
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                  : "bg-amber-50 text-amber-800 border border-amber-200"
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  : 'bg-amber-50 text-amber-800 border border-amber-200'
               }`}
             >
-              {sanity.isSane ? "Verified Viable" : "Lean Budget Warning"}
+              {sanity.isSane ? 'Verified Viable' : 'Lean Budget Warning'}
             </span>
           </div>
 
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-black text-slate-900 font-mono">
-              ₹{sanity.perGuest.toLocaleString("en-IN")}
+              ₹{sanity.perGuest.toLocaleString('en-IN')}
             </span>
-            <span className="text-xs text-slate-500">per guest allocation ({profile.guest_count} guests)</span>
+            <span className="text-xs text-slate-500">
+              per guest allocation ({profile.guest_count} guests)
+            </span>
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed font-light bg-slate-50 p-2.5 rounded-xl border border-slate-100">
@@ -125,7 +123,9 @@ export const RiskAdvisorView: React.FC<RiskAdvisorViewProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CloudRain className="w-4 h-4 text-sky-600" />
-              <h3 className="text-sm font-bold text-slate-900">Regional Climate & Weather Insight</h3>
+              <h3 className="text-sm font-bold text-slate-900">
+                Regional Climate & Weather Insight
+              </h3>
             </div>
             <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
               December Season
@@ -148,7 +148,8 @@ export const RiskAdvisorView: React.FC<RiskAdvisorViewProps> = ({
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed font-light">
-            Ahmedabad winter evenings feature heavy grass dew. Seating areas require wooden sub-flooring under carpets to prevent dampness.
+            Ahmedabad winter evenings feature heavy grass dew. Seating areas require wooden
+            sub-flooring under carpets to prevent dampness.
           </p>
         </div>
       </div>
@@ -162,11 +163,11 @@ export const RiskAdvisorView: React.FC<RiskAdvisorViewProps> = ({
             <div
               key={risk.id}
               className={`bg-white rounded-2xl border p-5 shadow-2xs hover:shadow-xs transition-shadow space-y-3 border-l-4 ${
-                risk.severity === "high"
-                  ? "border-l-rose-500"
-                  : risk.severity === "medium"
-                  ? "border-l-amber-500"
-                  : "border-l-blue-500"
+                risk.severity === 'high'
+                  ? 'border-l-rose-500'
+                  : risk.severity === 'medium'
+                    ? 'border-l-amber-500'
+                    : 'border-l-blue-500'
               }`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -180,11 +181,11 @@ export const RiskAdvisorView: React.FC<RiskAdvisorViewProps> = ({
                 <div className="flex items-center gap-2">
                   <span
                     className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
-                      risk.severity === "high"
-                        ? "bg-rose-100 text-rose-800"
-                        : risk.severity === "medium"
-                        ? "bg-amber-100 text-amber-800"
-                        : "bg-blue-100 text-blue-800"
+                      risk.severity === 'high'
+                        ? 'bg-rose-100 text-rose-800'
+                        : risk.severity === 'medium'
+                          ? 'bg-amber-100 text-amber-800'
+                          : 'bg-blue-100 text-blue-800'
                     }`}
                   >
                     {risk.severity} Severity

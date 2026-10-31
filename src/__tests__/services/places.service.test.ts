@@ -33,7 +33,6 @@ const { vendorRepository } = await import('../../server/repositories/index.js');
 const { env } = await import('../../server/config/env.js');
 const mockSearchVendors = vendorRepository.searchVendors as ReturnType<typeof vi.fn>;
 
-
 describe('Places Service - Google Places API Integration', () => {
   let placesService: PlacesService;
 
@@ -448,9 +447,7 @@ describe('Places Service - Error Handling', () => {
       status: 401,
     });
 
-    mockSearchVendors.mockResolvedValue([
-      { id: 'local-1', name: 'Fallback' },
-    ]);
+    mockSearchVendors.mockResolvedValue([{ id: 'local-1', name: 'Fallback' }]);
 
     const result = await placesService.searchVendors({
       category: 'Catering',
@@ -467,9 +464,7 @@ describe('Places Service - Error Handling', () => {
       status: 429,
     });
 
-    mockSearchVendors.mockResolvedValue([
-      { id: 'local-1', name: 'Fallback' },
-    ]);
+    mockSearchVendors.mockResolvedValue([{ id: 'local-1', name: 'Fallback' }]);
 
     const result = await placesService.searchVendors({
       category: 'Venue & Facilities',
@@ -486,9 +481,7 @@ describe('Places Service - Error Handling', () => {
       status: 500,
     });
 
-    mockSearchVendors.mockResolvedValue([
-      { id: 'local-1', name: 'Fallback' },
-    ]);
+    mockSearchVendors.mockResolvedValue([{ id: 'local-1', name: 'Fallback' }]);
 
     const result = await placesService.searchVendors({
       category: 'Decor',
@@ -506,9 +499,7 @@ describe('Places Service - Error Handling', () => {
         })
     );
 
-    mockSearchVendors.mockResolvedValue([
-      { id: 'local-1', name: 'Timeout Fallback' },
-    ]);
+    mockSearchVendors.mockResolvedValue([{ id: 'local-1', name: 'Timeout Fallback' }]);
 
     const result = await placesService.searchVendors({
       category: 'Photography',
@@ -570,10 +561,7 @@ describe('Places Service - Data Mapping', () => {
 
   it('should generate unique IDs when API id missing', async () => {
     const mockApiResponse = {
-      places: [
-        { displayName: { text: 'Vendor 1' } },
-        { displayName: { text: 'Vendor 2' } },
-      ],
+      places: [{ displayName: { text: 'Vendor 1' } }, { displayName: { text: 'Vendor 2' } }],
     };
 
     (global.fetch as any).mockResolvedValue({

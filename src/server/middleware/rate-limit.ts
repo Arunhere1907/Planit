@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { CONSTANTS } from '../config/constants.js';
 
 interface RateLimitEntry {
@@ -55,8 +55,8 @@ export function inMemoryRateLimiter(
         error: {
           code: 'RATE_LIMIT_EXCEEDED',
           message: `Too many requests. Please try again after ${retryAfterSeconds} seconds.`,
-          retryAfter: retryAfterSeconds
-        }
+          retryAfter: retryAfterSeconds,
+        },
       });
       return;
     }

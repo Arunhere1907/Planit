@@ -1,7 +1,7 @@
 import { eventRepository } from '../../repositories/index.js';
 import { mailer } from './mailer.js';
 import { logger } from '../../utils/logger.js';
-import { AppNotification, FullEventPlan, Expense } from '../../../shared/types/index.js';
+import type { AppNotification, FullEventPlan, Expense } from '../../../shared/types/index.js';
 
 export class InProcessScheduler {
   private timer: NodeJS.Timeout | null = null;
@@ -81,7 +81,10 @@ export class InProcessScheduler {
       }
 
       // Check budget overspending
-      const totalSpent = event.budget.expenses.reduce((acc: number, exp: Expense) => acc + exp.amount, 0);
+      const totalSpent = event.budget.expenses.reduce(
+        (acc: number, exp: Expense) => acc + exp.amount,
+        0
+      );
       if (totalSpent > event.budget.total_budget) {
         const notifId = `notif_budget_overspend_${event.profile.id}`;
         if (!notifications.some((n: AppNotification) => n.id === notifId)) {

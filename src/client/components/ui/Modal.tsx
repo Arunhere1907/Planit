@@ -16,7 +16,7 @@ export const Modal: React.FC<ModalProps> = ({
   title,
   subtitle,
   children,
-  maxWidth = 'md'
+  maxWidth = 'md',
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
@@ -24,7 +24,7 @@ export const Modal: React.FC<ModalProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
-      
+
       // Focus trap: keep focus within modal
       if (e.key === 'Tab' && modalRef.current) {
         const focusableElements = modalRef.current.querySelectorAll(
@@ -46,10 +46,10 @@ export const Modal: React.FC<ModalProps> = ({
     if (isOpen) {
       // Store the currently focused element
       previousActiveElement.current = document.activeElement as HTMLElement;
-      
+
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
-      
+
       // Focus the modal dialog after a brief delay to ensure it's rendered
       setTimeout(() => {
         modalRef.current?.focus();
@@ -59,7 +59,7 @@ export const Modal: React.FC<ModalProps> = ({
     return () => {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
-      
+
       // Return focus to the element that opened the modal
       if (previousActiveElement.current) {
         previousActiveElement.current.focus();
@@ -74,7 +74,7 @@ export const Modal: React.FC<ModalProps> = ({
     md: 'max-w-lg',
     lg: 'max-w-2xl',
     xl: 'max-w-4xl',
-    '2xl': 'max-w-5xl'
+    '2xl': 'max-w-5xl',
   }[maxWidth];
 
   return (
@@ -92,15 +92,21 @@ export const Modal: React.FC<ModalProps> = ({
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-title"
-          aria-describedby={subtitle ? "modal-subtitle" : undefined}
+          aria-describedby={subtitle ? 'modal-subtitle' : undefined}
           tabIndex={-1}
           className={`relative w-full ${maxWidths} transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all border border-slate-200`}
         >
           {/* Modal Header */}
           <div className="flex items-start justify-between border-b border-slate-100 p-5">
             <div>
-              <h2 id="modal-title" className="text-lg font-bold text-slate-900 tracking-tight">{title}</h2>
-              {subtitle && <p id="modal-subtitle" className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+              <h2 id="modal-title" className="text-lg font-bold text-slate-900 tracking-tight">
+                {title}
+              </h2>
+              {subtitle && (
+                <p id="modal-subtitle" className="text-xs text-slate-500 mt-0.5">
+                  {subtitle}
+                </p>
+              )}
             </div>
             <button
               onClick={onClose}

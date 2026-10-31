@@ -55,7 +55,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(import.meta.dirname, './'),
+      '@': path.resolve(import.meta.dirname, './src'),
+      '@server': path.resolve(import.meta.dirname, './src/server'),
+      '@shared': path.resolve(import.meta.dirname, './src/shared'),
+      '@client': path.resolve(import.meta.dirname, './src/client'),
+      '@components': path.resolve(import.meta.dirname, './src/components'),
     },
   },
 });

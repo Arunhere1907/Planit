@@ -3,30 +3,154 @@
   "name": "Wedding & Reception",
   "description": "Comprehensive template for traditional and modern weddings with multi-day rituals, ceremonies, and reception.",
   "default_budget_split": [
-    { "category": "Venue & Facilities", "percent": 30, "reasoning": "Banquet hall/resort rental, lawn charges, stage infrastructure, and lighting." },
-    { "category": "Catering & Beverages", "percent": 32, "reasoning": "Buffet courses, live counters, welcome drinks, desserts, and hospitality staff." },
-    { "category": "Decor & Floral Design", "percent": 12, "reasoning": "Mandap/altar, entrance arches, floral arrangements, seating, and table centrepieces." },
-    { "category": "Photography & Video", "percent": 9, "reasoning": "Candid photographer, cinematic videographer, drone shots, and pre-wedding shoot." },
-    { "category": "Music, DJ & Entertainment", "percent": 5, "reasoning": "DJ setup, sound system, MC/host, and traditional performers (dhol/sangeet)." },
-    { "category": "Attire, Hair & Makeup", "percent": 4, "reasoning": "Bridal makeup artist, hairstylist, drape artist, and grooming." },
-    { "category": "Invitations & Stationery", "percent": 1.5, "reasoning": "Printed invitation boxes/cards, digital WhatsApp cards, itinerary booklets." },
-    { "category": "Transport & Logistics", "percent": 1.5, "reasoning": "Guest pickup, vintage wedding car, luggage shuttle, and parking coordination." },
-    { "category": "Rituals & Miscellaneous", "percent": 2, "reasoning": "Priest/pandit dakshina, puja materials, safa/pagdi, and guest hampers." },
-    { "category": "Contingency Fund", "percent": 7, "reasoning": "Buffer for unexpected last-minute additions, overtime charges, or extra plates." }
+    {
+      "category": "Venue & Facilities",
+      "percent": 30,
+      "reasoning": "Banquet hall/resort rental, lawn charges, stage infrastructure, and lighting."
+    },
+    {
+      "category": "Catering & Beverages",
+      "percent": 32,
+      "reasoning": "Buffet courses, live counters, welcome drinks, desserts, and hospitality staff."
+    },
+    {
+      "category": "Decor & Floral Design",
+      "percent": 12,
+      "reasoning": "Mandap/altar, entrance arches, floral arrangements, seating, and table centrepieces."
+    },
+    {
+      "category": "Photography & Video",
+      "percent": 9,
+      "reasoning": "Candid photographer, cinematic videographer, drone shots, and pre-wedding shoot."
+    },
+    {
+      "category": "Music, DJ & Entertainment",
+      "percent": 5,
+      "reasoning": "DJ setup, sound system, MC/host, and traditional performers (dhol/sangeet)."
+    },
+    {
+      "category": "Attire, Hair & Makeup",
+      "percent": 4,
+      "reasoning": "Bridal makeup artist, hairstylist, drape artist, and grooming."
+    },
+    {
+      "category": "Invitations & Stationery",
+      "percent": 1.5,
+      "reasoning": "Printed invitation boxes/cards, digital WhatsApp cards, itinerary booklets."
+    },
+    {
+      "category": "Transport & Logistics",
+      "percent": 1.5,
+      "reasoning": "Guest pickup, vintage wedding car, luggage shuttle, and parking coordination."
+    },
+    {
+      "category": "Rituals & Miscellaneous",
+      "percent": 2,
+      "reasoning": "Priest/pandit dakshina, puja materials, safa/pagdi, and guest hampers."
+    },
+    {
+      "category": "Contingency Fund",
+      "percent": 7,
+      "reasoning": "Buffer for unexpected last-minute additions, overtime charges, or extra plates."
+    }
   ],
   "timeline_milestones": [
-    { "offset_days": 180, "title": "Finalize Event Date & Book Main Venue", "phase": "6+ months", "role": "Host/Family", "priority": "high", "linked_vendor": "Venue & Facilities" },
-    { "offset_days": 150, "title": "Shortlist and Book Catering Team & Sample Menu", "phase": "6+ months", "role": "Host", "priority": "high", "linked_vendor": "Catering & Beverages" },
-    { "offset_days": 120, "title": "Hire Lead Photographer & Videographer", "phase": "3 months", "role": "Host", "priority": "high", "linked_vendor": "Photography & Video" },
-    { "offset_days": 90, "title": "Lock Decor Theme, Color Palette & Floral Concept", "phase": "3 months", "role": "Decorator", "priority": "medium", "linked_vendor": "Decor & Floral Design" },
-    { "offset_days": 60, "title": "Design & Send Wedding Invitations / WhatsApp RSVP", "phase": "1 month", "role": "Host", "priority": "high", "linked_vendor": "Invitations & Stationery" },
-    { "offset_days": 45, "title": "Book Bridal Makeup Artist & Schedule Trial", "phase": "1 month", "role": "Bride", "priority": "medium", "linked_vendor": "Attire, Hair & Makeup" },
-    { "offset_days": 30, "title": "Coordinate Sound, DJ Playlist & Sangeet Choreography", "phase": "1 month", "role": "Entertainment Lead", "priority": "medium", "linked_vendor": "Music, DJ & Entertainment" },
-    { "offset_days": 14, "title": "Confirm Final RSVP Count with Caterer and Table Seating", "phase": "1 week", "role": "Catering Coordinator", "priority": "high", "linked_vendor": "Catering & Beverages" },
-    { "offset_days": 7, "title": "Conduct Venue Walkthrough & Generator / Electrical Check", "phase": "1 week", "role": "Logistics Lead", "priority": "high", "linked_vendor": "Venue & Facilities" },
-    { "offset_days": 2, "title": "Assemble Welcome Bags & Welcome Outstation Guests", "phase": "Day before", "role": "Hospitality Lead", "priority": "medium", "linked_vendor": "Transport & Logistics" },
-    { "offset_days": 1, "title": "Rehearsal, Sound Check & Stage Setup Handover", "phase": "Day before", "role": "Stage Manager", "priority": "high", "linked_vendor": "Decor & Floral Design" },
-    { "offset_days": 0, "title": "Day-of Run of Show Execution & Ritual Facilitation", "phase": "Day-of", "role": "Event Coordinator", "priority": "high", "linked_vendor": "All Vendors" }
+    {
+      "offset_days": 180,
+      "title": "Finalize Event Date & Book Main Venue",
+      "phase": "6+ months",
+      "role": "Host/Family",
+      "priority": "high",
+      "linked_vendor": "Venue & Facilities"
+    },
+    {
+      "offset_days": 150,
+      "title": "Shortlist and Book Catering Team & Sample Menu",
+      "phase": "6+ months",
+      "role": "Host",
+      "priority": "high",
+      "linked_vendor": "Catering & Beverages"
+    },
+    {
+      "offset_days": 120,
+      "title": "Hire Lead Photographer & Videographer",
+      "phase": "3 months",
+      "role": "Host",
+      "priority": "high",
+      "linked_vendor": "Photography & Video"
+    },
+    {
+      "offset_days": 90,
+      "title": "Lock Decor Theme, Color Palette & Floral Concept",
+      "phase": "3 months",
+      "role": "Decorator",
+      "priority": "medium",
+      "linked_vendor": "Decor & Floral Design"
+    },
+    {
+      "offset_days": 60,
+      "title": "Design & Send Wedding Invitations / WhatsApp RSVP",
+      "phase": "1 month",
+      "role": "Host",
+      "priority": "high",
+      "linked_vendor": "Invitations & Stationery"
+    },
+    {
+      "offset_days": 45,
+      "title": "Book Bridal Makeup Artist & Schedule Trial",
+      "phase": "1 month",
+      "role": "Bride",
+      "priority": "medium",
+      "linked_vendor": "Attire, Hair & Makeup"
+    },
+    {
+      "offset_days": 30,
+      "title": "Coordinate Sound, DJ Playlist & Sangeet Choreography",
+      "phase": "1 month",
+      "role": "Entertainment Lead",
+      "priority": "medium",
+      "linked_vendor": "Music, DJ & Entertainment"
+    },
+    {
+      "offset_days": 14,
+      "title": "Confirm Final RSVP Count with Caterer and Table Seating",
+      "phase": "1 week",
+      "role": "Catering Coordinator",
+      "priority": "high",
+      "linked_vendor": "Catering & Beverages"
+    },
+    {
+      "offset_days": 7,
+      "title": "Conduct Venue Walkthrough & Generator / Electrical Check",
+      "phase": "1 week",
+      "role": "Logistics Lead",
+      "priority": "high",
+      "linked_vendor": "Venue & Facilities"
+    },
+    {
+      "offset_days": 2,
+      "title": "Assemble Welcome Bags & Welcome Outstation Guests",
+      "phase": "Day before",
+      "role": "Hospitality Lead",
+      "priority": "medium",
+      "linked_vendor": "Transport & Logistics"
+    },
+    {
+      "offset_days": 1,
+      "title": "Rehearsal, Sound Check & Stage Setup Handover",
+      "phase": "Day before",
+      "role": "Stage Manager",
+      "priority": "high",
+      "linked_vendor": "Decor & Floral Design"
+    },
+    {
+      "offset_days": 0,
+      "title": "Day-of Run of Show Execution & Ritual Facilitation",
+      "phase": "Day-of",
+      "role": "Event Coordinator",
+      "priority": "high",
+      "linked_vendor": "All Vendors"
+    }
   ],
   "vendor_categories": [
     "Venue & Facilities",

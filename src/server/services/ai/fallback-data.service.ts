@@ -1,11 +1,11 @@
 /**
  * Fallback Data Service
- * 
+ *
  * Provides high-quality curated data for all AI features when the LLM is unavailable.
  * This ensures the app remains fully functional without API keys.
  */
 
-import {
+import type {
   EventProfile,
   EventType,
   IdeaItem,
@@ -110,15 +110,15 @@ export class FallbackDataService {
       lower.includes('rooftop') || lower.includes('lawn') || lower.includes('outdoor')
         ? 'outdoor'
         : lower.includes('banquet') || lower.includes('hall') || lower.includes('indoor')
-        ? 'indoor'
-        : 'hybrid';
+          ? 'indoor'
+          : 'hybrid';
 
     const title =
       eventType === 'wedding'
         ? `Grand Celebration in ${city}`
         : eventType === 'birthday'
-        ? `Milestone Birthday Celebration in ${city}`
-        : `Community Cultural Gathering in ${city}`;
+          ? `Milestone Birthday Celebration in ${city}`
+          : `Community Cultural Gathering in ${city}`;
 
     const profile: EventProfile = {
       id: `event-${Date.now()}`,
@@ -133,7 +133,11 @@ export class FallbackDataService {
       culture_tradition: eventType === 'wedding' ? 'Traditional Indian' : 'Contemporary',
       dietary_mix: dietaryMix,
       indoor_outdoor: indoorOutdoor,
-      priorities: ['Catering & Culinary Excellence', 'Warm Aesthetic Decor', 'Memorable Hospitality'],
+      priorities: [
+        'Catering & Culinary Excellence',
+        'Warm Aesthetic Decor',
+        'Memorable Hospitality',
+      ],
       constraints: '10:00 PM sound restrictions; elderly accessibility required',
     };
 

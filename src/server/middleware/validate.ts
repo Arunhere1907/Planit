@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
-import { ZodSchema } from "zod";
-import { ValidationError } from "../errors/app-error.js";
+import type { Request, Response, NextFunction, RequestHandler } from 'express';
+import type { ZodSchema } from 'zod';
+import { ValidationError } from '../errors/app-error.js';
 
 /**
  * Reusable middleware to validate req.body against a Zod schema
@@ -11,7 +11,12 @@ export function validateBody<T>(schema: ZodSchema<T>): RequestHandler {
     const result = schema.safeParse(req.body);
     if (!result.success) {
       const issues = result.error.issues || [];
-      const formatted = issues.map((e: { path: PropertyKey[]; message: string }) => `${e.path.map(String).join(".")}: ${e.message}`).join(", ");
+      const formatted = issues
+        .map(
+          (e: { path: PropertyKey[]; message: string }) =>
+            `${e.path.map(String).join('.')}: ${e.message}`
+        )
+        .join(', ');
       return next(new ValidationError(`Validation failed: ${formatted}`, result.error.format()));
     }
     req.body = result.data;
@@ -27,7 +32,12 @@ export function validateParams<T>(schema: ZodSchema<T>): RequestHandler {
     const result = schema.safeParse(req.params);
     if (!result.success) {
       const issues = result.error.issues || [];
-      const formatted = issues.map((e: { path: PropertyKey[]; message: string }) => `${e.path.map(String).join(".")}: ${e.message}`).join(", ");
+      const formatted = issues
+        .map(
+          (e: { path: PropertyKey[]; message: string }) =>
+            `${e.path.map(String).join('.')}: ${e.message}`
+        )
+        .join(', ');
       return next(new ValidationError(`Invalid parameters: ${formatted}`, result.error.format()));
     }
     req.params = result.data as typeof req.params;
@@ -43,8 +53,15 @@ export function validateQuery<T>(schema: ZodSchema<T>): RequestHandler {
     const result = schema.safeParse(req.query);
     if (!result.success) {
       const issues = result.error.issues || [];
-      const formatted = issues.map((e: { path: PropertyKey[]; message: string }) => `${e.path.map(String).join(".")}: ${e.message}`).join(", ");
-      return next(new ValidationError(`Invalid query parameters: ${formatted}`, result.error.format()));
+      const formatted = issues
+        .map(
+          (e: { path: PropertyKey[]; message: string }) =>
+            `${e.path.map(String).join('.')}: ${e.message}`
+        )
+        .join(', ');
+      return next(
+        new ValidationError(`Invalid query parameters: ${formatted}`, result.error.format())
+      );
     }
     req.query = result.data as typeof req.query;
     next();
@@ -60,7 +77,7 @@ export function validate(config: {
   query?: ZodSchema;
 }): RequestHandler[] {
   const middlewares: RequestHandler[] = [];
-  
+
   if (config.body) {
     middlewares.push(validateBody(config.body));
   }
@@ -70,6 +87,6 @@ export function validate(config: {
   if (config.query) {
     middlewares.push(validateQuery(config.query));
   }
-  
+
   return middlewares;
 }

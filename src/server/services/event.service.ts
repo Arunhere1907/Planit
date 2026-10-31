@@ -1,5 +1,5 @@
 import { eventRepository } from '../repositories/index.js';
-import {
+import type {
   FullEventPlan,
   EventProfile,
   Collaborator,
@@ -23,7 +23,10 @@ export class EventService {
     return event;
   }
 
-  public async createEventFromProfile(profile: EventProfile, _creatorUserId: string): Promise<FullEventPlan> {
+  public async createEventFromProfile(
+    profile: EventProfile,
+    creatorUserId: string
+  ): Promise<FullEventPlan> {
     const budget = aiService.generateDeterministicBudget(profile);
     const timeline = aiService.generateDeterministicTimeline(profile);
     const ideas = await aiService.suggestIdeas(profile);
@@ -31,7 +34,7 @@ export class EventService {
     const risks = await aiService.analyzeRisks(profile);
 
     const initialMember: Collaborator = {
-      id: `member_${Date.now()}`,
+      id: creatorUserId,
       name: 'Aarav Patel (Organizer)',
       email: 'aarav@planit.demo',
       role: 'owner',
@@ -111,10 +114,7 @@ export class EventService {
     return newComment;
   }
 
-  public async addMember(
-    eventId: string,
-    member: Omit<Collaborator, 'id'>
-  ): Promise<Collaborator> {
+  public async addMember(eventId: string, member: Omit<Collaborator, 'id'>): Promise<Collaborator> {
     const event = await this.getEventById(eventId);
     const newMember: Collaborator = {
       ...member,

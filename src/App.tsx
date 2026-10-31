@@ -1,91 +1,287 @@
-import { useState, useEffect, lazy, Suspense, useRef } from "react";
-import { Header } from "./components/Header";
-import { DashboardView } from "./components/DashboardView";
-import { FullEventPlan, EventProfile, BudgetCategory, Task, Expense, VendorItem, IdeaItem, RiskItem, InvitationItem, Collaborator } from "./types";
-import { exportToICS, exportBudgetCSV, exportVendorsCSV } from "./lib/exportUtils";
-import { eventApi } from "./client/services/api/event-api.js";
-import { DemoUserProvider } from "./client/context/DemoUserContext.js";
-import seedWeddingData from "../data/seed_wedding.json";
+import { useState, useEffect, lazy, Suspense, useRef } from 'react';
+import { Header } from './components/Header';
+import { DashboardView } from './components/DashboardView';
+import type {
+  FullEventPlan,
+  EventProfile,
+  BudgetCategory,
+  Task,
+  Expense,
+  VendorItem,
+  IdeaItem,
+  RiskItem,
+  InvitationItem,
+  Collaborator,
+} from './types';
+import { exportToICS, exportBudgetCSV, exportVendorsCSV } from './lib/exportUtils';
+import { eventApi } from './client/services/api/event-api.js';
+import { DemoUserProvider } from './client/context/DemoUserContext.js';
+import seedWeddingData from '../data/seed_wedding.json';
 
 // Lazy load heavy components that are only shown in modals or specific tabs
-const IntakeChat = lazy(() => import("./components/IntakeChat").then(m => ({ default: m.IntakeChat })));
-const BudgetView = lazy(() => import("./components/BudgetView").then(m => ({ default: m.BudgetView })));
-const TimelineView = lazy(() => import("./components/TimelineView").then(m => ({ default: m.TimelineView })));
-const VendorsView = lazy(() => import("./components/VendorsView").then(m => ({ default: m.VendorsView })));
-const IdeasView = lazy(() => import("./components/IdeasView").then(m => ({ default: m.IdeasView })));
-const InvitationsView = lazy(() => import("./components/InvitationsView").then(m => ({ default: m.InvitationsView })));
-const RiskAdvisorView = lazy(() => import("./components/RiskAdvisorView").then(m => ({ default: m.RiskAdvisorView })));
-const CollaborationView = lazy(() => import("./components/CollaborationView").then(m => ({ default: m.CollaborationView })));
-const BudgetOptimizerModal = lazy(() => import("./components/BudgetOptimizerModal").then(m => ({ default: m.BudgetOptimizerModal })));
-const NotificationCenter = lazy(() => import("./components/NotificationCenter").then(m => ({ default: m.NotificationCenter })));
-const ReplanModal = lazy(() => import("./components/ReplanModal").then(m => ({ default: m.ReplanModal })));
-const PrintablePlanModal = lazy(() => import("./components/PrintablePlanModal").then(m => ({ default: m.PrintablePlanModal })));
+const IntakeChat = lazy(() =>
+  import('./components/IntakeChat').then((m) => ({ default: m.IntakeChat }))
+);
+const BudgetView = lazy(() =>
+  import('./components/BudgetView').then((m) => ({ default: m.BudgetView }))
+);
+const TimelineView = lazy(() =>
+  import('./components/TimelineView').then((m) => ({ default: m.TimelineView }))
+);
+const VendorsView = lazy(() =>
+  import('./components/VendorsView').then((m) => ({ default: m.VendorsView }))
+);
+const IdeasView = lazy(() =>
+  import('./components/IdeasView').then((m) => ({ default: m.IdeasView }))
+);
+const InvitationsView = lazy(() =>
+  import('./components/InvitationsView').then((m) => ({ default: m.InvitationsView }))
+);
+const RiskAdvisorView = lazy(() =>
+  import('./components/RiskAdvisorView').then((m) => ({ default: m.RiskAdvisorView }))
+);
+const CollaborationView = lazy(() =>
+  import('./components/CollaborationView').then((m) => ({ default: m.CollaborationView }))
+);
+const BudgetOptimizerModal = lazy(() =>
+  import('./components/BudgetOptimizerModal').then((m) => ({ default: m.BudgetOptimizerModal }))
+);
+const NotificationCenter = lazy(() =>
+  import('./components/NotificationCenter').then((m) => ({ default: m.NotificationCenter }))
+);
+const ReplanModal = lazy(() =>
+  import('./components/ReplanModal').then((m) => ({ default: m.ReplanModal }))
+);
+const PrintablePlanModal = lazy(() =>
+  import('./components/PrintablePlanModal').then((m) => ({ default: m.PrintablePlanModal }))
+);
 
 // Additional preset demo events for easy testing
 const DEMO_EVENTS: FullEventPlan[] = [
   seedWeddingData as FullEventPlan,
   {
     profile: {
-      id: "event-birthday-mum",
+      id: 'event-birthday-mum',
       title: "Arjun's 30th Rooftop Milestone",
-      type: "birthday",
-      date: "2026-11-20",
-      city: "Mumbai",
+      type: 'birthday',
+      date: '2026-11-20',
+      city: 'Mumbai',
       guest_count: 50,
       total_budget: 200000,
-      currency: "INR",
-      vibe_theme: "Sunset Rooftop Cocktails, Neon & Deep House",
-      culture_tradition: "Contemporary",
-      dietary_mix: "Gourmet Finger Foods & Signature Cocktail Bar",
-      indoor_outdoor: "outdoor",
-      priorities: ["Stellar DJ sound", "Artisanal cocktails", "Custom neon photo booth"],
-      constraints: "Elevator access only up to 14th floor",
+      currency: 'INR',
+      vibe_theme: 'Sunset Rooftop Cocktails, Neon & Deep House',
+      culture_tradition: 'Contemporary',
+      dietary_mix: 'Gourmet Finger Foods & Signature Cocktail Bar',
+      indoor_outdoor: 'outdoor',
+      priorities: ['Stellar DJ sound', 'Artisanal cocktails', 'Custom neon photo booth'],
+      constraints: 'Elevator access only up to 14th floor',
     },
     budget: {
       total_budget: 200000,
-      currency: "INR",
+      currency: 'INR',
       categories: [
-        { id: "b-mum-1", name: "Venue & Space Rental", amount: 56000, percent: 28.0, reasoning: "Bandra rooftop lounge rental with private bar.", is_locked: true, source: "ai", edited_at: "2026-10-24T08:00:00Z" },
-        { id: "b-mum-2", name: "Food, Cake & Drinks", amount: 70000, percent: 35.0, reasoning: "Sushi platters, sliders, mixologist and 2-tier custom cake.", is_locked: false, source: "ai", edited_at: "2026-10-24T08:00:00Z" },
-        { id: "b-mum-3", name: "Themed Decor & Balloons", amount: 30000, percent: 15.0, reasoning: "Custom neon signage and chrome black/gold balloon garland.", is_locked: false, source: "ai", edited_at: "2026-10-24T08:00:00Z" },
-        { id: "b-mum-4", name: "Entertainment & Games", amount: 20000, percent: 10.0, reasoning: "House DJ setup and party host.", is_locked: false, source: "ai", edited_at: "2026-10-24T08:00:00Z" },
-        { id: "b-mum-5", name: "Photography & Reels", amount: 12000, percent: 6.0, reasoning: "Party content creator for Instagram reels.", is_locked: false, source: "ai", edited_at: "2026-10-24T08:00:00Z" },
-        { id: "b-mum-6", name: "Favors & Return Gifts", amount: 8000, percent: 4.0, reasoning: "Custom engraved hip flasks.", is_locked: false, source: "ai", edited_at: "2026-10-24T08:00:00Z" },
-        { id: "b-mum-7", name: "Contingency Buffer", amount: 4000, percent: 2.0, reasoning: "Bar overtime buffer.", is_locked: false, source: "ai", edited_at: "2026-10-24T08:00:00Z" },
+        {
+          id: 'b-mum-1',
+          name: 'Venue & Space Rental',
+          amount: 56000,
+          percent: 28.0,
+          reasoning: 'Bandra rooftop lounge rental with private bar.',
+          is_locked: true,
+          source: 'ai',
+          edited_at: '2026-10-24T08:00:00Z',
+        },
+        {
+          id: 'b-mum-2',
+          name: 'Food, Cake & Drinks',
+          amount: 70000,
+          percent: 35.0,
+          reasoning: 'Sushi platters, sliders, mixologist and 2-tier custom cake.',
+          is_locked: false,
+          source: 'ai',
+          edited_at: '2026-10-24T08:00:00Z',
+        },
+        {
+          id: 'b-mum-3',
+          name: 'Themed Decor & Balloons',
+          amount: 30000,
+          percent: 15.0,
+          reasoning: 'Custom neon signage and chrome black/gold balloon garland.',
+          is_locked: false,
+          source: 'ai',
+          edited_at: '2026-10-24T08:00:00Z',
+        },
+        {
+          id: 'b-mum-4',
+          name: 'Entertainment & Games',
+          amount: 20000,
+          percent: 10.0,
+          reasoning: 'House DJ setup and party host.',
+          is_locked: false,
+          source: 'ai',
+          edited_at: '2026-10-24T08:00:00Z',
+        },
+        {
+          id: 'b-mum-5',
+          name: 'Photography & Reels',
+          amount: 12000,
+          percent: 6.0,
+          reasoning: 'Party content creator for Instagram reels.',
+          is_locked: false,
+          source: 'ai',
+          edited_at: '2026-10-24T08:00:00Z',
+        },
+        {
+          id: 'b-mum-6',
+          name: 'Favors & Return Gifts',
+          amount: 8000,
+          percent: 4.0,
+          reasoning: 'Custom engraved hip flasks.',
+          is_locked: false,
+          source: 'ai',
+          edited_at: '2026-10-24T08:00:00Z',
+        },
+        {
+          id: 'b-mum-7',
+          name: 'Contingency Buffer',
+          amount: 4000,
+          percent: 2.0,
+          reasoning: 'Bar overtime buffer.',
+          is_locked: false,
+          source: 'ai',
+          edited_at: '2026-10-24T08:00:00Z',
+        },
       ],
       expenses: [
-        { id: "e-mum-1", category_id: "b-mum-1", category_name: "Venue & Space Rental", vendor_name: "SkyLounge Bandra", amount: 25000, date: "2026-10-18", status: "paid", notes: "Booking token" },
+        {
+          id: 'e-mum-1',
+          category_id: 'b-mum-1',
+          category_name: 'Venue & Space Rental',
+          vendor_name: 'SkyLounge Bandra',
+          amount: 25000,
+          date: '2026-10-18',
+          status: 'paid',
+          notes: 'Booking token',
+        },
       ],
     },
     timeline: {
       tasks: [
-        { id: "t-mum-1", title: "Reserve Bandra Rooftop Lounge", due_date: "2026-10-25", phase: "1 month", status: "completed", assignee: "Host", linked_vendor: "Venue", priority: "high", notes: "Token deposit paid." },
-        { id: "t-mum-2", title: "Order Custom Black & Gold 30th Birthday Cake", due_date: "2026-11-05", phase: "1 week", status: "pending", assignee: "Host", linked_vendor: "Bakery", priority: "high", notes: "Flavor: Belgian Dark Chocolate." },
-        { id: "t-mum-3", title: "Send WhatsApp RSVP Link with Music Request Field", due_date: "2026-11-01", phase: "1 month", status: "in_progress", assignee: "Host", linked_vendor: "Invitations", priority: "high", notes: "Collect cocktail choices." },
+        {
+          id: 't-mum-1',
+          title: 'Reserve Bandra Rooftop Lounge',
+          due_date: '2026-10-25',
+          phase: '1 month',
+          status: 'completed',
+          assignee: 'Host',
+          linked_vendor: 'Venue',
+          priority: 'high',
+          notes: 'Token deposit paid.',
+        },
+        {
+          id: 't-mum-2',
+          title: 'Order Custom Black & Gold 30th Birthday Cake',
+          due_date: '2026-11-05',
+          phase: '1 week',
+          status: 'pending',
+          assignee: 'Host',
+          linked_vendor: 'Bakery',
+          priority: 'high',
+          notes: 'Flavor: Belgian Dark Chocolate.',
+        },
+        {
+          id: 't-mum-3',
+          title: 'Send WhatsApp RSVP Link with Music Request Field',
+          due_date: '2026-11-01',
+          phase: '1 month',
+          status: 'in_progress',
+          assignee: 'Host',
+          linked_vendor: 'Invitations',
+          priority: 'high',
+          notes: 'Collect cocktail choices.',
+        },
       ],
       run_of_show: [
-        { id: "ros-mum-1", time: "07:30 PM", title: "Rooftop Welcome Drinks & Sundowner", owner: "Mixologist", location: "Terrace Bar", notes: "Signature smoked whiskey cocktail." },
-        { id: "ros-mum-2", time: "09:30 PM", title: "Cake Cutting Ceremony & Speeches", owner: "Friends & Family", location: "Neon Backdrop", notes: "Champagne toast." },
+        {
+          id: 'ros-mum-1',
+          time: '07:30 PM',
+          title: 'Rooftop Welcome Drinks & Sundowner',
+          owner: 'Mixologist',
+          location: 'Terrace Bar',
+          notes: 'Signature smoked whiskey cocktail.',
+        },
+        {
+          id: 'ros-mum-2',
+          time: '09:30 PM',
+          title: 'Cake Cutting Ceremony & Speeches',
+          owner: 'Friends & Family',
+          location: 'Neon Backdrop',
+          notes: 'Champagne toast.',
+        },
       ],
     },
     vendors: [
-      { id: "v-mum-1", name: "SkyLounge Rooftop Bandra", category: "Venue & Space Rental", contact: "Manager (+91 98200 44556)", quote: 56000, advance_paid: 25000, balance: 31000, due_date: "2026-11-15", status: "booked", notes: "Private bar." },
+      {
+        id: 'v-mum-1',
+        name: 'SkyLounge Rooftop Bandra',
+        category: 'Venue & Space Rental',
+        contact: 'Manager (+91 98200 44556)',
+        quote: 56000,
+        advance_paid: 25000,
+        balance: 31000,
+        due_date: '2026-11-15',
+        status: 'booked',
+        notes: 'Private bar.',
+      },
     ],
     ideas: [
-      { id: "idea-mum-1", category: "Entertainment & Music", title: "Live Vinyl Saxophone & DJ Set", description: "Saxophonist improvising live over deep house electronic beats during sunset hours.", cost_range: "₹18,000 - ₹25,000", effort_level: "Low", tags: ["Vibe", "Music", "Rooftop"], saved: true },
+      {
+        id: 'idea-mum-1',
+        category: 'Entertainment & Music',
+        title: 'Live Vinyl Saxophone & DJ Set',
+        description:
+          'Saxophonist improvising live over deep house electronic beats during sunset hours.',
+        cost_range: '₹18,000 - ₹25,000',
+        effort_level: 'Low',
+        tags: ['Vibe', 'Music', 'Rooftop'],
+        saved: true,
+      },
     ],
     risks: [
-      { id: "risk-mum-1", title: "High Rooftop Wind Gusts", severity: "medium", likelihood: "medium", category: "Weather", why: "Evening coastal breeze can topple lightweight balloon pillars and paper tableware.", mitigation: "Anchor heavy brass bases on balloon stands and use weighted acrylic glassware.", backup_plan: "Move bar stations under the covered canopy pergola." },
+      {
+        id: 'risk-mum-1',
+        title: 'High Rooftop Wind Gusts',
+        severity: 'medium',
+        likelihood: 'medium',
+        category: 'Weather',
+        why: 'Evening coastal breeze can topple lightweight balloon pillars and paper tableware.',
+        mitigation:
+          'Anchor heavy brass bases on balloon stands and use weighted acrylic glassware.',
+        backup_plan: 'Move bar stations under the covered canopy pergola.',
+      },
     ],
     invitations: [
-      { id: "inv-mum-1", type: "WhatsApp Invite", language: "English", tone: "Lighthearted & Joyful", content: "🥂 The 20s were fun, but the 30s are going to be legendary! 🥂\n\nJoin us for Arjun's 30th Birthday Sunset Soirée\n\n📅 Date: Friday, 20th November 2026\n📍 Venue: SkyLounge Rooftop, Bandra, Mumbai\n⏰ Time: 07:30 PM onwards\n\nDress code: Smart Chic & Dancing Shoes 🕺\nRSVP: +91 98200 44556", share_url: "https://wa.me/?text=" },
+      {
+        id: 'inv-mum-1',
+        type: 'WhatsApp Invite',
+        language: 'English',
+        tone: 'Lighthearted & Joyful',
+        content:
+          "🥂 The 20s were fun, but the 30s are going to be legendary! 🥂\n\nJoin us for Arjun's 30th Birthday Sunset Soirée\n\n📅 Date: Friday, 20th November 2026\n📍 Venue: SkyLounge Rooftop, Bandra, Mumbai\n⏰ Time: 07:30 PM onwards\n\nDress code: Smart Chic & Dancing Shoes 🕺\nRSVP: +91 98200 44556",
+        share_url: 'https://wa.me/?text=',
+      },
     ],
     collaborators: [
-      { id: "c-mum-1", name: "Arjun (Host)", email: "arjun@example.com", role: "owner" },
-      { id: "c-mum-2", name: "Riya (Co-host)", email: "riya@example.com", role: "editor" },
+      { id: 'c-mum-1', name: 'Arjun (Host)', email: 'arjun@example.com', role: 'owner' },
+      { id: 'c-mum-2', name: 'Riya (Co-host)', email: 'riya@example.com', role: 'editor' },
     ],
     activity_log: [
-      { id: "act-mum-1", user: "Arjun", action: "created", detail: "Created 30th birthday blueprint", timestamp: "2026-10-18T10:00:00Z" },
+      {
+        id: 'act-mum-1',
+        user: 'Arjun',
+        action: 'created',
+        detail: 'Created 30th birthday blueprint',
+        timestamp: '2026-10-18T10:00:00Z',
+      },
     ],
   },
 ];
@@ -93,7 +289,7 @@ const DEMO_EVENTS: FullEventPlan[] = [
 export default function App() {
   const [plans, setPlans] = useState<FullEventPlan[]>(DEMO_EVENTS);
   const [currentPlanId, setCurrentPlanId] = useState<string>(DEMO_EVENTS[0].profile.id);
-  const [activeTab, setActiveTab] = useState<string>("dashboard");
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
 
   // Main content ref for skip-to-content functionality
   const mainContentRef = useRef<HTMLDivElement>(null);
@@ -117,7 +313,8 @@ export default function App() {
 
   // Sync with seeded backend in-memory repository on mount
   useEffect(() => {
-    eventApi.getAllEvents()
+    eventApi
+      .getAllEvents()
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setPlans(data);
@@ -132,17 +329,17 @@ export default function App() {
   // Update page title dynamically based on active tab and event
   useEffect(() => {
     const tabTitles: Record<string, string> = {
-      dashboard: "Dashboard",
-      budget: "Budget & Expenses",
-      timeline: "Timeline & Run-of-Show",
-      vendors: "Vendors & Places",
-      ideas: "Curated Ideas",
-      invitations: "Invitations & Copy",
-      risks: "Risk Advisor",
-      collaborators: "Team & Log",
+      dashboard: 'Dashboard',
+      budget: 'Budget & Expenses',
+      timeline: 'Timeline & Run-of-Show',
+      vendors: 'Vendors & Places',
+      ideas: 'Curated Ideas',
+      invitations: 'Invitations & Copy',
+      risks: 'Risk Advisor',
+      collaborators: 'Team & Log',
     };
-    
-    const tabTitle = tabTitles[activeTab] || "Dashboard";
+
+    const tabTitle = tabTitles[activeTab] || 'Dashboard';
     document.title = `${tabTitle} - ${activePlan.profile.title} | PlanIt`;
   }, [activeTab, activePlan.profile.title]);
 
@@ -171,7 +368,7 @@ export default function App() {
         profile: newProfile,
         budget: {
           total_budget: newProfile.total_budget,
-          currency: newProfile.currency || "INR",
+          currency: newProfile.currency || 'INR',
           categories: budgetData.categories || [],
           expenses: [],
         },
@@ -183,12 +380,13 @@ export default function App() {
         ideas: [
           {
             id: `idea-${Date.now()}-1`,
-            category: "Decor & Ambiance",
-            title: "Heritage Marigold & Ambient Lanterns",
-            description: "Warm festive entryway styling crafted specifically for " + newProfile.city,
-            cost_range: "₹15,000 - ₹25,000",
-            effort_level: "Low",
-            tags: ["Traditional", "Aesthetic"],
+            category: 'Decor & Ambiance',
+            title: 'Heritage Marigold & Ambient Lanterns',
+            description:
+              'Warm festive entryway styling crafted specifically for ' + newProfile.city,
+            cost_range: '₹15,000 - ₹25,000',
+            effort_level: 'Low',
+            tags: ['Traditional', 'Aesthetic'],
             saved: true,
           },
         ],
@@ -196,26 +394,37 @@ export default function App() {
         invitations: [
           {
             id: `inv-${Date.now()}-1`,
-            type: "WhatsApp Invite",
-            language: "English",
-            tone: "Warm & Traditional",
+            type: 'WhatsApp Invite',
+            language: 'English',
+            tone: 'Warm & Traditional',
             content: `🌸 Save the Date! 🌸\n\nJoin us for ${newProfile.title} in ${newProfile.city}!\n\n📅 Date: ${newProfile.date}\n👥 Guests: ${newProfile.guest_count}\n\nRSVP to confirm your presence!`,
             share_url: `https://wa.me/?text=${encodeURIComponent(newProfile.title)}`,
           },
         ],
         collaborators: [
-          { id: `c-${Date.now()}`, name: "Host Organizer", email: "host@example.com", role: "owner" },
+          {
+            id: `c-${Date.now()}`,
+            name: 'Host Organizer',
+            email: 'host@example.com',
+            role: 'owner',
+          },
         ],
         activity_log: [
-          { id: `act-${Date.now()}`, user: "PlanIt AI", action: "generated", detail: "Generated custom event plan", timestamp: new Date().toISOString() },
+          {
+            id: `act-${Date.now()}`,
+            user: 'PlanIt AI',
+            action: 'generated',
+            detail: 'Generated custom event plan',
+            timestamp: new Date().toISOString(),
+          },
         ],
       };
 
       setPlans((prev) => [newFullPlan, ...prev]);
       setCurrentPlanId(newFullPlan.profile.id);
-      setActiveTab("dashboard");
+      setActiveTab('dashboard');
     } catch (e) {
-      console.warn("Error bootstrapping new plan from API:", e);
+      console.warn('Error bootstrapping new plan from API:', e);
     }
   };
 
@@ -227,9 +436,9 @@ export default function App() {
       activity_log: [
         {
           id: `act-${Date.now()}`,
-          user: "Host",
-          action: "rebalanced",
-          detail: "Rebalanced budget categories",
+          user: 'Host',
+          action: 'rebalanced',
+          detail: 'Rebalanced budget categories',
           timestamp: new Date().toISOString(),
         },
         ...prev.activity_log,
@@ -248,9 +457,9 @@ export default function App() {
       activity_log: [
         {
           id: `act-${Date.now()}`,
-          user: "Host",
-          action: "added expense",
-          detail: `₹${expense.amount.toLocaleString("en-IN")} for ${expense.vendor_name}`,
+          user: 'Host',
+          action: 'added expense',
+          detail: `₹${expense.amount.toLocaleString('en-IN')} for ${expense.vendor_name}`,
           timestamp: new Date().toISOString(),
         },
         ...prev.activity_log,
@@ -282,7 +491,7 @@ export default function App() {
         t.id === taskId
           ? {
               ...t,
-              status: t.status === "completed" ? ("pending" as const) : ("completed" as const),
+              status: t.status === 'completed' ? ('pending' as const) : ('completed' as const),
               edited_at: new Date().toISOString(),
             }
           : t
@@ -294,14 +503,16 @@ export default function App() {
     });
   };
 
-  const handleUpdateRunOfShow = (runOfShow: Array<{
-    id?: string;
-    time: string;
-    title: string;
-    owner: string;
-    location: string;
-    notes: string;
-  }>) => {
+  const handleUpdateRunOfShow = (
+    runOfShow: Array<{
+      id?: string;
+      time: string;
+      title: string;
+      owner: string;
+      location: string;
+      notes: string;
+    }>
+  ) => {
     const itemsWithIds = runOfShow.map((item, idx) => ({
       ...item,
       id: item.id || `ros-${Date.now()}-${idx}`,
@@ -352,8 +563,8 @@ export default function App() {
       activity_log: [
         {
           id: `act-${Date.now()}`,
-          user: "Owner",
-          action: "invited",
+          user: 'Owner',
+          action: 'invited',
           detail: `Invited ${collab.name} as ${collab.role}`,
           timestamp: new Date().toISOString(),
         },
@@ -390,9 +601,9 @@ export default function App() {
       activity_log: [
         {
           id: `act-${Date.now()}`,
-          user: "Host",
-          action: "replanned event",
-          detail: `Updated date to ${updatedProfile.date} & budget to ₹${updatedProfile.total_budget.toLocaleString("en-IN")}`,
+          user: 'Host',
+          action: 'replanned event',
+          detail: `Updated date to ${updatedProfile.date} & budget to ₹${updatedProfile.total_budget.toLocaleString('en-IN')}`,
           timestamp: new Date().toISOString(),
         },
         ...prev.activity_log,
@@ -420,165 +631,168 @@ export default function App() {
   return (
     <DemoUserProvider>
       <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
-      {/* Skip to main content link for keyboard users */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-lg focus:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-      >
-        Skip to main content
-      </a>
-      
-      {/* Top Header */}
-      <Header
-        currentProfile={activePlan.profile}
-        eventsList={plans.map((p) => p.profile)}
-        onSelectEvent={(id) => setCurrentPlanId(id)}
-        onOpenNewEventModal={() => setShowIntakeModal(true)}
-        onOpenReplanModal={() => setShowReplanModal(true)}
-        onOpenPrintModal={() => setShowPrintModal(true)}
-        onOpenNotificationModal={() => setShowNotificationModal(true)}
-        onResetDatabase={handleResetDatabase}
-        unreadNotificationsCount={2}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+        {/* Skip to main content link for keyboard users */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-lg focus:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        >
+          Skip to main content
+        </a>
 
-      {/* Main Tab Views */}
-      <main 
-        id="main-content"
-        ref={mainContentRef}
-        className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full"
-        role="main"
-        aria-label="Event planning content"
-      >
-        <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="text-slate-500">Loading...</div></div>}>
-          {activeTab === "dashboard" && (
-            <DashboardView
-              plan={activePlan}
-              onNavigateTab={setActiveTab}
-              onToggleTaskStatus={handleToggleTaskStatus}
-              onOpenAddExpenseModal={() => {
-                setActiveTab("budget");
-              }}
+        {/* Top Header */}
+        <Header
+          currentProfile={activePlan.profile}
+          eventsList={plans.map((p) => p.profile)}
+          onSelectEvent={(id) => setCurrentPlanId(id)}
+          onOpenNewEventModal={() => setShowIntakeModal(true)}
+          onOpenReplanModal={() => setShowReplanModal(true)}
+          onOpenPrintModal={() => setShowPrintModal(true)}
+          onOpenNotificationModal={() => setShowNotificationModal(true)}
+          onResetDatabase={handleResetDatabase}
+          unreadNotificationsCount={2}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+
+        {/* Main Tab Views */}
+        <main
+          id="main-content"
+          ref={mainContentRef}
+          className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full"
+          role="main"
+          aria-label="Event planning content"
+        >
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-64">
+                <div className="text-slate-500">Loading...</div>
+              </div>
+            }
+          >
+            {activeTab === 'dashboard' && (
+              <DashboardView
+                plan={activePlan}
+                onNavigateTab={setActiveTab}
+                onToggleTaskStatus={handleToggleTaskStatus}
+                onOpenAddExpenseModal={() => {
+                  setActiveTab('budget');
+                }}
+              />
+            )}
+
+            {activeTab === 'budget' && (
+              <BudgetView
+                categories={activePlan.budget.categories}
+                expenses={activePlan.budget.expenses}
+                profile={activePlan.profile}
+                onUpdateCategories={handleUpdateCategories}
+                onAddExpense={handleAddExpense}
+                onDeleteExpense={handleDeleteExpense}
+                onOpenOptimizerModal={() => setShowOptimizerModal(true)}
+                onExportCSV={() => exportBudgetCSV(activePlan)}
+              />
+            )}
+
+            {activeTab === 'timeline' && (
+              <TimelineView
+                tasks={activePlan.timeline.tasks}
+                runOfShow={activePlan.timeline.run_of_show}
+                profile={activePlan.profile}
+                onUpdateTasks={handleUpdateTasks}
+                onUpdateRunOfShow={handleUpdateRunOfShow}
+                onExportICS={() => exportToICS(activePlan)}
+                onOpenReplanModal={() => setShowReplanModal(true)}
+              />
+            )}
+
+            {activeTab === 'vendors' && (
+              <VendorsView
+                vendors={activePlan.vendors}
+                profile={activePlan.profile}
+                onUpdateVendors={handleUpdateVendors}
+                onExportCSV={() => exportVendorsCSV(activePlan)}
+              />
+            )}
+
+            {activeTab === 'ideas' && (
+              <IdeasView
+                ideas={activePlan.ideas}
+                profile={activePlan.profile}
+                onUpdateIdeas={handleUpdateIdeas}
+              />
+            )}
+
+            {activeTab === 'invitations' && (
+              <InvitationsView
+                invitations={activePlan.invitations}
+                profile={activePlan.profile}
+                onUpdateInvitations={handleUpdateInvitations}
+              />
+            )}
+
+            {activeTab === 'risks' && (
+              <RiskAdvisorView
+                risks={activePlan.risks}
+                profile={activePlan.profile}
+                totalBudget={activePlan.budget.total_budget}
+                onUpdateRisks={handleUpdateRisks}
+              />
+            )}
+
+            {activeTab === 'collaborators' && (
+              <CollaborationView
+                collaborators={activePlan.collaborators}
+                activityLog={activePlan.activity_log}
+                onAddCollaborator={handleAddCollaborator}
+                onRemoveCollaborator={handleRemoveCollaborator}
+              />
+            )}
+          </Suspense>
+        </main>
+
+        {/* MODALS */}
+        <Suspense fallback={null}>
+          {/* 1. Conversational Intake Modal */}
+          {showIntakeModal && (
+            <IntakeChat
+              onPlanGenerated={handleIntakeGenerated}
+              onCancel={() => setShowIntakeModal(false)}
             />
           )}
 
-          {activeTab === "budget" && (
-            <BudgetView
+          {/* 2. Budget Optimizer Modal */}
+          {showOptimizerModal && (
+            <BudgetOptimizerModal
               categories={activePlan.budget.categories}
-              expenses={activePlan.budget.expenses}
               profile={activePlan.profile}
-              onUpdateCategories={handleUpdateCategories}
-              onAddExpense={handleAddExpense}
-              onDeleteExpense={handleDeleteExpense}
-              onOpenOptimizerModal={() => setShowOptimizerModal(true)}
-              onExportCSV={() => exportBudgetCSV(activePlan)}
+              onApplyScenario={handleUpdateCategories}
+              onClose={() => setShowOptimizerModal(false)}
             />
           )}
 
-          {activeTab === "timeline" && (
-            <TimelineView
-              tasks={activePlan.timeline.tasks}
-              runOfShow={activePlan.timeline.run_of_show}
-              profile={activePlan.profile}
-              onUpdateTasks={handleUpdateTasks}
-              onUpdateRunOfShow={handleUpdateRunOfShow}
-              onExportICS={() => exportToICS(activePlan)}
-              onOpenReplanModal={() => setShowReplanModal(true)}
+          {/* 3. Replan Modal */}
+          {showReplanModal && (
+            <ReplanModal
+              plan={activePlan}
+              onApplyReplan={handleApplyReplan}
+              onClose={() => setShowReplanModal(false)}
             />
           )}
 
-          {activeTab === "vendors" && (
-            <VendorsView
-              vendors={activePlan.vendors}
-              profile={activePlan.profile}
-              onUpdateVendors={handleUpdateVendors}
-              onExportCSV={() => exportVendorsCSV(activePlan)}
+          {/* 4. Notification Center Slide-out */}
+          {showNotificationModal && (
+            <NotificationCenter
+              plan={activePlan}
+              onClose={() => setShowNotificationModal(false)}
+              onMarkTaskDone={handleToggleTaskStatus}
             />
           )}
 
-          {activeTab === "ideas" && (
-            <IdeasView
-              ideas={activePlan.ideas}
-              profile={activePlan.profile}
-              onUpdateIdeas={handleUpdateIdeas}
-            />
-          )}
-
-          {activeTab === "invitations" && (
-            <InvitationsView
-              invitations={activePlan.invitations}
-              profile={activePlan.profile}
-              onUpdateInvitations={handleUpdateInvitations}
-            />
-          )}
-
-          {activeTab === "risks" && (
-            <RiskAdvisorView
-              risks={activePlan.risks}
-              profile={activePlan.profile}
-              totalBudget={activePlan.budget.total_budget}
-              onUpdateRisks={handleUpdateRisks}
-            />
-          )}
-
-          {activeTab === "collaborators" && (
-            <CollaborationView
-              collaborators={activePlan.collaborators}
-              activityLog={activePlan.activity_log}
-              onAddCollaborator={handleAddCollaborator}
-              onRemoveCollaborator={handleRemoveCollaborator}
-            />
+          {/* 5. Printable / PDF Dossier Modal */}
+          {showPrintModal && (
+            <PrintablePlanModal plan={activePlan} onClose={() => setShowPrintModal(false)} />
           )}
         </Suspense>
-      </main>
-
-      {/* MODALS */}
-      <Suspense fallback={null}>
-        {/* 1. Conversational Intake Modal */}
-        {showIntakeModal && (
-          <IntakeChat
-            onPlanGenerated={handleIntakeGenerated}
-            onCancel={() => setShowIntakeModal(false)}
-          />
-        )}
-
-        {/* 2. Budget Optimizer Modal */}
-        {showOptimizerModal && (
-          <BudgetOptimizerModal
-            categories={activePlan.budget.categories}
-            profile={activePlan.profile}
-            onApplyScenario={handleUpdateCategories}
-            onClose={() => setShowOptimizerModal(false)}
-          />
-        )}
-
-        {/* 3. Replan Modal */}
-        {showReplanModal && (
-          <ReplanModal
-            plan={activePlan}
-            onApplyReplan={handleApplyReplan}
-            onClose={() => setShowReplanModal(false)}
-          />
-        )}
-
-        {/* 4. Notification Center Slide-out */}
-        {showNotificationModal && (
-          <NotificationCenter
-            plan={activePlan}
-            onClose={() => setShowNotificationModal(false)}
-            onMarkTaskDone={handleToggleTaskStatus}
-          />
-        )}
-
-        {/* 5. Printable / PDF Dossier Modal */}
-        {showPrintModal && (
-          <PrintablePlanModal
-            plan={activePlan}
-            onClose={() => setShowPrintModal(false)}
-          />
-        )}
-      </Suspense>
       </div>
     </DemoUserProvider>
   );
